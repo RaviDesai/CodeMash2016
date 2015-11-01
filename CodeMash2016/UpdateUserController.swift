@@ -8,14 +8,16 @@
 
 import UIKit
 
-class UpdateUserController: UIViewController, UITextFieldDelegate {
+class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     @IBOutlet weak var idLabel: UILabel!
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var emailLabel: UILabel!
-    
     @IBOutlet weak var idValue: UILabel!
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
+    @IBOutlet weak var contactImageView: UIImageView!
+    @IBOutlet weak var removePhotoButton: UIButton!
+    @IBOutlet weak var choosePhotoButton: UIButton!
     
     var viewModel: UpdateUserViewModel?
     var userModificationHandler: ((DeletedOrSaved, User?) -> ())?
@@ -43,6 +45,8 @@ class UpdateUserController: UIViewController, UITextFieldDelegate {
         } else {
             self.emailTextField.textColor = UIColor.blackColor()
         }
+        
+        self.contactImageView.image = self.viewModel?.contactImage
         
         nameTextField.delegate = self
         emailTextField.delegate = self
@@ -142,5 +146,35 @@ class UpdateUserController: UIViewController, UITextFieldDelegate {
     func textFieldDidEndEditing(textField: UITextField) {
         updateViewModelFromTextField(textField)
     }
+    
+    @IBAction func removePhoto(sender: AnyObject) {
+        self.viewModel?.contactImage = nil
+        self.contactImageView.image = viewModel?.contactImage
+    }
+    
+    
+    @IBAction func attachPhoto(sender: AnyObject) {
+        let picker = UIImagePickerController()
+        picker.delegate = self
+        picker.allowsEditing = true
+        picker.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+        
+        self.presentViewController(picker, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage!, editingInfo: [NSObject : AnyObject]!) {
+        if let chosenImage = (editingInfo[UIImagePickerControllerEditedImage] as? UIImage) ?? image {
+            self.viewModel?.contactImage = chosenImage
+            self.contactImageView.image = self.viewModel?.contactImage
+        }
+        
+        picker.dismissViewControllerAnimated(true, completion: nil);
+        
+    }
+    
+    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        picker.dismissViewControllerAnimated(true, completion: nil);
+    }
+
 }
 

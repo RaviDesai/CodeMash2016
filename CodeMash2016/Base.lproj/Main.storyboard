@@ -263,6 +263,9 @@
                                 <rect key="frame" x="262" y="176" width="97" height="30"/>
                                 <animations/>
                                 <state key="normal" title="Choose Photo"/>
+                                <connections>
+                                    <action selector="attachPhoto:" destination="usC-Af-5Sd" eventType="touchUpInside" id="0Mp-z9-8qe"/>
+                                </connections>
                             </button>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="ybt-QZ-fS0">
                                 <rect key="frame" x="109" y="214" width="250" height="250"/>
@@ -272,11 +275,21 @@
                                     <constraint firstAttribute="width" constant="250" id="f8T-Q5-qwL"/>
                                 </constraints>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yMQ-tM-L5S">
+                                <rect key="frame" x="109" y="176" width="100" height="30"/>
+                                <animations/>
+                                <state key="normal" title="Remove Photo"/>
+                                <connections>
+                                    <action selector="removePhoto:" destination="usC-Af-5Sd" eventType="touchUpInside" id="KN4-SV-Twf"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <animations/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="gV7-9S-apY" firstAttribute="trailing" secondItem="zy3-99-0kq" secondAttribute="trailingMargin" id="3Zz-Fp-fDP"/>
+                            <constraint firstItem="ybt-QZ-fS0" firstAttribute="leading" secondItem="yMQ-tM-L5S" secondAttribute="leading" id="4ug-9y-coy"/>
+                            <constraint firstItem="Rv0-sM-Dmu" firstAttribute="centerY" secondItem="yMQ-tM-L5S" secondAttribute="centerY" id="5xw-eh-5PX"/>
                             <constraint firstItem="l4I-Ha-j7k" firstAttribute="leading" secondItem="zy3-99-0kq" secondAttribute="leadingMargin" id="6sH-iJ-xJf"/>
                             <constraint firstItem="Ndw-qc-Z5R" firstAttribute="trailing" secondItem="zy3-99-0kq" secondAttribute="trailingMargin" id="Avq-n3-Yn9"/>
                             <constraint firstItem="JRo-x1-dSH" firstAttribute="trailing" secondItem="zy3-99-0kq" secondAttribute="trailingMargin" id="C9r-DG-zgs"/>
@@ -310,12 +323,15 @@
                     </view>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina47"/>
                     <connections>
+                        <outlet property="choosePhotoButton" destination="Rv0-sM-Dmu" id="8wu-Gc-s2s"/>
+                        <outlet property="contactImageView" destination="ybt-QZ-fS0" id="uTR-zU-ILV"/>
                         <outlet property="emailLabel" destination="uZ9-Op-prr" id="Ozq-bO-doV"/>
                         <outlet property="emailTextField" destination="Ndw-qc-Z5R" id="5C3-M2-4lZ"/>
                         <outlet property="idLabel" destination="2lX-eH-dsB" id="SXO-OC-i3c"/>
                         <outlet property="idValue" destination="gV7-9S-apY" id="fRy-iD-NII"/>
                         <outlet property="nameLabel" destination="l4I-Ha-j7k" id="VTm-UW-Iy3"/>
                         <outlet property="nameTextField" destination="JRo-x1-dSH" id="vtf-2d-J9I"/>
+                        <outlet property="removePhotoButton" destination="yMQ-tM-L5S" id="FMP-5f-F6K"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OwT-gu-7In" userLabel="First Responder" sceneMemberID="firstResponder"/>

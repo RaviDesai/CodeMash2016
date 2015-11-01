@@ -6,7 +6,7 @@
 //  Copyright © 2015 RSD. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class UpdateUserViewModel: ViewModelBase {
     var originalUser: User?
@@ -37,6 +37,11 @@ class UpdateUserViewModel: ViewModelBase {
     
     var uuidString: String? {
         return self.user?.id?.compressedUUIDString
+    }
+    
+    var contactImage: UIImage? {
+        get { return self.user?.image }
+        set { self.user?.image = newValue }
     }
     
     var hasValidEmailAddress: Bool {

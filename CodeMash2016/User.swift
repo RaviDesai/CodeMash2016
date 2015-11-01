@@ -21,21 +21,32 @@ extension NSUUID {
 
 }
 
+private func== (lhs: UIImage?, rhs: UIImage?) -> Bool {
+    if let mylhs = lhs {
+        return mylhs.isEqual(rhs)
+    }
+    
+    switch(rhs) {
+        case .None: return true
+        default: return false
+    }
+}
+
 struct User : JSONSerializable, Comparable {
     var id: NSUUID?
     var name: String
     var emailAddress: EmailAddress?
     var image: UIImage?
 
-    init(id: NSUUID?, name: String, emailAddress: EmailAddress?/*, image: UIImage?*/) {
+    init(id: NSUUID?, name: String, emailAddress: EmailAddress?, image: UIImage?) {
         self.id = id
         self.name = name
         self.emailAddress = emailAddress
-        //self.image = image
+        self.image = image
     }
     
-    static func create(id: NSUUID?)(name: String)(emailAddress: EmailAddress?/*, image: UIImage?*/) -> User {
-        return User(id: id, name: name, emailAddress: emailAddress/*, image: image*/)
+    static func create(id: NSUUID?)(name: String)(emailAddress: EmailAddress?)(image: UIImage?) -> User {
+        return User(id: id, name: name, emailAddress: emailAddress, image: image)
     }
     
     func convertToJSON() -> JSONDictionary {
@@ -43,8 +54,8 @@ struct User : JSONSerializable, Comparable {
         addTuplesIf(&dict, tuples:
             ("ID", self.id?.UUIDString),
             ("Name", self.name),
-            ("EmailAddress", self.emailAddress?.convertToJSON())
-//            ("Image", toBase64FromImage(self.image))
+            ("EmailAddress", self.emailAddress?.convertToJSON()),
+            ("Image", toBase64FromImage(self.image))
         )
         
         return dict
@@ -56,7 +67,7 @@ struct User : JSONSerializable, Comparable {
                 <**> record["ID"] >>- asUUID
                 <*> record["Name"] >>- asString
                 <**> record["EmailAddress"] >>- EmailAddress.createFromJSON
-                //<**> record["Image"] >>- asImage
+                <**> record["Image"] >>- asImage
         }
         return nil;
     }
@@ -64,7 +75,7 @@ struct User : JSONSerializable, Comparable {
 
 func==(lhs: User, rhs: User) -> Bool {
     if (lhs.id == nil || rhs.id == nil) {
-        return lhs.name == rhs.name && lhs.emailAddress == rhs.emailAddress
+        return lhs.name == rhs.name && lhs.emailAddress == rhs.emailAddress && lhs.image == rhs.image
     }
     
     return lhs.id == rhs.id

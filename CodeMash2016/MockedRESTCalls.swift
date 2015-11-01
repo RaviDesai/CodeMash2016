@@ -17,10 +17,10 @@ public class MockedRESTCalls {
     
     public init() {
         self.users = [
-            User(id: NSUUID(), name: "One", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil)/*, image: nil*/),
-            User(id: NSUUID(), name: "Two", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil)/*, image: nil*/),
-            User(id: NSUUID(), name: "Three", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil)/*, image: nil*/),
-            User(id: NSUUID(), name: "Four", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil)/*, image: nil*/)]
+            User(id: NSUUID(), name: "One", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
+            User(id: NSUUID(), name: "Two", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
+            User(id: NSUUID(), name: "Three", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
+            User(id: NSUUID(), name: "Four", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
     }
     
     static func sampleAuthenticateData() -> NSData {
@@ -30,6 +30,17 @@ public class MockedRESTCalls {
     static func sampleAuthenticationTokenData() -> NSData {
         return "\"success\"".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
     }
+    
+    private static func getImageWithName(name: String) -> UIImage? {
+        let myBundle = NSBundle(forClass: self)
+            if let jsonFilePath = myBundle.pathForResource(name, ofType: "jpeg") {
+                if let data = NSData(contentsOfFile: jsonFilePath) {
+                    return UIImage(data: data)
+                }
+            }
+        return nil
+    }
+
     
     func findUserIndex(user: User) -> Int? {
         if let users = self.users {
@@ -205,9 +216,6 @@ public class MockedRESTCalls {
                 return false
             }
             
-            if (request.URL?.path != .Some("/api/users")) {
-                return false
-            }
             if (request.HTTPMethod != "PUT") {
                 return false
             }

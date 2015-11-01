@@ -29,6 +29,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ApplicationMockLoginProto
             self.mockedRest?.hijackAll(self.site, validLogin: validLogin)
         }
         
+        let arguments = NSProcessInfo.processInfo().arguments
+        let mock = arguments.contains("MOCK")
+        if (mock) {
+            UIView.setAnimationsEnabled(false)
+        }
+
+        
         return true
     }
 

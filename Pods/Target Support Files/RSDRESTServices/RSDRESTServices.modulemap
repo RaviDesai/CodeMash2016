@@ -1,0 +1,6 @@
+framework module RSDRESTServices {
+  umbrella header "RSDRESTServices-umbrella.h"
+
+  export *
+  module * { export * }
+}

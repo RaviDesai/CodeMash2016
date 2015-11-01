@@ -7,15 +7,28 @@
 //
 
 import UIKit
+import RSDRESTServices
+
+protocol ApplicationMockLoginProtocol {
+    var validLogin: LoginParameters? { get }
+}
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, ApplicationMockLoginProtocol {
 
     var window: UIWindow?
+    var mockedRest: MockedRESTCalls?
+    var site = LoginViewModel.site
+    var validLogin: LoginParameters? = LoginParameters(username: "admin", password: "admin")
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
+
+        if let validLogin = self.validLogin {
+            self.mockedRest = MockedRESTCalls()
+            self.mockedRest?.hijackAll(self.site, validLogin: validLogin)
+        }
+        
         return true
     }
 

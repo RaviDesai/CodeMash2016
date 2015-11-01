@@ -1,0 +1,6 @@
+framework module RSDSerialization {
+  umbrella header "RSDSerialization-umbrella.h"
+
+  export *
+  module * { export * }
+}

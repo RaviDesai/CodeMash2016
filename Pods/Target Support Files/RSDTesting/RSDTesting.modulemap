@@ -1,0 +1,6 @@
+framework module RSDTesting {
+  umbrella header "RSDTesting-umbrella.h"
+
+  export *
+  module * { export * }
+}

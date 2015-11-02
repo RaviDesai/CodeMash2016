@@ -14,10 +14,10 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '9F54746ACE0CD2B0197EF3C4'
-               BlueprintName = 'RSDSerialization'
+               BlueprintIdentifier = '01B9B85DC3C8CF890FE1A23B'
+               BlueprintName = 'TITokenField'
                ReferencedContainer = 'container:Pods.xcodeproj'
-               BuildableName = 'RSDSerialization.framework'>
+               BuildableName = 'TITokenField.framework'>
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>

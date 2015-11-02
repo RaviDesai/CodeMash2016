@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="initial-scale=1.0, minimum-scale=1.0" />
+        
+        <style type="text/css">
+        * {
+            outline: 0px solid transparent;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            -webkit-touch-callout: none;
+        }
+        html, body {
+            padding: 0;
+            margin: 0;
+            font-family: 'Helvetica Neue', Helvetica, sans-serif;
+        }
+        html {
+            height: 100%;
+        }
+        #editor {
+            background-color: #eee;
+        }
+        
+        body {
+            line-height: 1.35;
+            padding: 10px;
+            min-height: 100%;
+        }
+        
+        object {
+            width: 100px;
+        }
+        
+        </style>
+        
+    </head>
+    <body>
+        <div id="editor" contenteditable="true">
+            Here is some content
+        </div>
+        
+        <div id="attachments">
+        </div>
+        
+        <script type="text/javascript">
+            var touchtimer;
+            var touchduration = 500;
+            
+            function isSelected(element) {
+                return element.className.match(/(?:^|\s)selected(?!\S)/);
+            }
+        
+        function setEditability(editable) {
+            document.getElementById("editor").setAttribute("contenteditable", editable)
+        }
+        
+        
+        function setEditableMessage(message) {
+            var elem = document.getElementById("editor");
+            editor.innerHTML = message;
+        }
+        
+        (function() {
+         window.webkit.messageHandlers['editor'].postMessage("loaded:");
+         
+         var onInput = function (event) {
+         window.webkit.messageHandlers['editor'].postMessage("message:" + event.currentTarget.innerHTML);
+         };
+         document.getElementById('editor').addEventListener('input', onInput);
+         
+         })();
+            </script>
+    </body>
+</html>

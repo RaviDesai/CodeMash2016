@@ -52,7 +52,9 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         emailTextField.delegate = self
         
         let deleteButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Trash, target: self, action: Selector("deleteUser:"))
+
         self.navigationItem.rightBarButtonItem = deleteButton
+        
     }
     
     override func viewDidLoad() {
@@ -122,7 +124,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
             self.notifyUserOfError(myError, withCallbackOnDismissal: { () -> () in })
         })
     }
-    
+        
     func updateViewModelFromTextField(textField: UITextField) {
         if (textField == self.nameTextField) {
             self.viewModel?.contactName = textField.text
@@ -175,6 +177,5 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
         picker.dismissViewControllerAnimated(true, completion: nil);
     }
-
 }
 

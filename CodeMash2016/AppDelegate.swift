@@ -30,11 +30,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ApplicationMockLoginProto
         }
         
         let arguments = NSProcessInfo.processInfo().arguments
-        let mock = arguments.contains("MOCK")
+        let mock = arguments.contains("--noanimations")
         if (mock) {
             UIView.setAnimationsEnabled(false)
         }
-
         
         return true
     }

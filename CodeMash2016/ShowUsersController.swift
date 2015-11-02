@@ -31,6 +31,9 @@ class ShowUsersController: UITableViewController {
         self.tableView.delegate = self
         self.tableView.dataSource = self.viewModel!
         self.tableView.reloadData()
+        
+        let composeButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: Selector("newMessage:"))
+        self.navigationItem.rightBarButtonItem = composeButton
     }
     
     override func viewDidLoad() {
@@ -54,6 +57,10 @@ class ShowUsersController: UITableViewController {
         return 55
     }
     
+    func newMessage(sender: UIBarButtonItem) {
+        self.performSegueWithIdentifier("NewMessage", sender: self)
+    }
+
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if (segue.identifier == "ModifyUser") {
             if let updateUserController = segue.destinationViewController as? UpdateUserController {
@@ -71,7 +78,13 @@ class ShowUsersController: UITableViewController {
                     })
                 }
             }
+        } else if (segue.identifier == "NewMessage") {
+            if let controller =  segue.destinationViewController as? MessageController {
+                controller.setContacts(self.viewModel?.users?.map { $0.emailAddress }.filter { $0 != nil }.map { $0! })
+            }
         }
 
+
     }
+    
 }

@@ -128,6 +128,15 @@ struct EmailAddress: JSONSerializable, Comparable, CustomStringConvertible {
         
         return result
     }
+    
+    static func getCollapsedEmailAddressDisplayText(addresses: [EmailAddress]) -> String {
+        if (addresses.count == 0) { return "" }
+        let firstAddress = addresses[0].addressString
+        if (addresses.count == 1) { return firstAddress }
+        let count = addresses.count - 1
+        let others = (count == 1) ? " and one other" : "and \(count) others"
+        return "\(firstAddress)\(others)"
+    }
 
 }
 

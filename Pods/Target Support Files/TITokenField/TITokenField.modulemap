@@ -1,0 +1,6 @@
+framework module TITokenField {
+  umbrella header "TITokenField-umbrella.h"
+
+  export *
+  module * { export * }
+}

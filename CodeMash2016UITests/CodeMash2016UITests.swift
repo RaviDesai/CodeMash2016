@@ -32,6 +32,7 @@ class CodeMash2016UITests: XCTestCase {
 
         let okButton = app.alerts.element.collectionViews.buttons["OK"]
         if (okButton.exists) {
+            //this line will never be hit even when the dialog is displayed
             okButton.tap()
         }
 

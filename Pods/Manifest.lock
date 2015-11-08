@@ -1,10 +1,10 @@
 PODS:
   - OHHTTPStubs (4.1.0)
-  - RSDRESTServices (0.3.1):
+  - RSDRESTServices (0.3.2):
     - OHHTTPStubs (~> 4.1.0)
     - RSDSerialization (~> 0.1)
   - RSDSerialization (0.3.1)
-  - RSDTesting (0.1.3)
+  - RSDTesting (0.1.4)
   - TITokenField (0.9.5)
 
 DEPENDENCIES:
@@ -15,9 +15,9 @@ DEPENDENCIES:
 
 SPEC CHECKSUMS:
   OHHTTPStubs: f3473ab21dbf0815253ac96b977d5c36f1daad09
-  RSDRESTServices: e36577522e3d75c23dcc3ca94efcb3d00e6d63fa
+  RSDRESTServices: 081a0a982ec80988c1085312f08029582dddf854
   RSDSerialization: 77029226a082e40e82b412ebae155044aeed8e43
-  RSDTesting: 361e526ea7227d1a708ef94dc3f211f88b54a1dc
+  RSDTesting: b840abe249fba63a6be2ebed98b4e6a1e73af404
   TITokenField: 39da9ead760009440ffc38602070d2097901430c
 
 COCOAPODS: 0.39.0.beta.5

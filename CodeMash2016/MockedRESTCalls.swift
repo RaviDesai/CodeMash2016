@@ -11,81 +11,34 @@ import RSDRESTServices
 import RSDSerialization
 import OHHTTPStubs
 
-public class MockedRESTCalls {
-    var users: [User]?
-    var host: String?
+
+public class MockedRESTLogin {
+    public var host: String?
+    public var site: APISite
+    public var loginParameters: LoginParameters
     
-    public init() {
-        self.users = [
-            User(id: NSUUID(), name: "One", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
-            User(id: NSUUID(), name: "Two", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
-            User(id: NSUUID(), name: "Three", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
-            User(id: NSUUID(), name: "Four", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
+    private var authStub: OHHTTPStubsDescriptor?
+    private var tokenStub: OHHTTPStubsDescriptor?
+    private var postStub: OHHTTPStubsDescriptor?
+
+    
+    public init(site: APISite, validLogin: LoginParameters) {
+        self.site = site
+        self.loginParameters = validLogin
     }
     
-    static func sampleAuthenticateData() -> NSData {
+    private static func sampleAuthenticateData() -> NSData {
         return "{\"Success\":true,\"Message\":null,\"Parameters\":{\"wa\":\"wsignin1.0\",\"wresult\":\"<crazyweirdxml></crazyweirdxml>\"}}".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
     }
     
-    static func sampleAuthenticationTokenData() -> NSData {
+    private static func sampleAuthenticationTokenData() -> NSData {
         return "\"success\"".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
     }
-    
-    private static func getImageWithName(name: String) -> UIImage? {
-        let myBundle = NSBundle(forClass: self)
-            if let jsonFilePath = myBundle.pathForResource(name, ofType: "jpeg") {
-                if let data = NSData(contentsOfFile: jsonFilePath) {
-                    return UIImage(data: data)
-                }
-            }
-        return nil
-    }
 
-    
-    func findUserIndex(user: User) -> Int? {
-        if let users = self.users {
-            var index: Int = 0
-            for (index = 0; index < users.count; index++) {
-                if (users[index] == user) {
-                    return index
-                }
-            }
-        }
-        return nil
-    }
-
-    func findUserIdIndex(id: NSUUID) -> Int? {
-        if let users = self.users {
-            var index: Int = 0
-            for (index = 0; index < users.count; index++) {
-                if (users[index].id == id) {
-                    return index
-                }
-            }
-        }
-        return nil
-    }
-
-    func updateUser(user: User) -> Bool {
-        if let index = self.findUserIndex(user) {
-            self.users![index] = user
-            return true
-        }
-        return false
-    }
-    
-    func deleteUser(requestId: String) -> User? {
-        if let uuid = NSUUID(UUIDString: requestId) {
-            if let index = findUserIdIndex(uuid) {
-                return self.users!.removeAtIndex(index)
-            }
-        }
-        return nil
-    }
-    
-    public func hijackLoginSequence(loginSite: APISite, validLoginParameters: LoginParameters) {
+    private func hijackLoginSequence(loginSite: APISite, validLoginParameters: LoginParameters) {
         self.host = loginSite.uri?.host
         
+        self.authStub =
         OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
             if (request.URL?.host != self.host) {
                 return false
@@ -103,19 +56,20 @@ public class MockedRESTCalls {
             
             return true
         }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-            if let requestData = NSURLProtocol.propertyForKey("PostedData", inRequest: request) as? NSData {
-                if let json = try? NSJSONSerialization.JSONObjectWithData(requestData, options: NSJSONReadingOptions.AllowFragments) {
-                    if let login = LoginParameters.createFromJSON(json) {
-                        if login == validLoginParameters {
-                            let response = MockedRESTCalls.sampleAuthenticateData()
-                            return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "application/json"])
+                if let requestData = NSURLProtocol.propertyForKey("PostedData", inRequest: request) as? NSData {
+                    if let json = try? NSJSONSerialization.JSONObjectWithData(requestData, options: NSJSONReadingOptions.AllowFragments) {
+                        if let login = LoginParameters.createFromJSON(json) {
+                            if login == validLoginParameters {
+                                let response = MockedRESTLogin.sampleAuthenticateData()
+                                return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "application/json"])
+                            }
                         }
                     }
                 }
-            }
-            return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 401, headers: nil)
+                return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 401, headers: nil)
         })
         
+        self.tokenStub =
         OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
             if (request.URL?.host != self.host) {
                 return false
@@ -136,10 +90,11 @@ public class MockedRESTCalls {
             }
             return true
         }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-            let response = MockedRESTCalls.sampleAuthenticationTokenData()
-            return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "text/plain"])
+                let response = MockedRESTLogin.sampleAuthenticationTokenData()
+                return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "text/plain"])
         })
         
+        self.postStub =
         OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
             if (request.URL?.host != self.host) {
                 return false
@@ -165,145 +120,63 @@ public class MockedRESTCalls {
         })
         
     }
+
+    public func hijackAll() {
+        self.hijackLoginSequence(self.site, validLoginParameters: self.loginParameters)
+    }
     
-    public func hijackGetUsers() {
-        OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
-            if (request.URL?.host != self.host) {
-                return false
-            }
-            if (request.URL?.path != .Some("/api/users")) {
-                return false
-            }
-            if (request.HTTPMethod != "GET") {
-                return false
-            }
-            
-            return true
-            
-        }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-            if let users = self.users,
-                let json = convertToJSONArray(users) {
-                    do {
-                        let data = try NSJSONSerialization.dataWithJSONObject(json, options: NSJSONWritingOptions.PrettyPrinted)
-                        return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
-                    } catch let error as NSError {
-                        return OHHTTPStubsResponse(error: error)
-                    }
-            }
-            return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 500, headers: nil)
-        })
-    }
-
-    public func hijackUpdateUser() {
-        let queryPattern = "/api/users/(.+)$"
-        let regEx = try? NSRegularExpression(pattern: queryPattern, options: NSRegularExpressionOptions.CaseInsensitive)
-
-        OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
-            if (request.URL?.host != self.host) {
-                return false
-            }
-            
-            var userId: String?
-            if let path = request.URL?.path {
-                if let matches = regEx?.matchesInString(path, options: NSMatchingOptions(), range: NSMakeRange(0, path.characters.count)) {
-                    if (matches.count > 0) {
-                        userId = path.substringWithRange(matches[0].rangeAtIndex(1))
-                    }
-                }
-            }
-            
-            if (userId == nil || userId!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) == "") {
-                return false
-            }
-            
-            if (request.HTTPMethod != "PUT") {
-                return false
-            }
-            
-            let requestData = NSURLProtocol.propertyForKey("PostedData", inRequest: request) as? NSData
-            if (requestData == nil) {
-                return false
-            }
-
-            return true
-        }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-            if let requestData = NSURLProtocol.propertyForKey("PostedData", inRequest: request) as? NSData {
-                if let json = try? NSJSONSerialization.JSONObjectWithData(requestData, options: NSJSONReadingOptions.AllowFragments) {
-                    if let user = User.createFromJSON(json) {
-                        if (self.updateUser(user)) {
-                            return OHHTTPStubsResponse(data: requestData, statusCode: 200, headers: ["Content-Type": "application/json"])
-                        } else {
-                            return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 404, headers: nil)
-                        }
-                    }
-                }
-                return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 500, headers: nil)
-            }
-            return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 400, headers: nil)
-        })
-    }
-
-    public func hijackDeleteUser() {
-        let queryPattern = "/api/users/(.+)$"
-        let regEx = try? NSRegularExpression(pattern: queryPattern, options: NSRegularExpressionOptions.CaseInsensitive)
-        
-        OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
-            if (request.URL?.host != self.host) {
-                return false
-            }
-            
-            var userId: String?
-            if let path = request.URL?.path {
-                if let matches = regEx?.matchesInString(path, options: NSMatchingOptions(), range: NSMakeRange(0, path.characters.count)) {
-                    if (matches.count > 0) {
-                        userId = path.substringWithRange(matches[0].rangeAtIndex(1))
-                    }
-                }
-            }
-            
-            if (userId == nil || userId!.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) == "") {
-                return false
-            }
-            
-            if (request.HTTPMethod != "DELETE") {
-                return false
-            }
-                        
-            return true
-        }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-            var userId: String?
-            if let path = request.URL?.path {
-                if let matches = regEx?.matchesInString(path, options: NSMatchingOptions(), range: NSMakeRange(0, path.characters.count)) {
-                    if (matches.count > 0) {
-                        userId = path.substringWithRange(matches[0].rangeAtIndex(1))
-                    }
-                }
-            }
-
-            if let requestId = userId {
-                if let deletedUser = self.deleteUser(requestId) {
-                    let json = deletedUser.convertToJSON()
-                    if let data = try? NSJSONSerialization.dataWithJSONObject(json, options: NSJSONWritingOptions.PrettyPrinted) {
-                        return OHHTTPStubsResponse(data: data, statusCode: 200, headers: ["Content-Type": "application/json"])
-                    }
-                } else {
-                    return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 404, headers: nil)
-                }
-                
-                return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 500, headers: nil)
-            }
-            return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 400, headers: nil)
-        })
-    }
-
-    public func hijackAll(site: APISite, validLogin: LoginParameters) {
-        self.hijackLoginSequence(site, validLoginParameters: validLogin)
-        self.hijackGetUsers()
-        self.hijackUpdateUser()
-        self.hijackDeleteUser()
+    public func unhijackAll() {
+        if let authStub = self.authStub {
+            OHHTTPStubs.removeStub(authStub)
+            self.authStub = nil
+        }
+        if let tokenStub = self.authStub {
+            OHHTTPStubs.removeStub(tokenStub)
+            self.tokenStub = nil
+        }
+        if let postStub = self.authStub {
+            OHHTTPStubs.removeStub(postStub)
+            self.postStub = nil
+        }
     }
     
     deinit {
-        OHHTTPStubs.removeAllStubs()
+        unhijackAll()
+    }
+}
+
+class MockedRESTCalls {
+    var userStore: MockedRESTStore<User>?
+    var loginStore: MockedRESTLogin?
+    
+    init(site: APISite, validLogin: LoginParameters) {
+        self.loginStore = MockedRESTLogin(site: site, validLogin: validLogin)
+
+        self.userStore = MockedRESTStore(host: site.uri?.host, endpoint: "/api/users", initialValues: [
+            User(id: NSUUID(), name: "One", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
+            User(id: NSUUID(), name: "Two", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
+            User(id: NSUUID(), name: "Three", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
+            User(id: NSUUID(), name: "Four", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))])
+        
+    }
+    
+    static func getImageWithName(name: String) -> UIImage? {
+        let myBundle = NSBundle(forClass: self)
+        if let jsonFilePath = myBundle.pathForResource(name, ofType: "jpeg") {
+            if let data = NSData(contentsOfFile: jsonFilePath) {
+                return UIImage(data: data)
+            }
+        }
+        return nil
+    }
+
+    func hijackAll() {
+        self.loginStore?.hijackAll()
+        self.userStore?.hijackAll()
+    }
+    
+    deinit {
+        self.loginStore = nil
+        self.userStore = nil
     }
 }

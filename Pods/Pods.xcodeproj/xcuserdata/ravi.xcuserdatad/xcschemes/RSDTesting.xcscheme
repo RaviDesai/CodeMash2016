@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = 'A365D0C6E15C850C8A90C97F'
+               BlueprintIdentifier = '937DC8E7FC7E49F4E92567A9'
                BlueprintName = 'RSDTesting'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'RSDTesting.framework'>

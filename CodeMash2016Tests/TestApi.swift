@@ -18,7 +18,7 @@ import OHHTTPStubs
 class TestApi: AsynchronousTestCase {
     var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
     var called = false
-    var mockedRest = MockedRESTCalls()
+    var mockedRest = MockedRESTLogin(site: APISite(name: "Sample", uri: "http://com.desai.sample/"), validLogin: LoginParameters(username: "Admin", password: "Admin"))
     
     override func setUp() {
         super.setUp()
@@ -33,7 +33,7 @@ class TestApi: AsynchronousTestCase {
     }
     
     func testLogin() {
-        mockedRest.hijackLoginSequence(loginSite, validLoginParameters: LoginParameters(username: "Admin", password: "Admin"))
+        mockedRest.hijackAll()
         
         var returnedError: NSError?
         

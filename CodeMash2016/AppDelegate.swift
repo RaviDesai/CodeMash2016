@@ -25,8 +25,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ApplicationMockLoginProto
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 
         if let validLogin = self.validLogin {
-            self.mockedRest = MockedRESTCalls()
-            self.mockedRest?.hijackAll(self.site, validLogin: validLogin)
+            self.mockedRest = MockedRESTCalls(site: self.site, validLogin: validLogin)
+            self.mockedRest?.hijackAll()
         }
         
         let arguments = NSProcessInfo.processInfo().arguments

@@ -13,9 +13,10 @@ private var performSegueAssociation: UInt8 = 0
 private var prepareSegueAssociation: UInt8 = 0
 private var prepareForSegueInterceptCallbackAssociation: UInt8 = 0
 private var performSegueWithIdentifierInterceptCallbackAssociation: UInt8 = 0
-private var presentViewControllerInterceptCallbackAssociation: UInt8 = 0
+private var presentViewControllerAnimatedInterceptCallbackAssociation: UInt8 = 0
 private var presentedViewControllerAssociation: UInt8 = 0
 private var navigationControllerAssociation: UInt8 = 0
+private var dismissViewControllerAnimatedInterceptCallbackAssociation: UInt8 = 0
 
 
 public class PrepareForSegueInterceptCallbackWrapper {
@@ -42,7 +43,7 @@ public class PerformSegueWithIdentifierInterceptCallbackWrapper {
     
 }
 
-public class PresentViewControllerInterceptCallbackWrapper {
+public class PresentViewControllerAnimatedInterceptCallbackWrapper {
     var closure: ((UIViewController, Bool)->Bool)?
     public init(_ closure: ((UIViewController, Bool)->Bool)?) {
         self.closure = closure
@@ -52,6 +53,18 @@ public class PresentViewControllerInterceptCallbackWrapper {
         return self.closure?(viewController, animated) ?? true
     }
 }
+
+public class DismissViewControllerAnimatedInterceptCallbackWrapper {
+    var closure: ((Bool)->Bool)?
+    public init(_ closure: ((Bool)->Bool)?) {
+        self.closure = closure
+    }
+    
+    public func call(animated: Bool) -> Bool{
+        return self.closure?(animated) ?? true
+    }
+}
+
 
 public extension UIViewController {
     var prepareForSegueInterceptCallback: PrepareForSegueInterceptCallbackWrapper? {
@@ -74,16 +87,28 @@ public extension UIViewController {
         }
     }
     
-    var presentViewControllerInterceptCallback: PresentViewControllerInterceptCallbackWrapper? {
+    var presentViewControllerAnimatedInterceptCallback: PresentViewControllerAnimatedInterceptCallbackWrapper? {
         get {
-            let wrapper: AnyObject? = objc_getAssociatedObject(self, &prepareForSegueInterceptCallbackAssociation)
-            return wrapper as? PresentViewControllerInterceptCallbackWrapper
+            let wrapper: AnyObject? = objc_getAssociatedObject(self, &presentViewControllerAnimatedInterceptCallbackAssociation)
+            return wrapper as? PresentViewControllerAnimatedInterceptCallbackWrapper
         }
         set {
-            objc_setAssociatedObject(self, &prepareForSegueInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &presentViewControllerAnimatedInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
         
     }
+    
+    var dismissViewControllerAnimatedInterceptCallback: DismissViewControllerAnimatedInterceptCallbackWrapper? {
+        get {
+            let wrapper: AnyObject? = objc_getAssociatedObject(self, &dismissViewControllerAnimatedInterceptCallbackAssociation)
+            return wrapper as? DismissViewControllerAnimatedInterceptCallbackWrapper
+        }
+        set {
+            objc_setAssociatedObject(self, &dismissViewControllerAnimatedInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+        
+    }
+
     
     func testImpl_performSegueWithIdentifier(identifier: String?, sender: AnyObject?) -> () {
         let callOriginalMethod = self.performSegueWithIdentifierInterceptCallback?.call(identifier) ?? true
@@ -99,10 +124,19 @@ public extension UIViewController {
         }
     }
     
-    func tempImpl_presentViewController(viewController: UIViewController, animated: Bool, completion:(()->())?) {
-        let callOriginalMethod = self.presentViewControllerInterceptCallback?.call(viewController, animated: animated) ?? true
+    func testImpl_presentViewController(viewController: UIViewController, animated: Bool, completion:(()->())?) {
+        let callOriginalMethod = self.presentViewControllerAnimatedInterceptCallback?.call(viewController, animated: animated) ?? true
         if (callOriginalMethod) {
-            tempImpl_presentViewController(viewController, animated: animated, completion: completion)
+            testImpl_presentViewController(viewController, animated: animated, completion: completion)
+        } else {
+            completion?()
+        }
+    }
+    
+    func testImpl_dismissViewControllerAnimated(animated: Bool, completion:(()->())?) {
+        let callOriginalMethod = self.dismissViewControllerAnimatedInterceptCallback?.call(animated) ?? true
+        if (callOriginalMethod) {
+            testImpl_dismissViewControllerAnimated(animated, completion: completion)
         } else {
             completion?()
         }
@@ -143,9 +177,22 @@ public extension UIViewController {
 }
 
 
-public extension UIViewController {
+public class Swizzler<T where T: UIViewController> {
+    public class func swizzlePrepareForSegue() {
+        let vcClass: AnyClass = T.classForCoder()
+        let realMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("prepareForSegue:sender:"))
+        
+        let testMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("testImpl_prepareForSegue:sender:"))
+        
+        method_exchangeImplementations(realMethod, testMethod)
+    }
+
     public class func swizzlePerformSegueWithIdentifier() {
-        let vcClass: AnyClass = UIViewController.classForCoder()
+        let vcClass: AnyClass = T.classForCoder()
         let realMethod: Method = class_getInstanceMethod(
             vcClass,
             Selector("performSegueWithIdentifier:sender:"))
@@ -157,20 +204,9 @@ public extension UIViewController {
         method_exchangeImplementations(realMethod, testMethod)
     }
     
-    public class func swizzlePrepareForSegue(vcClass: AnyClass) {
-        let realMethod: Method = class_getInstanceMethod(
-            vcClass,
-            Selector("prepareForSegue:sender:"))
-        
-        let testMethod: Method = class_getInstanceMethod(
-            vcClass,
-            Selector("testImpl_prepareForSegue:sender:"))
-        
-        method_exchangeImplementations(realMethod, testMethod)
-    }
     
     public class func swizzleNavigationControllerProperty() {
-        let vcClass: AnyClass = UIViewController.classForCoder()
+        let vcClass: AnyClass = T.classForCoder()
         
         let realMethod: Method = class_getInstanceMethod(
             vcClass,
@@ -183,8 +219,8 @@ public extension UIViewController {
         method_exchangeImplementations(realMethod, testMethod)
     }
     
-    public class func swizzlePresentViewController() {
-        let vcClass: AnyClass = UIViewController.classForCoder()
+    public class func swizzlePresentViewControllerAnimated() {
+        let vcClass: AnyClass = T.classForCoder()
         
         let realMethod: Method = class_getInstanceMethod(
             vcClass,
@@ -193,6 +229,20 @@ public extension UIViewController {
         let testMethod: Method = class_getInstanceMethod(
             vcClass,
             Selector("testImpl_presentViewController:animated:completion:"))
+        
+        method_exchangeImplementations(realMethod, testMethod)
+    }
+    
+    public class func swizzleDismissViewControllerAnimated() {
+        let vcClass: AnyClass = T.classForCoder()
+        
+        let realMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("dismissViewControllerAnimated:completion:"))
+        
+        let testMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("testImpl_dismissViewControllerAnimated:completion:"))
         
         method_exchangeImplementations(realMethod, testMethod)
     }

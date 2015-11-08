@@ -8,6 +8,7 @@
 
 import Foundation
 import RSDSerialization
+import RSDRESTServices
 
 extension NSUUID {
     var compressedUUIDString: String {
@@ -32,7 +33,12 @@ private func== (lhs: UIImage?, rhs: UIImage?) -> Bool {
     }
 }
 
-struct User : JSONSerializable, Comparable {
+public protocol ModelItemWithID {
+    var id: NSUUID? { get set }
+}
+
+
+struct User : ModelItem {
     var id: NSUUID?
     var name: String
     var emailAddress: EmailAddress?

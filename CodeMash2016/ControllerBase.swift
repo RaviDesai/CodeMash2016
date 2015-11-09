@@ -25,8 +25,21 @@ extension UIViewController {
     }
     
     public func notifyUserOfError(error: NSError, withCallbackOnDismissal callback: ()->()) {
-        let alert = UIAlertController(title: error.localizedDescription, message: error.localizedRecoverySuggestion, preferredStyle: UIAlertControllerStyle.Alert)
+        var message: String? = error.localizedRecoverySuggestion
+        if (error.isNetworkResponseUnauthorized) {
+            if let msg = message?.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) where msg != ""  {
+                message = "\(msg). You will be logged off."
+            } else {
+                message = "You will be logged off."
+            }
+        }
+        let alert = UIAlertController(title: error.localizedDescription, message: message, preferredStyle: UIAlertControllerStyle.Alert)
         let dismissAction = UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+            if (error.isNetworkResponseUnauthorized) {
+                Client.sharedClient.logout({ () -> () in
+                    self.navigationController?.popToRootViewControllerAnimated(true)
+                })
+            }
             callback()
         })
         

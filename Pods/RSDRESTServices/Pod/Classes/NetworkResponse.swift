@@ -8,7 +8,16 @@
 import Foundation
 import RSDSerialization
 
-public enum NetworkResponse : CustomStringConvertible {
+public protocol NetworkResponseCheckProtocol {
+    func isNetworkFailure() -> Bool
+    func isBadRequest() -> Bool
+    func isUnauthorized() -> Bool
+    func isUndetermined() -> Bool
+    func getData() -> NSData?
+    func getJSON() -> (JSON?, NSError?)
+}
+
+public enum NetworkResponse : CustomStringConvertible, NetworkResponseCheckProtocol {
     case Success(Int, String, NSData?)
     case HTTPStatusCodeFailure(Int, String)
     case CouldNotConnectToURL(String)
@@ -132,19 +141,24 @@ public enum NetworkResponse : CustomStringConvertible {
     public func getError() -> NSError? {
         switch(self) {
         case let .HTTPStatusCodeFailure(_, localizedMessage):
-            let userInfo = [NSLocalizedDescriptionKey:localizedMessage, NSLocalizedFailureReasonErrorKey: localizedMessage];
+            let userInfo = [NSLocalizedDescriptionKey:localizedMessage, NSLocalizedFailureReasonErrorKey: localizedMessage, RSDRESTServicesNetworkResponseKey: BoxedNetworkResponse(self)];
             return NSError(domain: "com.github.RaviDesai", code: 48118003, userInfo: userInfo)
         case let .CouldNotConnectToURL(urlString):
             let message = "Could not connect to url: \(urlString)"
-            let userInfo = [NSLocalizedDescriptionKey:message, NSLocalizedFailureReasonErrorKey: message];
+            let userInfo = [NSLocalizedDescriptionKey:message, NSLocalizedFailureReasonErrorKey: message, RSDRESTServicesNetworkResponseKey: BoxedNetworkResponse(self)];
             return NSError(domain: "com.github.RaviDesai", code: 48118004, userInfo: userInfo)
         case let .SystemFailure(error):
-            return error
+            var userInfo = error.userInfo
+            userInfo[RSDRESTServicesNetworkResponseKey] = BoxedNetworkResponse(self)
+            return NSError(domain: error.domain, code: error.code, userInfo: userInfo)
         case .NetworkFailure:
             let message = "General Network Failure"
-            let userInfo = [NSLocalizedDescriptionKey:message, NSLocalizedFailureReasonErrorKey: message];
+            let userInfo = [NSLocalizedDescriptionKey:message, NSLocalizedFailureReasonErrorKey: message, RSDRESTServicesNetworkResponseKey: BoxedNetworkResponse(self)]
             return NSError(domain: "com.github.RaviDesai", code: 48118005, userInfo: userInfo)
-            
+        case .Undetermined:
+            let message = "Task never completed"
+            let userInfo = [NSLocalizedDescriptionKey:message, NSLocalizedFailureReasonErrorKey: message, RSDRESTServicesNetworkResponseKey: BoxedNetworkResponse(self)]
+            return NSError(domain: "com.github.RaviDesai", code: 48118006, userInfo: userInfo)
         default:
             return nil
         }

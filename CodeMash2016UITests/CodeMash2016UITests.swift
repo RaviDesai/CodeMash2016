@@ -22,6 +22,21 @@ class CodeMash2016UITests: XCTestCase {
         super.tearDown()
     }
     
+    func testForCoverage() {
+        
+        let app = XCUIApplication()
+        let tablesQuery = app.tables
+        tablesQuery.buttons["Login"].tap()
+        tablesQuery.staticTexts["Four"].tap()
+        
+        let textField = app.otherElements.containingType(.NavigationBar, identifier:"CodeMash2016.UpdateUser").childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.TextField).elementBoundByIndex(0)
+        textField.tap()
+        textField.typeText("a")
+        app.navigationBars["CodeMash2016.UpdateUser"].childrenMatchingType(.Button).matchingIdentifier("Back").elementBoundByIndex(0).tap()
+        app.sheets["Save changes"].collectionViews.buttons["Save changes"].tap()
+        
+    }
+    
     func testChoosePhoto() {
         
         let app = XCUIApplication()

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		413892FC1BE58DF400AB940D /* JSONHelperForImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */; };
+		413C92A91BF799750027ACB2 /* TestApiUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92A81BF799750027ACB2 /* TestApiUsers.swift */; };
+		413C92AB1BF7A9F90027ACB2 /* LoginControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */; };
+		413C92AD1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */; };
 		419089931BDB2095004F6F46 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419089921BDB2095004F6F46 /* AppDelegate.swift */; };
 		419089951BDB2095004F6F46 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419089941BDB2095004F6F46 /* ViewController.swift */; };
 		419089981BDB2095004F6F46 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 419089961BDB2095004F6F46 /* Main.storyboard */; };
@@ -21,7 +24,7 @@
 		41B2AAC51BDD25A100C66703 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AAC41BDD25A100C66703 /* Client.swift */; };
 		41B2AAC71BDD25BB00C66703 /* LoginParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AAC61BDD25BB00C66703 /* LoginParameters.swift */; };
 		41B2AAC91BDD25D200C66703 /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AAC81BDD25D200C66703 /* LoginResponse.swift */; };
-		41B2AACB1BDD260800C66703 /* TestApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AACA1BDD260800C66703 /* TestApi.swift */; };
+		41B2AACB1BDD260800C66703 /* TestApiLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AACA1BDD260800C66703 /* TestApiLogin.swift */; };
 		41B2AACD1BDD263800C66703 /* MockedRESTCalls.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AACC1BDD263800C66703 /* MockedRESTCalls.swift */; };
 		41C88DD71BE2A4B900C5C115 /* UpdateUserController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C88DD61BE2A4B900C5C115 /* UpdateUserController.swift */; };
 		41C88DD91BE2A4E500C5C115 /* UpdateUserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41C88DD81BE2A4E500C5C115 /* UpdateUserViewModel.swift */; };
@@ -65,6 +68,9 @@
 /* Begin PBXFileReference section */
 		3045416F80F09C4FAF35E994 /* Pods-CodeMash2016.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CodeMash2016.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CodeMash2016/Pods-CodeMash2016.debug.xcconfig"; sourceTree = "<group>"; };
 		413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelperForImage.swift; sourceTree = "<group>"; };
+		413C92A81BF799750027ACB2 /* TestApiUsers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiUsers.swift; sourceTree = "<group>"; };
+		413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginControllerTests.swift; sourceTree = "<group>"; };
+		413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartialMockLoginViewModel.swift; sourceTree = "<group>"; };
 		4190898F1BDB2095004F6F46 /* CodeMash2016.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodeMash2016.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		419089921BDB2095004F6F46 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		419089941BDB2095004F6F46 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -84,7 +90,7 @@
 		41B2AAC41BDD25A100C66703 /* Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		41B2AAC61BDD25BB00C66703 /* LoginParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginParameters.swift; sourceTree = "<group>"; };
 		41B2AAC81BDD25D200C66703 /* LoginResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
-		41B2AACA1BDD260800C66703 /* TestApi.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApi.swift; sourceTree = "<group>"; };
+		41B2AACA1BDD260800C66703 /* TestApiLogin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiLogin.swift; sourceTree = "<group>"; };
 		41B2AACC1BDD263800C66703 /* MockedRESTCalls.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockedRESTCalls.swift; sourceTree = "<group>"; };
 		41C88DD61BE2A4B900C5C115 /* UpdateUserController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateUserController.swift; sourceTree = "<group>"; };
 		41C88DD81BE2A4E500C5C115 /* UpdateUserViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateUserViewModel.swift; sourceTree = "<group>"; };
@@ -184,8 +190,11 @@
 			children = (
 				419089A71BDB2095004F6F46 /* CodeMash2016Tests.swift */,
 				419089A91BDB2095004F6F46 /* Info.plist */,
-				41B2AACA1BDD260800C66703 /* TestApi.swift */,
+				41B2AACA1BDD260800C66703 /* TestApiLogin.swift */,
+				413C92A81BF799750027ACB2 /* TestApiUsers.swift */,
 				41F3251A1BEE484900FAD3C1 /* LoginViewModelTests.swift */,
+				413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */,
+				413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */,
 			);
 			path = CodeMash2016Tests;
 			sourceTree = "<group>";
@@ -550,8 +559,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				413C92AD1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift in Sources */,
 				41F3251B1BEE484900FAD3C1 /* LoginViewModelTests.swift in Sources */,
-				41B2AACB1BDD260800C66703 /* TestApi.swift in Sources */,
+				413C92AB1BF7A9F90027ACB2 /* LoginControllerTests.swift in Sources */,
+				413C92A91BF799750027ACB2 /* TestApiUsers.swift in Sources */,
+				41B2AACB1BDD260800C66703 /* TestApiLogin.swift in Sources */,
 				419089A81BDB2095004F6F46 /* CodeMash2016Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

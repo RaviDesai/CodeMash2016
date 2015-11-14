@@ -36,23 +36,21 @@ public class MockedRESTStore<T: ModelItem> {
     }
     
     public func findIndex(object: T) -> Int? {
-        var index: Int = 0
-        for (index = 0; index < store.count; index++) {
+        for (var index = 0; index < store.count; index++) {
             if (store[index] == object) {
                 return index
             }
         }
-        return index
+        return nil
     }
     
     public func findIndexOfUUID(id: NSUUID) -> Int? {
-        var index: Int = 0
-        for (index = 0; index < store.count; index++) {
+        for (var index = 0; index < store.count; index++) {
             if (store[index].id == id) {
                 return index
             }
         }
-        return index
+        return nil
     }
     
     public func create(object: T) -> T? {

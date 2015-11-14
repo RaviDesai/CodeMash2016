@@ -16,6 +16,11 @@ enum LoginTableCellIdentifier : String {
 }
 
 protocol LoginViewModelProtocol: UITableViewDataSource {
+    var isLoggingIn: Bool { get }
+    var username: String { get set }
+    var password: String { get set }
+    var loginButtonLabel: String { get set }
+    func instantiateCell(cellIdentifier: LoginTableCellIdentifier, value: String, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
     func executeLogin(completionHandler: (NSError?)->())
     func getAllUsers(completionHandler: ([User]?, NSError?)->())
 }
@@ -81,7 +86,7 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
     
     func getAllUsers(completionHandler: ([User]?, NSError?)->()) {
         let handler = self.fireOnMainThread(completionHandler)
-        Api.getAllUsers(handler)
+        Api.sharedInstance.getAllUsers(handler)
     }
     
 }

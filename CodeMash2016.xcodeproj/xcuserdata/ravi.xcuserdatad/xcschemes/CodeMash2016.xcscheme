@@ -48,6 +48,11 @@
                BlueprintName = "CodeMash2016UITests"
                ReferencedContainer = "container:CodeMash2016.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "CodeMash2016UITests">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>

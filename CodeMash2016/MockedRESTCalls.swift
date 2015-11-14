@@ -175,6 +175,11 @@ class MockedRESTCalls {
         self.userStore?.hijackAll()
     }
     
+    func unhijackAll() {
+        self.loginStore?.unhijackAll()
+        self.userStore?.unhijackAll()
+    }
+    
     deinit {
         self.loginStore = nil
         self.userStore = nil

@@ -52,7 +52,9 @@ class CodeMash2016UITests: XCTestCase {
         }
 
         tablesQuery.buttons["Moments"].tap()
-        app.collectionViews.cells["Photo, Landscape, March 12, 2011, 4:17 PM"].tap()
+        
+        app.collectionViews.childrenMatchingType(.Cell).matchingIdentifier("Photo, Landscape, March 12, 2011, 4:17 PM").elementBoundByIndex(0).tap()
+        
         let chooseButton = app.buttons["Choose"]
         XCTAssertTrue(chooseButton.exists)
         
@@ -98,8 +100,15 @@ class CodeMash2016UITests: XCTestCase {
         app.navigationBars["CodeMash2016.UpdateUser"].childrenMatchingType(.Button).matchingIdentifier("Back").elementBoundByIndex(0).tap()
         app.sheets["Save changes"].collectionViews.buttons["Exit without saving"].tap()
         
-        // test fails after executing this line
+        // test fails after executing this line...
         app.navigationBars["CodeMash2016.ShowUsers"].buttons["Compose"].tap()
+        
+        // but only if you comment out the following 4 lines...
+        let navBarText = app.navigationBars.containingType(.StaticText, identifier: "Compose").element
+        let navBarTextExists = NSPredicate(format: "exists == 1")
+        self.expectationForPredicate(navBarTextExists, evaluatedWithObject: navBarText, handler: nil)
+        self.waitForExpectationsWithTimeout(5, handler: nil)
+        // ...stop commenting out here
         
         let toTextField = app.textFields.containingType(.StaticText, identifier:"To:").element
         toTextField.tap()

@@ -55,7 +55,7 @@ class UpdateUserViewModel: ViewModelBase {
     func saveUser(completionHandler: (User?, NSError?)->()) {
         if let user = self.user {
             let handler = self.fireOnMainThread(completionHandler)
-            Api.saveUser(user, completionHandler: handler)
+            Api.sharedInstance.saveUser(user, completionHandler: handler)
         } else {
             completionHandler(nil, nil)
         }
@@ -64,7 +64,7 @@ class UpdateUserViewModel: ViewModelBase {
     func deleteUser(completionHandler: (User?, NSError?)->()) {
         if let user = self.user {
             let handler = self.fireOnMainThread(completionHandler)
-            Api.deleteUser(user, completionHandler: handler)
+            Api.sharedInstance.deleteUser(user, completionHandler: handler)
         } else {
             completionHandler(nil, nil)
         }

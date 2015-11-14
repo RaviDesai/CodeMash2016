@@ -15,7 +15,7 @@ import OHHTTPStubs
 @testable import CodeMash2016
 
 
-class TestApi: AsynchronousTestCase {
+class TestApiLogin: AsynchronousTestCase {
     var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
     var called = false
     var mockedRest = MockedRESTLogin(site: APISite(name: "Sample", uri: "http://com.desai.sample/"), validLogin: LoginParameters(username: "Admin", password: "Admin"))
@@ -37,7 +37,7 @@ class TestApi: AsynchronousTestCase {
         
         var returnedError: NSError?
         
-        Client.sharedClient.authenticate(self.loginSite, username: "Admin", password:"Admin", completion: { (error) -> () in
+        Client.sharedClient.authenticate(self.loginSite, username: "Admin", password: "Admin", completion: { (error) -> () in
             self.called = true
             returnedError = error
         })

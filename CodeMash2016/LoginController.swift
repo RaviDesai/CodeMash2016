@@ -9,7 +9,7 @@
 import UIKit
 
 class LoginController: UITableViewController {
-    var viewModel: LoginViewModel?
+    var viewModel: LoginViewModelProtocol?
     var loginButton: UIButton?
     
     func ensureViewModelIsCreated() {

@@ -12,6 +12,7 @@ import RSDRESTServices
 class ShowUsersViewModel: ViewModelBase, UITableViewDataSource {
     var cellIdentifier = "userCellIdentifier"
     var users: [User]?
+    var isLoaded: Bool { get { return users != nil } }
     
     private var cellInstantiator: ((User?, UITableView, NSIndexPath) -> UITableViewCell)
     

@@ -47,11 +47,11 @@ class LoginViewModelTests: AsynchronousTestCase {
     
     func testTableLayout() {
         XCTAssertTrue(self.vm!.numberOfSectionsInTableView(self.mockTableView) == 1)
-        XCTAssertTrue(self.vm!.tableView(self.mockTableView, numberOfRowsInSection: 0) == 3)
+        XCTAssertTrue(self.vm!.tableView(self.mockTableView, numberOfRowsInSection: 0) == 4)
         
         let userCell = self.vm!.tableView(self.mockTableView, cellForRowAtIndexPath: NSIndexPath(forRow: 0, inSection: 0)) as? MockCell
         XCTAssertTrue(userCell != nil)
-        XCTAssertTrue(userCell!.value == "admin")
+        XCTAssertTrue(userCell!.value == "Admin")
         XCTAssertTrue(userCell!.cellIdentifier == LoginTableCellIdentifier.UsernameCell)
 
         let passwordCell = self.vm!.tableView(self.mockTableView, cellForRowAtIndexPath: NSIndexPath(forRow: 1, inSection: 0)) as? MockCell

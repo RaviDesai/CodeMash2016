@@ -24,19 +24,19 @@ public class Client {
         }
     }
     
-    public func authenticate(site: APISite, username: String, password: String, completion: ((NSError?) -> ())) {
+    public func authenticate(site: APISite, username: String, password: String, completion: ((NSUUID?, NSError?) -> ())) {
         self.session = APISession(configurationBlock: nil)
         self.session.selectSite(site)
         self.authenticateUsingFedAuth(username, password: password, callback: completion)
     }
     
-    public func setSiteForUnitTesting(site: APISite, authenticated: Bool) {
+    public func setSite(site: APISite, authenticated: Bool) {
         self.site = site
         self.session.selectSite(site)
         self.authenticated = authenticated
     }
     
-    private func authenticateUsingFedAuth(userName: String, password: String, callback: ((NSError?) ->())) {
+    private func authenticateUsingFedAuth(userName: String, password: String, callback: ((NSUUID?, NSError?) ->())) {
         let message = "Invalid username or password"
         let userInfo = [NSLocalizedDescriptionKey:message, NSLocalizedFailureReasonErrorKey: message];
         let authError = NSError(domain: "com.github.RaviDesai", code: 48118002, userInfo: userInfo)
@@ -48,8 +48,7 @@ public class Client {
         let request = APIRequest(baseURL: self.session.baseURL, endpoint: endpoint, bodyEncoder: encoder, responseParser: parser, additionalHeaders: nil)
         let call = APICall(session: self.session, request: request)
         call.executeRespondWithObject { (loginResponse, error) -> () in
-            
-            if let params = loginResponse?.token {
+            if let params = loginResponse?.token, let message = loginResponse?.message, let userId = NSUUID(UUIDString: message) {
                 let parser = APIObjectResponseParser<String>()
                 let encoder = APIURLBodyEncoder(model: params)
                 let endpointUrl = URLAndParameters(url:"api/authentication/authenticationtoken")
@@ -70,7 +69,7 @@ public class Client {
                                         let foundCheck: AnyObject? = cookies?.filter { $0.name == "PassedPostLoginChecks" && $0.value == "true" }.first
                                         if (foundCheck != nil) {
                                             self.authenticated = true
-                                            callback(nil)
+                                            callback(userId, nil)
                                             return
                                         }
                                     }
@@ -78,17 +77,17 @@ public class Client {
                                 let message = "Please log into the webclient to finish security questions."
                                 let userInfo = [NSLocalizedDescriptionKey:message, NSLocalizedFailureReasonErrorKey: message];
                                 let cookieError = NSError(domain: "com.github.RaviDesai", code: 48118006, userInfo: userInfo)
-                                callback(cookieError)
+                                callback(userId, cookieError)
                             } else {
-                                callback(error)
+                                callback(userId, error)
                             }
                         })
                     } else {
-                        callback(error ?? authError)
+                        callback(userId, error ?? authError)
                     }
                 })
             } else {
-                callback(error ?? authError)
+                callback(nil, error ?? authError)
             }
         }
     }
@@ -102,6 +101,9 @@ public class Client {
     
     public func logout(completion: (()->())) {
         self.authenticated = false
+        if let mockLogin = UIApplication.sharedApplication().delegate as? ApplicationMockLoginProtocol {
+            mockLogin.logoff()
+        }
         self.session.reset(completion)
     }
     

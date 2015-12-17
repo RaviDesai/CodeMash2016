@@ -18,26 +18,29 @@ import OHHTTPStubs
 class TestApiLogin: AsynchronousTestCase {
     var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
     var called = false
-    var mockedRest = MockedRESTLogin(site: APISite(name: "Sample", uri: "http://com.desai.sample/"), validLogin: LoginParameters(username: "Admin", password: "Admin"))
+    let initialUsers = [User(id: NSUUID(), name: "Admin", password: "Admin", emailAddress: EmailAddress(user: "admin", host: "desai.com", displayValue: nil), image: nil)]
+    var mockedRest: MockedRESTLogin?
     
     override func setUp() {
         super.setUp()
+        self.mockedRest = MockedRESTLogin(site: loginSite, usersStore: MockedUsersStore(host: loginSite.uri?.host, endpoint: "/api/users", initialValues: initialUsers), userLoginChange: {(user)->() in })
         self.called = false
     }
     
     override func tearDown() {
         self.called = false
-        OHHTTPStubs.removeAllStubs();
+        self.mockedRest?.unhijackAll()
+        self.mockedRest = nil
         
         super.tearDown()
     }
     
     func testLogin() {
-        mockedRest.hijackAll()
+        mockedRest?.hijackAll()
         
         var returnedError: NSError?
         
-        Client.sharedClient.authenticate(self.loginSite, username: "Admin", password: "Admin", completion: { (error) -> () in
+        Client.sharedClient.authenticate(self.loginSite, username: "Admin", password: "Admin", completion: { (nsuuid, error) -> () in
             self.called = true
             returnedError = error
         })

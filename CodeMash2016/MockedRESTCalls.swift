@@ -11,31 +11,53 @@ import RSDRESTServices
 import RSDSerialization
 import OHHTTPStubs
 
+protocol UsersStore {
+    var store: [User] { get }
+}
 
-public class MockedRESTLogin {
-    public var host: String?
-    public var site: APISite
-    public var loginParameters: LoginParameters
+protocol GamesStore {
+    var store: [Game] { get }
+}
+
+protocol MessageStore {
+    var store: [Message] { get }
+}
+
+class MockedRESTLogin {
+    var host: String?
+    var site: APISite
+    var userStore: UsersStore
+    var loggedInUser: User?
+    var userLoginChange: (User?)->()
     
     private var authStub: OHHTTPStubsDescriptor?
     private var tokenStub: OHHTTPStubsDescriptor?
     private var postStub: OHHTTPStubsDescriptor?
 
     
-    public init(site: APISite, validLogin: LoginParameters) {
+    init(site: APISite, usersStore: UsersStore, userLoginChange: (User?)->()) {
         self.site = site
-        self.loginParameters = validLogin
+        self.userStore = usersStore
+        self.loggedInUser = nil
+        self.userLoginChange = userLoginChange
     }
     
-    private static func sampleAuthenticateData() -> NSData {
-        return "{\"Success\":true,\"Message\":null,\"Parameters\":{\"wa\":\"wsignin1.0\",\"wresult\":\"<crazyweirdxml></crazyweirdxml>\"}}".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
+    func logoff() {
+        self.loggedInUser = nil
+        userLoginChange(nil)
+    }
+    
+    private static func sampleAuthenticateData(userId: NSUUID) -> NSData {
+        let response = LoginResponse(success: true, message: userId.UUIDString, token: LoginToken(id: "wsignin1.0", token: "<crazyweirdxml></crazyweirdxml>")).convertToJSON()
+        
+        return try! NSJSONSerialization.dataWithJSONObject(response, options: NSJSONWritingOptions.PrettyPrinted)
     }
     
     private static func sampleAuthenticationTokenData() -> NSData {
         return "\"success\"".dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false)!
     }
 
-    private func hijackLoginSequence(loginSite: APISite, validLoginParameters: LoginParameters) {
+    private func hijackLoginSequence(loginSite: APISite, usersStore: UsersStore) {
         self.host = loginSite.uri?.host
         
         self.authStub =
@@ -56,17 +78,19 @@ public class MockedRESTLogin {
             
             return true
         }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-                if let requestData = NSURLProtocol.propertyForKey("PostedData", inRequest: request) as? NSData {
-                    if let json = try? NSJSONSerialization.JSONObjectWithData(requestData, options: NSJSONReadingOptions.AllowFragments) {
-                        if let login = LoginParameters.createFromJSON(json) {
-                            if login == validLoginParameters {
-                                let response = MockedRESTLogin.sampleAuthenticateData()
-                                return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "application/json"])
-                            }
+            if let requestData = NSURLProtocol.propertyForKey("PostedData", inRequest: request) as? NSData {
+                if let json = try? NSJSONSerialization.JSONObjectWithData(requestData, options: NSJSONReadingOptions.AllowFragments) {
+                    if let login = LoginParameters.createFromJSON(json) {
+                        let foundUser = self.userStore.store.filter { $0.name.lowercaseString == login.username.lowercaseString && $0.password == login.password }.first
+                        if let loggedInUserId = foundUser?.id {
+                            self.userLoginChange(foundUser!)
+                            let response = MockedRESTLogin.sampleAuthenticateData(loggedInUserId)
+                            return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "application/json"])
                         }
                     }
                 }
-                return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 401, headers: nil)
+            }
+            return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 401, headers: nil)
         })
         
         self.tokenStub =
@@ -121,11 +145,11 @@ public class MockedRESTLogin {
         
     }
 
-    public func hijackAll() {
-        self.hijackLoginSequence(self.site, validLoginParameters: self.loginParameters)
+    func hijackAll() {
+        self.hijackLoginSequence(self.site, usersStore: self.userStore)
     }
     
-    public func unhijackAll() {
+    func unhijackAll() {
         if let authStub = self.authStub {
             OHHTTPStubs.removeStub(authStub)
             self.authStub = nil
@@ -145,19 +169,215 @@ public class MockedRESTLogin {
     }
 }
 
-class MockedRESTCalls {
-    var userStore: MockedRESTStore<User>?
-    var loginStore: MockedRESTLogin?
-    
-    init(site: APISite, validLogin: LoginParameters) {
-        self.loginStore = MockedRESTLogin(site: site, validLogin: validLogin)
+protocol StoreWithLoggedInUser {
+    var loggedInUser: User? { get set }
+}
 
-        self.userStore = MockedRESTStore(host: site.uri?.host, endpoint: "/api/users", initialValues: [
-            User(id: NSUUID(), name: "One", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
-            User(id: NSUUID(), name: "Two", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
-            User(id: NSUUID(), name: "Three", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
-            User(id: NSUUID(), name: "Four", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))])
+class MockedUsersStore: MockedRESTStore<User>, UsersStore, StoreWithLoggedInUser {
+    var loggedInUser: User?
+    
+    override init(host: String?, endpoint: String, initialValues: [User]?) {
+        super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+    }
+}
+
+class MockedGamesStore: MockedRESTStore<Game>, GamesStore, StoreWithLoggedInUser {
+    private var getForUserStub: OHHTTPStubsDescriptor?
+    var loggedInUser: User?
+
+    override init(host: String?, endpoint: String, initialValues: [Game]?) {
+        super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+    }
+    
+    override func hijackGetAll() {
+        if (self.getAllStub != nil) { return }
         
+        self.getAllStub =
+            OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.host != self.host) {
+                    return false
+                }
+                if (request.URL?.path != self.endpoint) {
+                    return false
+                }
+                if (request.HTTPMethod != "GET") {
+                    return false
+                }
+                if let queryString = request.URL?.query where queryString != "" {
+                    return false
+                }
+                
+                return true
+            }, withStubResponse: { (request) -> OHHTTPStubsResponse in
+                guard let userString = self.loggedInUser?.id?.UUIDString else {
+                    return MockHTTPResponder<Game>.produceArrayResponse(nil, error: StoreError.InvalidId)
+                }
+                
+                let response = self.store.filter {
+                    if ($0.owner.id?.UUIDString == userString) {
+                        return true
+                    }
+                    let found = $0.users?.filter { $0.id?.UUIDString == userString }
+                    return (found?.count ?? 0) > 0
+                    }.sort(<)
+                
+                return MockHTTPResponder<Game>.produceArrayResponse(response, error: nil)
+            })
+    }
+    
+    func hijackGetForUser() {
+        if (getForUserStub != nil) {return}
+        
+        let queryPattern = "userId=(.+)$"
+        let queryRegEx = try? NSRegularExpression(pattern: queryPattern, options: NSRegularExpressionOptions.CaseInsensitive)
+        
+        let parseUserIdFromQueryString = {(queryStringIn: String?) -> String? in
+            guard let queryString = queryStringIn where queryString != "" else {
+                return nil
+            }
+            var userString: String?
+            if let matches = queryRegEx?.matchesInString(queryString, options: NSMatchingOptions(), range:NSMakeRange(0, queryString.characters.count)) {
+                if (matches.count > 0) {
+                    userString = queryString.substringWithRange(matches[0].rangeAtIndex(1))
+                }
+            }
+            return userString
+
+        }
+        
+        self.getForUserStub =
+            OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.host != self.host) {
+                    return false
+                }
+                if (request.URL?.path != self.endpoint) {
+                    return false
+                }
+                if (request.HTTPMethod != "GET") {
+                    return false
+                }
+                
+                return parseUserIdFromQueryString(request.URL?.query) != nil
+            }, withStubResponse: { (request) -> OHHTTPStubsResponse in
+                guard let userString = parseUserIdFromQueryString(request.URL?.query) else {
+                    return MockHTTPResponder<Game>.produceArrayResponse(nil, error: StoreError.NotFound)
+                }
+                
+                let response = self.store.filter {
+                    if ($0.owner.id?.UUIDString == userString) {
+                        return true
+                    }
+                    let found = $0.users?.filter { $0.id?.UUIDString == userString }
+                    return (found?.count ?? 0) > 0
+                }.sort(<)
+                
+                return MockHTTPResponder<Game>.produceArrayResponse(response, error: nil)
+            })
+    }
+    
+    override func hijackAll() {
+        super.hijackAll()
+        hijackGetForUser()
+        
+    }
+    
+    override func unhijackAll() {
+        super.unhijackAll()
+        if let getForUserStub = self.getForUserStub {
+            OHHTTPStubs.removeStub(getForUserStub)
+            self.getForUserStub = nil
+        }
+        
+    }
+
+}
+
+class MockedMessagesStore: MockedRESTStore<Message>, MessageStore, StoreWithLoggedInUser {
+    private var getForGameStub: OHHTTPStubsDescriptor?
+    private var getForUserStub: OHHTTPStubsDescriptor?
+    var loggedInUser: User?
+
+    override init(host: String?, endpoint: String, initialValues: [Message]?) {
+        super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+    }
+    
+    func hijackGetForGame() {
+        if (getForGameStub != nil) {return}
+        let queryPattern = "game=(.+)$"
+        let queryRegEx = try? NSRegularExpression(pattern: queryPattern, options: NSRegularExpressionOptions.CaseInsensitive)
+
+        let parseGameFromQueryString = {(queryStringIn: String?) -> String? in
+            guard let queryString = queryStringIn where queryString != "" else {
+                return nil
+            }
+            var gameString: String?
+            if let matches = queryRegEx?.matchesInString(queryString, options: NSMatchingOptions(), range:NSMakeRange(0, queryString.characters.count)) {
+                if (matches.count > 0) {
+                    gameString = queryString.substringWithRange(matches[0].rangeAtIndex(1))
+                }
+            }
+            return gameString
+            
+        }
+
+        self.getForGameStub =
+            OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.host != self.host) {
+                    return false
+                }
+                if (request.URL?.path != self.endpoint) {
+                    return false
+                }
+                if (request.HTTPMethod != "GET") {
+                    return false
+                }
+                
+                return parseGameFromQueryString(request.URL?.query) != nil
+            }, withStubResponse: { (request) -> OHHTTPStubsResponse in
+                guard let gameString = parseGameFromQueryString(request.URL?.query) where gameString != "" else {
+                    return MockHTTPResponder<Message>.produceArrayResponse(nil, error: StoreError.NotFound)
+                }
+
+                let response = self.store.filter { $0.game?.id?.UUIDString == gameString }.sort(<)
+                return MockHTTPResponder<Message>.produceArrayResponse(response, error: nil)
+            })
+    }
+    
+    override func hijackAll() {
+        super.hijackAll()
+        hijackGetForGame()
+        
+    }
+    
+    override func unhijackAll() {
+        super.unhijackAll()
+        if let getForGameStub = self.getForGameStub {
+            OHHTTPStubs.removeStub(getForGameStub)
+            self.getForGameStub = nil
+        }
+
+    }
+}
+
+class MockedRESTCalls {
+    var userStore: MockedUsersStore
+    var loginStore: MockedRESTLogin?
+    var gamesStore: MockedGamesStore
+    var messagesStore: MockedMessagesStore
+    
+    init(site: APISite, initialUsers: [User], initialGames: [Game], initialMessages: [Message]) {
+
+        self.userStore = MockedUsersStore(host: site.uri?.host, endpoint: "/api/users", initialValues: initialUsers)
+        
+        self.gamesStore = MockedGamesStore(host: site.uri?.host, endpoint: "/api/games", initialValues: initialGames)
+        
+        self.messagesStore = MockedMessagesStore(host: site.uri?.host, endpoint: "/api/messages", initialValues: initialMessages)
+        
+        self.loginStore = MockedRESTLogin(site: site, usersStore: self.userStore, userLoginChange: { (user) -> () in
+            self.userStore.loggedInUser = user
+            self.gamesStore.loggedInUser = user
+            self.messagesStore.loggedInUser = user
+        })
     }
     
     static func getImageWithName(name: String) -> UIImage? {
@@ -172,16 +392,19 @@ class MockedRESTCalls {
 
     func hijackAll() {
         self.loginStore?.hijackAll()
-        self.userStore?.hijackAll()
+        self.userStore.hijackAll()
+        self.gamesStore.hijackAll()
+        self.messagesStore.hijackAll()
     }
     
     func unhijackAll() {
         self.loginStore?.unhijackAll()
-        self.userStore?.unhijackAll()
+        self.userStore.unhijackAll()
+        self.gamesStore.unhijackAll()
+        self.messagesStore.unhijackAll()
     }
     
     deinit {
-        self.loginStore = nil
-        self.userStore = nil
+        self.unhijackAll()
     }
 }

@@ -31,15 +31,12 @@ public struct LoginParameters : JSONSerializable, Equatable {
     }
     
     public func convertToJSON() -> JSONDictionary {
-        var dict = JSONDictionary()
-        addTuplesIf( &dict, tuples:
+        return JSONDictionary(tuples:
             ("UserName", self.username),
             ("Password", self.password))
-        
-        return dict
     }
 }
 
 public func==(lhs: LoginParameters, rhs: LoginParameters) -> Bool {
-    return lhs.username == rhs.username && lhs.password == rhs.password
+    return lhs.username.lowercaseString == rhs.username.lowercaseString && lhs.password == rhs.password
 }

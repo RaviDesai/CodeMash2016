@@ -31,12 +31,9 @@ public struct LoginToken: JSONSerializable, Equatable {
     }
     
     public func convertToJSON() -> JSONDictionary {
-        var dict = JSONDictionary()
-        addTuplesIf(&dict, tuples:
+        return JSONDictionary(tuples:
             ("wa", self.id),
             ("wresult", self.token))
-        
-        return dict
     }
 }
 
@@ -70,13 +67,10 @@ public struct LoginResponse : JSONSerializable, Equatable {
     }
     
     public func convertToJSON() -> JSONDictionary {
-        var dict = JSONDictionary()
-        addTuplesIf(&dict, tuples:
+        return JSONDictionary(tuples:
             ("Success", self.success),
             ("Message", self.message),
             ("Parameters", self.token.convertToJSON()))
-        
-        return dict
     }
 }
 

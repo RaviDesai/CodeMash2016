@@ -33,38 +33,34 @@ private func== (lhs: UIImage?, rhs: UIImage?) -> Bool {
     }
 }
 
-public protocol ModelItemWithID {
-    var id: NSUUID? { get set }
-}
-
 
 struct User : ModelItem {
     var id: NSUUID?
     var name: String
+    var password: String
     var emailAddress: EmailAddress?
     var image: UIImage?
 
-    init(id: NSUUID?, name: String, emailAddress: EmailAddress?, image: UIImage?) {
+    init(id: NSUUID?, name: String, password: String, emailAddress: EmailAddress?, image: UIImage?) {
         self.id = id
         self.name = name
+        self.password = password
         self.emailAddress = emailAddress
         self.image = image
     }
     
-    static func create(id: NSUUID?)(name: String)(emailAddress: EmailAddress?)(image: UIImage?) -> User {
-        return User(id: id, name: name, emailAddress: emailAddress, image: image)
+    static func create(id: NSUUID?)(name: String)(password: String)(emailAddress: EmailAddress?)(image: UIImage?) -> User {
+        return User(id: id, name: name, password: password, emailAddress: emailAddress, image: image)
     }
     
     func convertToJSON() -> JSONDictionary {
-        var dict = JSONDictionary()
-        addTuplesIf(&dict, tuples:
+        return JSONDictionary(tuples:
             ("ID", self.id?.UUIDString),
             ("Name", self.name),
+            ("Password", self.password),
             ("EmailAddress", self.emailAddress?.convertToJSON()),
             ("Image", toBase64FromImage(self.image))
         )
-        
-        return dict
     }
     
     static func createFromJSON(json: JSON) -> User? {
@@ -72,6 +68,7 @@ struct User : ModelItem {
             return User.create
                 <**> record["ID"] >>- asUUID
                 <*> record["Name"] >>- asString
+                <*> record["Password"] >>- asString
                 <**> record["EmailAddress"] >>- EmailAddress.createFromJSON
                 <**> record["Image"] >>- asImage
         }
@@ -81,10 +78,14 @@ struct User : ModelItem {
 
 func==(lhs: User, rhs: User) -> Bool {
     if (lhs.id == nil || rhs.id == nil) {
-        return lhs.name == rhs.name && lhs.emailAddress == rhs.emailAddress && lhs.image == rhs.image
+        return lhs.name == rhs.name && lhs.password == rhs.password && lhs.emailAddress == rhs.emailAddress && lhs.image == rhs.image
     }
     
     return lhs.id == rhs.id
+}
+
+func==%(lhs: User, rhs: User) -> Bool {
+    return lhs.name == rhs.name
 }
 
 func<(lhs: User, rhs: User) -> Bool {

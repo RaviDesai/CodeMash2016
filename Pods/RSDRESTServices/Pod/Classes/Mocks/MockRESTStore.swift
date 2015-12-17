@@ -9,18 +9,25 @@ import Foundation
 import RSDSerialization
 import OHHTTPStubs
 
+public enum StoreError: ErrorType {
+    case InvalidId
+    case NotUnique
+    case NotFound
+    case UndefinedError
+}
+
 public class MockedRESTStore<T: ModelItem> {
-    private var host: String?
-    private var endpoint: String?
+    public var host: String?
+    public var endpoint: String?
     private var endpointRegEx: NSRegularExpression?
     
     public var store: [T]
     
-    private var createStub: OHHTTPStubsDescriptor?
-    private var deleteStub: OHHTTPStubsDescriptor?
-    private var updateStub: OHHTTPStubsDescriptor?
-    private var getAllStub: OHHTTPStubsDescriptor?
-    private var getOneStub: OHHTTPStubsDescriptor?
+    public var createStub: OHHTTPStubsDescriptor?
+    public var deleteStub: OHHTTPStubsDescriptor?
+    public var updateStub: OHHTTPStubsDescriptor?
+    public var getAllStub: OHHTTPStubsDescriptor?
+    public var getOneStub: OHHTTPStubsDescriptor?
     
     public init(host: String?, endpoint: String, initialValues: [T]?) {
         self.host = host
@@ -44,6 +51,17 @@ public class MockedRESTStore<T: ModelItem> {
         return nil
     }
     
+    public func verifyUnique(object: T, atIndex: Int?) -> Bool {
+        for (var index = 0; index < store.count; index++) {
+            if (index != atIndex) {
+                if (store[index] ==% object) {
+                    return false
+                }
+            }
+        }
+        return true
+    }
+    
     public func findIndexOfUUID(id: NSUUID) -> Int? {
         for (var index = 0; index < store.count; index++) {
             if (store[index].id == id) {
@@ -53,8 +71,14 @@ public class MockedRESTStore<T: ModelItem> {
         return nil
     }
     
-    public func create(object: T) -> T? {
-        if (object.id != nil) { return nil }
+    public func create(object: T) throws -> T? {
+        if (object.id != nil) {
+            throw StoreError.InvalidId
+        }
+        
+        guard verifyUnique(object, atIndex: nil) else {
+            throw StoreError.NotUnique
+        }
         
         var item = object
         item.id = NSUUID()
@@ -62,22 +86,27 @@ public class MockedRESTStore<T: ModelItem> {
         return item
     }
     
-    public func update(object: T) -> T? {
-        if let index = self.findIndex(object) {
-            self.store[index] = object
-            return object
+    public func update(object: T) throws -> T {
+        guard let index = self.findIndex(object) else {
+            throw StoreError.NotFound
         }
-        return nil
+        
+        guard verifyUnique(object, atIndex: index) else {
+            throw StoreError.NotUnique
+        }
+        
+        self.store[index] = object
+        return object
     }
     
-    public func delete(uuid: NSUUID) -> T? {
-        if let index = findIndexOfUUID(uuid) {
-            return self.store.removeAtIndex(index)
+    public func delete(uuid: NSUUID) throws -> T? {
+        guard let index = findIndexOfUUID(uuid) else {
+            throw StoreError.NotFound
         }
-        return nil
+        return self.store.removeAtIndex(index)
     }
     
-    private func hijackGetAll() {
+    public func hijackGetAll() {
         if (self.getAllStub != nil) { return }
         
         self.getAllStub =
@@ -91,14 +120,17 @@ public class MockedRESTStore<T: ModelItem> {
                 if (request.HTTPMethod != "GET") {
                     return false
                 }
+                if let queryString = request.URL?.query where queryString != "" {
+                    return false
+                }
                 
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-                return MockHTTPResponder<T>.produceArrayResponse(self.store.sort(<))
+                return MockHTTPResponder<T>.produceArrayResponse(self.store.sort(<), error: nil)
             })
     }
     
-    private func hijackGetOne() {
+    public func hijackGetOne() {
         if (self.getOneStub != nil) { return }
         
         self.getOneStub =
@@ -115,6 +147,10 @@ public class MockedRESTStore<T: ModelItem> {
                     return false
                 }
                 
+                if let queryString = request.URL?.query where queryString != "" {
+                    return false
+                }
+                
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
                     var item: T? = nil
@@ -123,11 +159,11 @@ public class MockedRESTStore<T: ModelItem> {
                             item = self.store[index]
                         }
                     }
-                    return MockHTTPResponder<T>.produceObjectResponse(item)
+                return MockHTTPResponder<T>.produceObjectResponse(item, error: nil)
             })
     }
     
-    private func hijackCreate() {
+    public func hijackCreate() {
         if self.createStub != nil { return }
         
         self.createStub =
@@ -136,7 +172,7 @@ public class MockedRESTStore<T: ModelItem> {
                     return false
                 }
                 
-                if request.URL?.path == self.endpoint {
+                if request.URL?.path != self.endpoint {
                     return false
                 }
                 
@@ -150,13 +186,23 @@ public class MockedRESTStore<T: ModelItem> {
                 
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-                    return MockHTTPResponder<T>.withPostedObject(request, logic: { (item) -> OHHTTPStubsResponse in
-                        return MockHTTPResponder<T>.produceObjectResponse(self.create(item as! T))
-                    })
+                return MockHTTPResponder<T>.withPostedObject(request, logic: { (item) -> OHHTTPStubsResponse in
+                    var response: T?
+                    var responseError: StoreError?
+                    do {
+                        response = try self.create(item)
+                    } catch let err as StoreError {
+                        responseError = err
+                    } catch {
+                        responseError = StoreError.UndefinedError
+                    }
+                    
+                    return MockHTTPResponder<T>.produceObjectResponse(response, error: responseError)
+                })
             })
     }
     
-    private func hijackUpdate() {
+    public func hijackUpdate() {
         if (self.updateStub != nil) { return }
         
         self.updateStub =
@@ -179,13 +225,24 @@ public class MockedRESTStore<T: ModelItem> {
                 
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-                    return MockHTTPResponder<T>.withPostedObject(request, logic: { (item) -> OHHTTPStubsResponse in
-                        return MockHTTPResponder<T>.produceObjectResponse(self.update(item as! T))
-                    })
+                return MockHTTPResponder<T>.withPostedObject(request, logic: { (item) -> OHHTTPStubsResponse in
+                    var response: T?
+                    var responseError: StoreError?
+                    do {
+                        response = try self.update(item)
+                    } catch let err as StoreError {
+                        responseError = err
+                    } catch {
+                        responseError = StoreError.UndefinedError
+                    }
+                    
+
+                    return MockHTTPResponder<T>.produceObjectResponse(response, error: responseError)
+                })
             })
     }
     
-    private func hijackDelete() {
+    public func hijackDelete() {
         if (self.deleteStub != nil) { return }
         
         self.deleteStub =
@@ -205,7 +262,19 @@ public class MockedRESTStore<T: ModelItem> {
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
                     return MockHTTPResponder<T>.withIdInPath(request, regEx: self.endpointRegEx, logic: { (requestId) -> OHHTTPStubsResponse in
-                        MockHTTPResponder<T>.produceObjectResponse(self.delete(requestId))
+                        
+                        var response: T?
+                        var responseError: StoreError?
+                        do {
+                            response = try self.delete(requestId)
+                        } catch let err as StoreError {
+                            responseError = err
+                        } catch {
+                            responseError = StoreError.UndefinedError
+                        }
+                        
+                        
+                        return MockHTTPResponder<T>.produceObjectResponse(response, error: responseError)
                     })
             })
     }

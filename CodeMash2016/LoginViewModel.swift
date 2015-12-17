@@ -13,6 +13,7 @@ enum LoginTableCellIdentifier : String {
     case UsernameCell = "usernameCell"
     case PasswordCell = "passwordCell"
     case LoginCell = "loginCell"
+    case CreateNewUserCell = "createNewUserCell"
 }
 
 protocol LoginViewModelProtocol: UITableViewDataSource {
@@ -20,9 +21,10 @@ protocol LoginViewModelProtocol: UITableViewDataSource {
     var username: String { get set }
     var password: String { get set }
     var loginButtonLabel: String { get set }
+    var loggedInUser: User? { get }
+    
     func instantiateCell(cellIdentifier: LoginTableCellIdentifier, value: String, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
-    func executeLogin(completionHandler: (NSError?)->())
-    func getAllUsers(completionHandler: ([User]?, NSError?)->())
+    func executeLogin(completionHandler: (User?, NSError?)->())
 }
 
 class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
@@ -34,12 +36,15 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
     var username: String = ""
     var password: String = ""
     var loginButtonLabel: String = "Login"
+    var createNewUserLabel: String = "Create New User"
+    private(set) var loggedInUser: User?
     
     func getCellIdentifier(indexPath: NSIndexPath) -> LoginTableCellIdentifier {
         switch(indexPath.row) {
         case 0: return LoginTableCellIdentifier.UsernameCell
         case 1: return LoginTableCellIdentifier.PasswordCell
-        default: return LoginTableCellIdentifier.LoginCell
+        case 2: return LoginTableCellIdentifier.LoginCell
+        default: return LoginTableCellIdentifier.CreateNewUserCell
         }
     }
     
@@ -47,7 +52,8 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
         switch(indexPath.row) {
         case 0: return self.username
         case 1: return self.password
-        default: return self.loginButtonLabel
+        case 2: return self.loginButtonLabel
+        default: return self.createNewUserLabel
         }
     }
     
@@ -64,7 +70,7 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
+        return 4
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -79,14 +85,22 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
         return self.cellInstantiator(cellIdentifier, value, tableView, indexPath)
     }
     
-    func executeLogin(completionHandler: (NSError?)->()) {
+    func executeLogin(completionHandler: (User?, NSError?)->()) {
         let handler = self.fireOnMainThread(completionHandler)
-        Client.sharedClient.authenticate(LoginViewModel.site, username: self.username, password: self.password, completion: handler)
-    }
-    
-    func getAllUsers(completionHandler: ([User]?, NSError?)->()) {
-        let handler = self.fireOnMainThread(completionHandler)
-        Api.sharedInstance.getAllUsers(handler)
+        Client.sharedClient.authenticate(LoginViewModel.site, username: self.username, password: self.password, completion: {(userId, error) -> () in
+            if let myerror = error {
+                handler(nil, myerror)
+                return
+            }
+            guard let myUserId = userId else {
+                handler(nil, nil)
+                return
+            }
+            Api.sharedInstance.getUser(myUserId, completionHandler: {(user, error) -> () in
+                self.loggedInUser = user
+                handler(user, error)
+            })
+        })
     }
     
 }

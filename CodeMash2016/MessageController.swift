@@ -14,6 +14,8 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
     var addCCButton: UIButton?
     var toTokenFieldView: TITokenFieldView?
     var ccTokenFieldView: TITokenFieldView?
+    var subjectLabel: UILabel?
+    var subjectText: UITextField?
     var viewModel: MessageViewModel?
     var editorIsLoaded: Bool = false
     var webView: WebViewEditor?
@@ -46,21 +48,6 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
         toTokenFieldView?.forcePickSearchResult = true
         toTokenFieldView?.tokenField.accessibilityValue = EmailAddress.getCollapsedEmailAddressDisplayText(self.viewModel!.toTokens)
         
-        ccTokenFieldView?.tokenField.removeAllTokens()
-        ccTokenFieldView?.sourceArray = self.viewModel!.contacts.map { Box($0) }
-        for token in self.viewModel!.ccTokens {
-            let tiToken = TIToken(title: token.description, representedObject: Box(token))
-            tiToken.isAccessibilityElement = true
-            tiToken.accessibilityTraits = UIAccessibilityTraitButton
-            tiToken.accessibilityValue = "\(token.user)@\(token.host)"
-            tiToken.accessibilityLabel = tiToken.accessibilityValue
-            ccTokenFieldView?.tokenField.addToken(tiToken)
-        }
-        ccTokenFieldView?.forcePickSearchResult = true
-        ccTokenFieldView?.tokenField.accessibilityValue = EmailAddress.getCollapsedEmailAddressDisplayText(self.viewModel!.ccTokens)
-        
-        ccTokenFieldView?.tokenField.becomeFirstResponder()
-        ccTokenFieldView?.tokenField.endEditing(true)
         toTokenFieldView?.tokenField.becomeFirstResponder()
         toTokenFieldView?.tokenField.endEditing(true)
 
@@ -103,47 +90,34 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
         
         self.view.addConstraints([toFieldTop, toFieldBottom,toFieldLeft, toFieldRight])
         
-        let ccFieldView = TITokenFieldView(frame: toFieldView.contentView.bounds)
-        let ccField = ccFieldView.tokenField
-        ccField.delegate = self
-        ccField.addTarget(self, action: Selector("tokenFieldFrameDidChange:"), forControlEvents: event)
-        ccField.tokenizingCharacters = NSCharacterSet(charactersInString: ",:.")
-        ccField.setPromptText("Cc:")
-        ccField.placeholder = "Type a name"
-        ccField.removesTokensOnEndEditing = true
-        ccFieldView.translatesAutoresizingMaskIntoConstraints = false
+        let subjectLabel = UILabel(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let subjectText = UITextField(frame: CGRect(x: 100, y: 0, width: 300, height: 20))
+        subjectLabel.setContentCompressionResistancePriority(752, forAxis: UILayoutConstraintAxis.Horizontal)
         
-        let addCCButton = UIButton(type: UIButtonType.ContactAdd)
-        addCCButton.addTarget(self, action: Selector("showCCAddressPicker:"), forControlEvents: UIControlEvents.TouchUpInside)
-        ccField.rightView = addCCButton
-        ccField.rightViewMode = UITextFieldViewMode.Always
-        self.addCCButton = addCCButton
+        toFieldView.contentView.addSubview(subjectLabel)
+        toFieldView.contentView.addSubview(subjectText)
         
-        ccField.addTarget(self, action: Selector("tokenFieldChangedEditing:"), forControlEvents: UIControlEvents.EditingDidBegin)
-        ccField.addTarget(self, action: Selector("tokenFieldChangedEditing:"), forControlEvents: UIControlEvents.EditingDidEnd)
+        let subjectLabelTop = NSLayoutConstraint(item: subjectLabel, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 0.0)
+        let subjectLabelLeft = NSLayoutConstraint(item: subjectLabel, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 0.0)
+        let subjectTextTop = NSLayoutConstraint(item: subjectText, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 0.0)
+        let subjectTextLeft = NSLayoutConstraint(item: subjectText, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: subjectLabel, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0)
+        let subjectTextRight = NSLayoutConstraint(item: subjectText, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0)
         
-        toFieldView.contentView.addSubview(ccFieldView)
-        self.ccTokenFieldView = ccFieldView
+        toFieldView.contentView.addConstraints([subjectLabelTop, subjectLabelLeft, subjectTextTop, subjectTextLeft, subjectTextRight])
         
-        let ccFieldTop = NSLayoutConstraint(item: ccFieldView, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 0.0)
-        let ccFieldBottom = NSLayoutConstraint(item: ccFieldView, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0)
-        let ccFieldLeft = NSLayoutConstraint(item: ccFieldView, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 0.0)
-        let ccFieldRight = NSLayoutConstraint(item: ccFieldView, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0)
-        
-        toFieldView.contentView.addConstraints([ccFieldTop, ccFieldBottom, ccFieldLeft, ccFieldRight])
         
         self.editorIsLoaded = false
-        let webView = WebViewEditor(frame: ccFieldView.contentView.bounds, delegate: self);
+        let webView = WebViewEditor(frame: toFieldView.contentView.bounds, delegate: self);
         webView.translatesAutoresizingMaskIntoConstraints = false
-        ccFieldView.contentView.addSubview(webView);
+        toFieldView.contentView.addSubview(webView);
         self.webView = webView
         
-        let webViewTop = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: ccFieldView.contentView, attribute: NSLayoutAttribute.Top, multiplier: 1.0, constant: 0.0)
-        let webViewLeft = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: ccFieldView.contentView, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 0.0)
-        let webViewRight = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: ccFieldView.contentView, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0)
-        let webViewBottom = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: ccFieldView.contentView, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0)
+        let webViewTop = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Top, relatedBy: NSLayoutRelation.Equal, toItem: subjectText, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0)
+        let webViewLeft = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Left, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Left, multiplier: 1.0, constant: 0.0)
+        let webViewRight = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Right, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Right, multiplier: 1.0, constant: 0.0)
+        let webViewBottom = NSLayoutConstraint(item: webView, attribute: NSLayoutAttribute.Bottom, relatedBy: NSLayoutRelation.Equal, toItem: toFieldView.contentView, attribute: NSLayoutAttribute.Bottom, multiplier: 1.0, constant: 0.0)
         
-        ccFieldView.contentView.addConstraints([webViewTop, webViewLeft, webViewRight, webViewBottom])
+        toFieldView.contentView.addConstraints([webViewTop, webViewLeft, webViewRight, webViewBottom])
         
         webView.loadEditorResources()
     }

@@ -20,13 +20,29 @@ class TestApiUsers: AsynchronousTestCase {
     var called = false
     var mockedRest: MockedRESTCalls?
     
+    func getFakeUsers() -> [User] {
+        return [
+            User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
+            User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
+            User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
+            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
+    }
+
+    func getFakeGames() -> [Game] {
+        var users = getFakeUsers()
+        return [
+            Game(id: NSUUID(), title: "RuneQuest", owner: users[0], users: [users[1], users[2]]),
+            Game(id: NSUUID(), title: "ElfQuest", owner: users[3], users: [users[0], users[2]])
+        ]
+    }
+    
     override func setUp() {
         super.setUp()
-        mockedRest = MockedRESTCalls(site: self.loginSite, validLogin: LoginParameters(username: "Admin", password: "Admin"))
+        mockedRest = MockedRESTCalls(site: self.loginSite, initialUsers: getFakeUsers(), initialGames: getFakeGames(), initialMessages: [])
         self.called = false
         mockedRest?.hijackAll()
         
-        Client.sharedClient.authenticate(self.loginSite, username: "Admin", password: "Admin", completion: { (error) -> () in
+        Client.sharedClient.authenticate(self.loginSite, username: "One", password: "pass", completion: { (nsuuid, error) -> () in
             if (error == nil) {
                 self.called = true
             }
@@ -44,7 +60,7 @@ class TestApiUsers: AsynchronousTestCase {
     }
     
     private func usersFromStore() -> [User]? {
-        return self.mockedRest?.userStore?.store.sort()
+        return self.mockedRest?.userStore.store.sort()
     }
     
     func testGetAllUsers() {
@@ -90,7 +106,7 @@ class TestApiUsers: AsynchronousTestCase {
     func testDeleteUserFail() {
         let initialCount = self.usersFromStore()!.count
         XCTAssertTrue(initialCount >= 4)
-        let userToDelete = User(id: NSUUID(), name: "Not There", emailAddress: EmailAddress(user: "not", host: "there.com", displayValue: "not there, dude"), image: nil)
+        let userToDelete = User(id: NSUUID(), name: "Not There", password: "pass", emailAddress: EmailAddress(user: "not", host: "there.com", displayValue: "not there, dude"), image: nil)
         var resultUser: User?
         var resultError: NSError?
         

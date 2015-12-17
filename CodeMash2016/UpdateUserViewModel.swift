@@ -61,6 +61,13 @@ class UpdateUserViewModel: ViewModelBase {
         }
     }
     
+    func createUser(completionHandler: (User?, NSError?) -> ()) {
+        if let user = self.user {
+            let handler = self.fireOnMainThread(completionHandler)
+            Api.sharedInstance.createUser(user, completionHandler: handler)
+        }
+    }
+    
     func deleteUser(completionHandler: (User?, NSError?)->()) {
         if let user = self.user {
             let handler = self.fireOnMainThread(completionHandler)

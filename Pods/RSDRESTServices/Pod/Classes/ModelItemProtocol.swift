@@ -13,5 +13,19 @@ public protocol ItemWithID {
     var id: NSUUID? { get set }
 }
 
-public protocol ModelItem: JSONSerializable, ItemWithID, Comparable {}
+infix operator ==% {
+    associativity none
+    precedence 130
+}
+
+
+public protocol UniqueFieldComparable {
+    func==%(lhs: Self, rhs: Self) -> Bool
+}
+
+public func==%<T: UniqueFieldComparable>(lhs: T, rhs: T) -> Bool {
+    return false
+}
+
+public protocol ModelItem: JSONSerializable, ItemWithID, Comparable, UniqueFieldComparable {}
 

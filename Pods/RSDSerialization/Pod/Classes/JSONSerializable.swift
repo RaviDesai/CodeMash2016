@@ -12,8 +12,23 @@ public protocol SerializableToJSON {
 }
 
 public protocol SerializableFromJSON {
-    typealias ConcreteType
-    static func createFromJSON(json: JSON) -> ConcreteType?
+    static func createFromJSON(json: JSON) -> Self?
 }
 
 public protocol JSONSerializable : SerializableToJSON, SerializableFromJSON { }
+
+public extension SequenceType where Generator.Element: SerializableToJSON {
+    public func convertToJSONArray() -> [JSONDictionary] {
+        return self.map { $0.convertToJSON() }
+    }
+}
+
+public extension SequenceType where Generator.Element: JSON {
+    public func createFromJSONArray<T where T: SerializableFromJSON>() -> [T]? {
+        return self
+            .map { T.createFromJSON($0) }
+            .filter { $0 != nil }
+            .map { $0! }
+
+    }
+}

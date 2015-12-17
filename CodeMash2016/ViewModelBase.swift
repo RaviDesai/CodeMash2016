@@ -10,6 +10,12 @@ import Foundation
 
 internal class ViewModelBase : NSObject {
     
+    internal func fireNoResultOnMainThread(handler: ()->()) -> (()->()) {
+        return {
+            dispatch_async(dispatch_get_main_queue(), handler)
+        }
+    }
+    
     internal func fireOnMainThread(handler: (NSError?)->()) -> ((NSError?) -> ()) {
         return { (error) in
             dispatch_async(dispatch_get_main_queue(), {
@@ -41,6 +47,15 @@ internal class ViewModelBase : NSObject {
             })
         }
     }
+
+    internal func fireOnNoResultMainThreadAfterDelay(delayInSeconds: Double, handler: ()->()) -> (() -> ()) {
+        return { (error) in
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, Int64(delayInSeconds * Double(NSEC_PER_SEC))), dispatch_get_main_queue(), {
+                handler(error)
+            })
+        }
+    }
+
     
     internal func fireOnMainThreadAfterDelay(delayInSeconds: Double, handler: (NSError?)->()) -> ((NSError?) -> ()) {
         return { (error) in

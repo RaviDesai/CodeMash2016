@@ -24,7 +24,7 @@ public class APIJSONSerializableResponseParser<T: SerializableFromJSON> : APIRes
         let (jsonOptional, error) = response.getJSON()
         if let json:JSON = jsonOptional {
             if let obj = T.createFromJSON(json) {
-                return (obj as? T, nil)
+                return (obj, nil)
             } else {
                 let userInfo = [NSLocalizedDescriptionKey: "JSON deserialization error", NSLocalizedFailureReasonErrorKey: "JSON deserialization error"]
                 
@@ -40,7 +40,7 @@ public class APIJSONSerializableResponseParser<T: SerializableFromJSON> : APIRes
         let (jsonOptional, error) = response.getJSON()
         if let json:JSON = jsonOptional {
             if let objArray = ModelFactory<T>.createFromJSONArray(json) {
-                return (objArray.map { $0 as! T }, nil)
+                return (objArray.map { $0 }, nil)
             } else {
                 let userInfo = [NSLocalizedDescriptionKey: "JSON deserialization error", NSLocalizedFailureReasonErrorKey: "JSON deserialization error"]
                 

@@ -3,10 +3,26 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "TabController.instantiateFromViewModel() -&gt; ():TabController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.navigationItem">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "CodeMash2016UITests.testChoosePhoto() -&gt; ():CodeMash2016UITests.swift">
          <PersistentStrings>
             <PersistentString
                value = "app.alerts[&quot;\u{201c}CodeMash2016\u{201d} Would Like to Access Your Photos&quot;]">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "APIRequest.makeRequest&lt;A where ...&gt;() -&gt; NSMutableURLRequest?:APIRequest.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.endpoint">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

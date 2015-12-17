@@ -12,7 +12,19 @@ public typealias JSON = AnyObject
 public typealias JSONArray = [JSON]
 public typealias JSONDictionary = [String: JSON]
 
-public func toStringFromDate(format: String, dateOptional: NSDate?) -> String? {
+public extension String {
+    public func toDate(format: String) -> NSDate? {
+        return toDateFromString(format, dateString: self)
+    }
+}
+
+public extension NSDate {
+    public func toUTCString(format: String) -> String? {
+        return toStringFromDate(format, dateOptional: self)
+    }
+}
+
+private func toStringFromDate(format: String, dateOptional: NSDate?) -> String? {
     if let date = dateOptional {
         let formatter = NSDateFormatter()
         formatter.timeZone = NSTimeZone(forSecondsFromGMT: 0)
@@ -22,7 +34,7 @@ public func toStringFromDate(format: String, dateOptional: NSDate?) -> String? {
     return nil
 }
 
-public func toDateFromString(format: String, dateString: String) -> NSDate? {
+private func toDateFromString(format: String, dateString: String) -> NSDate? {
     let formatter = NSDateFormatter()
     formatter.dateFormat = format
     return formatter.dateFromString(dateString)

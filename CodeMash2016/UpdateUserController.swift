@@ -36,7 +36,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         nameLabel.text = "Name"
         emailLabel.text = "Email"
         
-        idValue.text = self.viewModel?.uuidString
+        idValue.text = self.viewModel?.uuidString ?? "--New User--"
         nameTextField.text = self.viewModel?.contactName
         emailTextField.text = self.viewModel?.contactAddress
         
@@ -54,10 +54,11 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         let deleteButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Trash, target: self, action: Selector("deleteUser:"))
 
         self.navigationItem.rightBarButtonItem = deleteButton
-        
+        self.navigationItem.title = "Edit User"
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         ensureViewModelIsCreated()
         initializeComponentsFromViewModel()
     }
@@ -74,14 +75,17 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         updateViewModelFromTextField(self.emailTextField)
         
         let emailAddressIsValid = (self.viewModel?.contactAddress != nil)
+        let nameIsValid = (self.viewModel?.contactName != nil && self.viewModel?.contactName != .Some(""))
         let informationHasChanged = self.viewModel?.hasInformationChanged ?? false
+        let userIsBeingUpdated = self.viewModel?.uuidString != nil
         
-        if (!informationHasChanged) {
+        if (!informationHasChanged && self.viewModel?.uuidString != nil) {
             return true
         }
         
         let title = "Save changes"
-        let message: String? = (!emailAddressIsValid) ? "Warning - the email field has an invalid value" : nil
+        
+        let message: String? = (!emailAddressIsValid || !nameIsValid) ? "Warning - the name or email field has an invalid value" : nil
         
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.ActionSheet)
         
@@ -90,21 +94,32 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         }
         
         let saveAction = UIAlertAction(title: "Save changes", style: UIAlertActionStyle.Default) { (action) -> Void in
-            self.viewModel!.saveUser({ (returnedUser, returnedError) -> () in
-                guard let myError = returnedError else {
-                    self.userModificationHandler?(.Saved, returnedUser)
-                    self.navigationController?.popViewControllerAnimated(true)
-                    return
-                }
-                self.notifyUserOfError(myError, withCallbackOnDismissal: { () -> () in })
-            })
+            if (userIsBeingUpdated) {
+                self.viewModel!.saveUser({ (returnedUser, returnedError) -> () in
+                    guard let myError = returnedError else {
+                        self.userModificationHandler?(.Saved, returnedUser)
+                        self.navigationController?.popViewControllerAnimated(true)
+                        return
+                    }
+                    self.notifyUserOfError(myError, withCallbackOnDismissal: { () -> () in })
+                })
+            } else {
+                self.viewModel!.createUser({ (returnedUser, returnedError) -> () in
+                    guard let myError = returnedError else {
+                        self.userModificationHandler?(.Saved, returnedUser)
+                        self.navigationController?.popViewControllerAnimated(true)
+                        return
+                    }
+                    self.notifyUserOfError(myError, withCallbackOnDismissal: { () -> () in })
+                })
+            }
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
         }
         
         alert.addAction(exitAction)
-        if (emailAddressIsValid) {
+        if (emailAddressIsValid && nameIsValid) {
             alert.addAction(saveAction)
         }
         alert.addAction(cancelAction)

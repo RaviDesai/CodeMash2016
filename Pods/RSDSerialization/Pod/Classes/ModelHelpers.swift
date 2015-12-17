@@ -8,19 +8,28 @@
 
 import Foundation
 
-public func addIf<Key, Value>(inout toDictionary: Dictionary<Key, Value>, key: Key, value: Value?) -> Void {
-    if let myvalue = value {
-        toDictionary[key] = myvalue
+public extension Dictionary {
+    public mutating func addIf(key: Key, value: Value?) {
+        if let myValue = value {
+            self[key] = myValue
+        }
+    }
+    
+    public mutating func addTuplesIf(tuples: (Key, Value?)...) {
+        for tuple in tuples {
+            self.addIf(tuple.0, value: tuple.1)
+        }
+    }
+    
+    init (tuples: (Key, Value?)...) {
+        self.init()
+        for tuple in tuples {
+            self.addIf(tuple.0, value: tuple.1)
+        }
     }
 }
 
-public func addTuplesIf<Key, Value>(inout toDictionary: Dictionary<Key, Value>, tuples: (Key, Value?)...) -> Void {
-    for tuple in tuples {
-        addIf(&toDictionary, key: tuple.0, value: tuple.1)
-    }
-}
-
-public func convertToFormUrl<Key, Value>(fromDictionary: Dictionary<Key, Value>) -> NSData {
+private func convertToFormUrl<Key, Value>(fromDictionary: Dictionary<Key, Value>) -> NSData {
     var urlParams = Array<String>();
     for (key, value) in fromDictionary {
         let set = NSCharacterSet.URLQueryAllowedCharacterSet().mutableCopy()
@@ -35,16 +44,10 @@ public func convertToFormUrl<Key, Value>(fromDictionary: Dictionary<Key, Value>)
     return strData.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: false) ?? NSData()
 }
 
-public func convertToFormUrl(obj: SerializableToJSON) -> NSData {
+private func convertToFormUrl(obj: SerializableToJSON) -> NSData {
     return convertToFormUrl(obj.convertToJSON());
 }
 
-public func convertToJSONArray<T: SerializableToJSON>(fromArray: [T]?) -> [JSONDictionary]? {
-    if let from = fromArray {
-        return from.map { $0.convertToJSON() }
-    }
-    return nil
-}
 
 public extension SerializableToJSON {
     public func convertToFormUrlEncoded() -> NSData {
@@ -53,18 +56,14 @@ public extension SerializableToJSON {
 }
 
 public class ModelFactory<T: SerializableFromJSON> {
-    public static func createFromJSONArray(json: JSON) -> [T.ConcreteType]? {
-        if let jsonArray = json as? JSONArray {
-            return jsonArray
-                .map { T.createFromJSON($0) }
-                .filter { $0 != nil }
-                .map { $0! }
-        }
-        return nil
+    public static func createFromJSONArray(json: JSON) -> [T]? {
+        let jsonArray = json as? JSONArray
+        let result : [T]? = jsonArray?.createFromJSONArray()
+        return result
     }
     
-    public static func createFromJSON(json: JSON) -> T.ConcreteType? {
-        return T.createFromJSON(json);
+    public static func createFromJSON(json: JSON) -> T? {
+        return T.createFromJSON(json)
     }
 }
 

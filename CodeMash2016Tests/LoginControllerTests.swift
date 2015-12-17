@@ -26,10 +26,15 @@ class LoginControllerTests: AsynchronousTestCase {
     
     func getFakeUsers() -> [User] {
         return [
-            User(id: NSUUID(), name: "One", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
-            User(id: NSUUID(), name: "Two", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
-            User(id: NSUUID(), name: "Three", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
-            User(id: NSUUID(), name: "Four", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
+            User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
+            User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
+            User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
+            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
+    }
+    
+    func getFakeGames() -> [Game] {
+        let users = getFakeUsers()
+        return [Game(id: NSUUID(), title: "D&D", owner: users[0], users: [users[1], users[3]])]
     }
     
     class override func setUp() {
@@ -49,7 +54,7 @@ class LoginControllerTests: AsynchronousTestCase {
         
         self.controller?.view.hidden = false
 
-        mockViewModel = PartialMockLoginViewModel(vm: self.controller!.viewModel! as! LoginViewModel, fakedUsers: getFakeUsers(), loginSucceeds: true)
+        mockViewModel = PartialMockLoginViewModel(vm: self.controller!.viewModel! as! LoginViewModel, fakedUsers: getFakeUsers(), fakedGames: getFakeGames(), loginSucceeds: true)
         
         self.controller?.viewModel = mockViewModel
     }
@@ -69,7 +74,7 @@ class LoginControllerTests: AsynchronousTestCase {
         XCTAssertTrue(self.controller != nil)
         XCTAssertTrue(self.controller!.numberOfSectionsInTableView(
             self.controller!.tableView) == 1)
-        XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 3)
+        XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 4)
 
         let userCell = self.controller!.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0))
         let userText = userCell?.viewWithTag(100) as? UITextField
@@ -108,6 +113,6 @@ class LoginControllerTests: AsynchronousTestCase {
         loginButton!.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
         
         XCTAssertTrue(self.waitForResponse { self.called })
-        XCTAssertTrue(segueCalled == .Some("ShowUsers"))
+        XCTAssertTrue(segueCalled == .Some("TabController"))
     }
 }

@@ -25,12 +25,9 @@ public struct APISite : JSONSerializable, Comparable {
     }
 
     public func convertToJSON() -> JSONDictionary {
-        var dict = JSONDictionary()
-        addTuplesIf( &dict, tuples:
+        return JSONDictionary(tuples:
             ("Name", self.name),
             ("Uri", self.uri?.absoluteString))
-        
-        return dict
 
     }
     

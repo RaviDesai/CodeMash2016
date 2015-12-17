@@ -25,13 +25,10 @@ struct EmailAddress: JSONSerializable, Comparable, CustomStringConvertible {
     }
     
     func convertToJSON() -> JSONDictionary {
-        var dict = JSONDictionary()
-        addTuplesIf(&dict, tuples:
+        return JSONDictionary(tuples:
             ("User", self.user),
             ("Host", self.host),
             ("DisplayValue", self.displayValue))
-        
-        return dict
     }
     
     static func createFromJSON(json: JSON) -> EmailAddress? {

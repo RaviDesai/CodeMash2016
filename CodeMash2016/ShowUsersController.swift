@@ -24,8 +24,8 @@ class ShowUsersController: UITableViewController {
         })
     }
     
-    func instantiateFromViewModel() {
-        if (self.viewModel == nil) { return }
+    func initializeComponentsFromViewModel() {
+        guard let isLoaded = self.viewModel?.isLoaded where isLoaded else { return }
         if (!self.isViewLoaded()) { return }
         
         self.tableView.delegate = self
@@ -37,19 +37,24 @@ class ShowUsersController: UITableViewController {
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
         ensureViewModelIsCreated()
-        instantiateFromViewModel()
+        initializeComponentsFromViewModel()
+    }
+    
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tabBarController?.title = "Users"
     }
     
     func setUsers(users: [User]?, error: NSError?) {
-        if let retrieveError = error {
-            self.notifyUserOfError(retrieveError, withCallbackOnDismissal: { () -> () in })
+        if let _ = error {
             self.popBackToCallerWithMissingDataMessage()
             return
         }
         ensureViewModelIsCreated()
         self.viewModel?.setUsers(users!, completionHandler: { (err) -> () in
-            self.instantiateFromViewModel()
+            self.initializeComponentsFromViewModel()
         })
     }
     
@@ -83,7 +88,6 @@ class ShowUsersController: UITableViewController {
                 controller.setContacts(self.viewModel?.users?.map { $0.emailAddress }.filter { $0 != nil }.map { $0! })
             }
         }
-
 
     }
     

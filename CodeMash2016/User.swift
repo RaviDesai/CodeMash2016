@@ -74,6 +74,18 @@ struct User : ModelItem {
         }
         return nil;
     }
+    
+    var isAdmin: Bool { get { return self.name.lowercaseString == "admin" } }
+}
+
+extension User {
+    func isAuthorizedForReading(user: User) -> Bool {
+        return true
+    }
+    
+    func isAuthorizedForUpdating(user: User) -> Bool {
+        return user.isAdmin || self == user
+    }
 }
 
 func==(lhs: User, rhs: User) -> Bool {

@@ -100,7 +100,7 @@ class LoginController: UITableViewController {
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "CreateUser" {
             if let createUserController = segue.destinationViewController as? UpdateUserController {
-                createUserController.setUser(User(id: nil, name: "", password: "pass", emailAddress: nil, image: nil), userWasModified: { (deletedOrSaved, user) -> () in
+                createUserController.setUser(User(id: nil, name: "", password: "pass", emailAddress: nil, image: nil), loggedInUser: self.viewModel?.loggedInUser, userWasModified: { (deletedOrSaved, user) -> () in
                     if (deletedOrSaved == DeletedOrSaved.Saved) {
                         if let newUser = user {
                             self.viewModel?.username = newUser.name

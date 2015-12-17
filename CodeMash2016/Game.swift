@@ -48,6 +48,36 @@ struct Game: ModelItem {
     }
 }
 
+extension Game {
+    func isAuthorizedForReading(user: User) -> Bool {
+        if (user.isAdmin) { return true }
+        return self.isAuthorizedForReading(user.id?.UUIDString)
+    }
+    
+    func isAuthorizedForReading(userIdString: String?) -> Bool {
+        if self.owner.id?.UUIDString == userIdString {
+            return true
+        }
+        let matchingUsersCount = self.users?.filter { $0.id?.UUIDString == userIdString }.count ?? 0
+        if (matchingUsersCount > 0) {
+            return true
+        }
+        return false
+    }
+    
+    func isAuthorizedForUpdating(user: User) -> Bool {
+        if (user.isAdmin) { return true }
+        return self.isAuthorizedForUpdating(user.id?.UUIDString)
+    }
+    
+    func isAuthorizedForUpdating(userIdString: String?) -> Bool {
+        if self.owner.id?.UUIDString == userIdString {
+            return true
+        }
+        return false
+    }
+}
+
 func==(lhs: Game, rhs: Game) -> Bool {
     if (lhs.id == nil || rhs.id == nil) {
         return lhs.title == rhs.title && lhs.owner == rhs.owner

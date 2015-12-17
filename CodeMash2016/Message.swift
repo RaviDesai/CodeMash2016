@@ -59,6 +59,35 @@ struct Message: ModelItem {
     }
 }
 
+extension Message {
+    func isAuthorizedForReading(authuser: User) -> Bool {
+        if (authuser.isAdmin) {
+            return true
+        }
+        if let game = self.game where game.isAuthorizedForReading(authuser) {
+            return true
+        }
+        if self.from == authuser {
+            return true
+        }
+        let matchingUsersCount = self.to?.filter { $0 == authuser }.count ?? 0
+        if (matchingUsersCount > 0) {
+            return true
+        }
+        return false
+    }
+    
+    func isAuthorizedForUpdate(authuser: User) -> Bool {
+        if (authuser.isAdmin) {
+            return true
+        }
+        if self.from == authuser {
+            return true
+        }
+        return false
+    }
+}
+
 func==(lhs: Message, rhs: Message) -> Bool {
     if (lhs.id == nil || rhs.id == nil) {
         return lhs.from == rhs.from && lhs.to ?? [] == rhs.to ?? [] && lhs.game == rhs.game && lhs.subject == rhs.subject && lhs.message == rhs.message && lhs.date == rhs.date

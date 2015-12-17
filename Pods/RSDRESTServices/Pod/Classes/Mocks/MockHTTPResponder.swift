@@ -70,6 +70,8 @@ public class MockHTTPResponder<T: JSONSerializable> {
                 return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 404, headers: nil)
             case StoreError.NotUnique:
                 return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 409, headers: nil)
+            case StoreError.NotAuthorized:
+                return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 401, headers: nil)
             default:
                 return OHHTTPStubsResponse(JSONObject: JSONDictionary(), statusCode: 400, headers: nil)
             }

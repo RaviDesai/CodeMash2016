@@ -11,12 +11,24 @@ import UIKit
 class UpdateUserViewModel: ViewModelBase {
     var originalUser: User?
     var user: User?
+    var loggedInUser: User?
     
-    func setUser(user: User?) {
+    func setUser(user: User?, loggedInUser: User?) {
         self.user = user
+        self.loggedInUser = loggedInUser
         self.originalUser = user
         // make sure comparisons are using ID field.
         self.originalUser?.id = nil
+    }
+    
+    var canBeUpdated: Bool {
+        get {
+            if let loggedInUser = self.loggedInUser, thisuser = self.user {
+                if (loggedInUser.isAdmin) { return true }
+                if (thisuser.isAuthorizedForUpdating(loggedInUser)) { return true }
+            }
+            return false
+        }
     }
     
     var contactName: String? {

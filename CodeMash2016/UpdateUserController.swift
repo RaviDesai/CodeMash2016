@@ -40,6 +40,11 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         nameTextField.text = self.viewModel?.contactName
         emailTextField.text = self.viewModel?.contactAddress
         
+        nameTextField.enabled = self.viewModel!.canBeUpdated
+        emailTextField.enabled = self.viewModel!.canBeUpdated
+        self.removePhotoButton.enabled = self.viewModel!.canBeUpdated
+        self.choosePhotoButton.enabled = self.viewModel!.canBeUpdated
+        
         if (self.viewModel?.hasValidEmailAddress == .Some(false)) {
             self.emailTextField.textColor = UIColor.redColor()
         } else {
@@ -52,6 +57,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         emailTextField.delegate = self
         
         let deleteButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Trash, target: self, action: Selector("deleteUser:"))
+        deleteButton.enabled = self.viewModel!.canBeUpdated
 
         self.navigationItem.rightBarButtonItem = deleteButton
         self.navigationItem.title = "Edit User"
@@ -63,10 +69,10 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         initializeComponentsFromViewModel()
     }
     
-    func setUser(user : User?, userWasModified: (DeletedOrSaved, User?)->()) {
+    func setUser(user : User?, loggedInUser: User?, userWasModified: (DeletedOrSaved, User?)->()) {
         self.userModificationHandler = userWasModified
         ensureViewModelIsCreated()
-        self.viewModel?.setUser(user)
+        self.viewModel?.setUser(user, loggedInUser: loggedInUser)
         initializeComponentsFromViewModel()
     }
     

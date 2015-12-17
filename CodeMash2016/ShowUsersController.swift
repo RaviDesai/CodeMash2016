@@ -47,13 +47,13 @@ class ShowUsersController: UITableViewController {
         self.tabBarController?.title = "Users"
     }
     
-    func setUsers(users: [User]?, error: NSError?) {
+    func setUsers(users: [User]?, loggedInUser: User?, error: NSError?) {
         if let _ = error {
             self.popBackToCallerWithMissingDataMessage()
             return
         }
         ensureViewModelIsCreated()
-        self.viewModel?.setUsers(users!, completionHandler: { (err) -> () in
+        self.viewModel?.setUsers(users!, loggedInUser: loggedInUser, completionHandler: { (err) -> () in
             self.initializeComponentsFromViewModel()
         })
     }
@@ -70,7 +70,7 @@ class ShowUsersController: UITableViewController {
         if (segue.identifier == "ModifyUser") {
             if let updateUserController = segue.destinationViewController as? UpdateUserController {
                 if let indexPath = self.tableView.indexPathForSelectedRow {
-                    updateUserController.setUser(self.viewModel?.getUserAtIndexPath(indexPath), userWasModified: {(deletedOrSaved, user)->() in
+                    updateUserController.setUser(self.viewModel?.getUserAtIndexPath(indexPath), loggedInUser: self.viewModel?.loggedInUser, userWasModified: {(deletedOrSaved, user)->() in
                         if deletedOrSaved == .Saved {
                             if let updatedUser = user {
                                 self.viewModel?.updateUser(updatedUser, atIndexPath: indexPath)

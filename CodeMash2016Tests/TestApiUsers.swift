@@ -25,7 +25,7 @@ class TestApiUsers: AsynchronousTestCase {
             User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
             User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
             User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
-            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
+            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFour"))]
     }
 
     func getFakeGames() -> [Game] {
@@ -83,7 +83,7 @@ class TestApiUsers: AsynchronousTestCase {
     func testDeleteUserSuccess() {
         let initialCount = self.usersFromStore()!.count
         XCTAssertTrue(initialCount >= 4)
-        let userToDelete = self.usersFromStore()![2]
+        let userToDelete = self.usersFromStore()![1]
         var resultUser: User?
         var resultError: NSError?
         
@@ -129,7 +129,7 @@ class TestApiUsers: AsynchronousTestCase {
     func testSaveUserSuccess() {
         let initialCount = self.usersFromStore()!.count
         XCTAssertTrue(initialCount >= 4)
-        var userToUpdate = self.usersFromStore()![2]
+        var userToUpdate = self.usersFromStore()![1]
         userToUpdate.name = "Jordy"
         var resultUser: User?
         var resultError: NSError?

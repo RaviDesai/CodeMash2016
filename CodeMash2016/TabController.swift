@@ -27,7 +27,7 @@ class TabController: UITabBarController {
         
         if let usersController = self.viewControllers?[0] as? ShowUsersController {
             self.viewModel?.getAllUsers({ (users, error) -> () in
-                usersController.setUsers(users, error: error)
+                usersController.setUsers(users, loggedInUser: self.viewModel?.loggedInUser, error: error)
                 if let gamesController = self.viewControllers?[1] as? GamesController {
                     self.viewModel?.getAllGames({ (games, error) -> () in
                         gamesController.setCurrentUserAndGames(self.viewModel?.loggedInUser, games: games, error: error)

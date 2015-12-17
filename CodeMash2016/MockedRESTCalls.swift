@@ -178,6 +178,18 @@ class MockedUsersStore: MockedRESTStore<User>, UsersStore, StoreWithLoggedInUser
     
     override init(host: String?, endpoint: String, initialValues: [User]?) {
         super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+        self.authFilterForReading = {(user) in
+            if let authuser = self.loggedInUser {
+                return user.isAuthorizedForReading(authuser)
+            }
+            return true
+        }
+        self.authFilterForUpdating = {(user) in
+            if let authuser = self.loggedInUser {
+                return user.isAuthorizedForUpdating(authuser)
+            }
+            return true
+        }
     }
 }
 
@@ -187,42 +199,18 @@ class MockedGamesStore: MockedRESTStore<Game>, GamesStore, StoreWithLoggedInUser
 
     override init(host: String?, endpoint: String, initialValues: [Game]?) {
         super.init(host: host, endpoint: endpoint, initialValues: initialValues)
-    }
-    
-    override func hijackGetAll() {
-        if (self.getAllStub != nil) { return }
-        
-        self.getAllStub =
-            OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
-                if (request.URL?.host != self.host) {
-                    return false
-                }
-                if (request.URL?.path != self.endpoint) {
-                    return false
-                }
-                if (request.HTTPMethod != "GET") {
-                    return false
-                }
-                if let queryString = request.URL?.query where queryString != "" {
-                    return false
-                }
-                
-                return true
-            }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-                guard let userString = self.loggedInUser?.id?.UUIDString else {
-                    return MockHTTPResponder<Game>.produceArrayResponse(nil, error: StoreError.InvalidId)
-                }
-                
-                let response = self.store.filter {
-                    if ($0.owner.id?.UUIDString == userString) {
-                        return true
-                    }
-                    let found = $0.users?.filter { $0.id?.UUIDString == userString }
-                    return (found?.count ?? 0) > 0
-                    }.sort(<)
-                
-                return MockHTTPResponder<Game>.produceArrayResponse(response, error: nil)
-            })
+        self.authFilterForReading = {(game) in
+            if let user = self.loggedInUser {
+                return game.isAuthorizedForReading(user)
+            }
+            return true
+        }
+        self.authFilterForUpdating = {(game) in
+            if let user = self.loggedInUser {
+                return game.isAuthorizedForUpdating(user)
+            }
+            return true
+        }
     }
     
     func hijackGetForUser() {
@@ -263,14 +251,7 @@ class MockedGamesStore: MockedRESTStore<Game>, GamesStore, StoreWithLoggedInUser
                     return MockHTTPResponder<Game>.produceArrayResponse(nil, error: StoreError.NotFound)
                 }
                 
-                let response = self.store.filter {
-                    if ($0.owner.id?.UUIDString == userString) {
-                        return true
-                    }
-                    let found = $0.users?.filter { $0.id?.UUIDString == userString }
-                    return (found?.count ?? 0) > 0
-                }.sort(<)
-                
+                let response = self.getAll().filter { $0.isAuthorizedForReading(userString) }.sort(<)
                 return MockHTTPResponder<Game>.produceArrayResponse(response, error: nil)
             })
     }
@@ -299,6 +280,38 @@ class MockedMessagesStore: MockedRESTStore<Message>, MessageStore, StoreWithLogg
 
     override init(host: String?, endpoint: String, initialValues: [Message]?) {
         super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+        self.authFilterForReading = {(message) in
+            if let authuser = self.loggedInUser {
+                if let game = message.game where game.isAuthorizedForReading(authuser) {
+                    return true
+                }
+                if message.from == authuser {
+                    return true
+                }
+                let matchingUsersCount = message.to?.filter { $0 == authuser }.count ?? 0
+                if (matchingUsersCount > 0) {
+                    return true
+                }
+                return false
+            }
+            return true
+        }
+        self.authFilterForUpdating = {(message) in
+            if let authuser = self.loggedInUser {
+                if let game = message.game where game.isAuthorizedForUpdating(authuser) {
+                    return true
+                }
+                if message.from == authuser {
+                    return true
+                }
+                let matchingUsersCount = message.to?.filter { $0 == authuser }.count ?? 0
+                if (matchingUsersCount > 0) {
+                    return true
+                }
+                return false
+            }
+            return true
+        }
     }
     
     func hijackGetForGame() {
@@ -338,7 +351,7 @@ class MockedMessagesStore: MockedRESTStore<Message>, MessageStore, StoreWithLogg
                     return MockHTTPResponder<Message>.produceArrayResponse(nil, error: StoreError.NotFound)
                 }
 
-                let response = self.store.filter { $0.game?.id?.UUIDString == gameString }.sort(<)
+                let response = self.getAll().filter { $0.game?.id?.UUIDString == gameString }.sort(<)
                 return MockHTTPResponder<Message>.produceArrayResponse(response, error: nil)
             })
     }

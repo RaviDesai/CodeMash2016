@@ -12,6 +12,7 @@ import RSDRESTServices
 class ShowUsersViewModel: ViewModelBase, UITableViewDataSource {
     var cellIdentifier = "userCellIdentifier"
     var users: [User]?
+    var loggedInUser: User?
     var isLoaded: Bool { get { return users != nil } }
     
     private var cellInstantiator: ((User?, UITableView, NSIndexPath) -> UITableViewCell)
@@ -20,9 +21,10 @@ class ShowUsersViewModel: ViewModelBase, UITableViewDataSource {
         self.cellInstantiator = cellInstantiator
     }
 
-    func setUsers(users: [User], completionHandler: (NSError?)->()) {
+    func setUsers(users: [User], loggedInUser: User?, completionHandler: (NSError?)->()) {
         let handler = self.fireOnMainThread(completionHandler)
         self.users = users
+        self.loggedInUser = loggedInUser
         handler(nil)
     }
  

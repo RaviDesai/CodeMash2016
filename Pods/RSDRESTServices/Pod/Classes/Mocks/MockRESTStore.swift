@@ -13,6 +13,7 @@ public enum StoreError: ErrorType {
     case InvalidId
     case NotUnique
     case NotFound
+    case NotAuthorized
     case UndefinedError
 }
 
@@ -20,6 +21,8 @@ public class MockedRESTStore<T: ModelItem> {
     public var host: String?
     public var endpoint: String?
     private var endpointRegEx: NSRegularExpression?
+    public var authFilterForReading: (T)->(Bool)
+    public var authFilterForUpdating: (T)->(Bool)
     
     public var store: [T]
     
@@ -29,9 +32,13 @@ public class MockedRESTStore<T: ModelItem> {
     public var getAllStub: OHHTTPStubsDescriptor?
     public var getOneStub: OHHTTPStubsDescriptor?
     
+    
     public init(host: String?, endpoint: String, initialValues: [T]?) {
         self.host = host
         self.endpoint = endpoint
+        self.authFilterForReading = {(t: T)->(Bool) in return true }
+        self.authFilterForUpdating = {(t: T)->(Bool) in return true }
+        
         let queryPattern = "\(endpoint)/(.+)$"
         self.endpointRegEx = try? NSRegularExpression(pattern: queryPattern, options: NSRegularExpressionOptions.CaseInsensitive)
         
@@ -76,6 +83,10 @@ public class MockedRESTStore<T: ModelItem> {
             throw StoreError.InvalidId
         }
         
+        if (!authFilterForUpdating(object)) {
+            throw StoreError.NotAuthorized
+        }
+        
         guard verifyUnique(object, atIndex: nil) else {
             throw StoreError.NotUnique
         }
@@ -91,6 +102,10 @@ public class MockedRESTStore<T: ModelItem> {
             throw StoreError.NotFound
         }
         
+        if (!authFilterForUpdating(store[index])) {
+            throw StoreError.NotAuthorized
+        }
+        
         guard verifyUnique(object, atIndex: index) else {
             throw StoreError.NotUnique
         }
@@ -103,7 +118,28 @@ public class MockedRESTStore<T: ModelItem> {
         guard let index = findIndexOfUUID(uuid) else {
             throw StoreError.NotFound
         }
+        
+        if (!authFilterForUpdating(store[index])) {
+            throw StoreError.NotAuthorized
+        }
+        
         return self.store.removeAtIndex(index)
+    }
+    
+    public func get(uuid: NSUUID) throws -> T? {
+        guard let index = findIndexOfUUID(uuid) else {
+            throw StoreError.NotFound
+        }
+        
+        if (!authFilterForReading(store[index])) {
+            throw StoreError.NotAuthorized
+        }
+        
+        return self.store[index]
+    }
+    
+    public func getAll() -> [T] {
+        return self.store.filter(self.authFilterForReading).sort(<)
     }
     
     public func hijackGetAll() {
@@ -126,7 +162,7 @@ public class MockedRESTStore<T: ModelItem> {
                 
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-                return MockHTTPResponder<T>.produceArrayResponse(self.store.sort(<), error: nil)
+                return MockHTTPResponder<T>.produceArrayResponse(self.getAll(), error: nil)
             })
     }
     
@@ -153,13 +189,21 @@ public class MockedRESTStore<T: ModelItem> {
                 
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
-                    var item: T? = nil
-                    if let id = pullIdFromPath(request.URL?.path, regEx: self.endpointRegEx) {
-                        if let index = self.findIndexOfUUID(id) {
-                            item = self.store[index]
-                        }
+                return MockHTTPResponder<T>.withIdInPath(request, regEx: self.endpointRegEx, logic: { (requestId) -> OHHTTPStubsResponse in
+                    
+                    var response: T?
+                    var responseError: StoreError?
+                    do {
+                        response = try self.get(requestId)
+                    } catch let err as StoreError {
+                        responseError = err
+                    } catch {
+                        responseError = StoreError.UndefinedError
                     }
-                return MockHTTPResponder<T>.produceObjectResponse(item, error: nil)
+                    
+                    
+                    return MockHTTPResponder<T>.produceObjectResponse(response, error: responseError)
+                })
             })
     }
     

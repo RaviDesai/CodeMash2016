@@ -15,7 +15,7 @@ protocol MessageListViewModelProtocol {
     var isLoaded: Bool { get }
     
     func instantiateCell(message: Message?, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
-    func setMessages(currentUser: User?, game: Game?, messages: [Message])
+    func setMessages(currentUser: User?, game: Game?, users: [User]?, messages: [Message])
 }
 
 class MessageListViewModel: NSObject, UITableViewDataSource, MessageListViewModelProtocol {
@@ -24,6 +24,7 @@ class MessageListViewModel: NSObject, UITableViewDataSource, MessageListViewMode
     var cellInstantiator: (Message?, UITableView, NSIndexPath) -> UITableViewCell
     var messages: [Message]?
     var game: Game?
+    var users: [User]?
     var currentUser: User?
     
     init(cellInstantiator: (Message?, UITableView, NSIndexPath)->UITableViewCell) {
@@ -56,9 +57,10 @@ class MessageListViewModel: NSObject, UITableViewDataSource, MessageListViewMode
         return self.cellInstantiator(message, tableView, indexPath)
     }
     
-    func setMessages(currentUser: User?, game: Game?, messages: [Message]) {
+    func setMessages(currentUser: User?, game: Game?, users: [User]?, messages: [Message]) {
         self.currentUser = currentUser
         self.game = game
+        self.users = users
         self.messages = messages
     }
 }

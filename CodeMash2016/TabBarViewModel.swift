@@ -10,27 +10,25 @@ import UIKit
 
 protocol TabBarViewModelProtocol {
     var loggedInUser: User? { get }
+    var users: [User]? { get }
+    var games: [Game]? { get }
+    var isLoaded: Bool { get }
     
-    func getAllUsers(completionHandler: ([User]?, NSError?)->())
-    func getAllGames(completionHandler: ([Game]?, NSError?) -> ())
-    func setUser(loggedInUser: User?)
+    func setUser(loggedInUser: User?, users: [User]?, games: [Game]?)
     func logout(completionHandler: ()->())
 }
 
 class TabBarViewModel: ViewModelBase, TabBarViewModelProtocol {
     var loggedInUser: User?
+    var users: [User]?
+    var games: [Game]?
     
-    func setUser(loggedInUser: User?) {
+    var isLoaded: Bool { get { return loggedInUser != nil && users != nil && games != nil } }
+    
+    func setUser(loggedInUser: User?, users: [User]?, games: [Game]?) {
         self.loggedInUser = loggedInUser
-    }
-    func getAllUsers(completionHandler: ([User]?, NSError?)->()) {
-        let handler = self.fireOnMainThread(completionHandler)
-        Api.sharedInstance.getAllUsers(handler)
-    }
-    
-    func getAllGames(completionHandler: ([Game]?, NSError?) -> ()) {
-        let handler = self.fireOnMainThread(completionHandler)
-        Api.sharedInstance.getAllGames(self.loggedInUser, completionHandler: handler)
+        self.users = users
+        self.games = games
     }
     
     func logout(completionHandler: ()->()) {

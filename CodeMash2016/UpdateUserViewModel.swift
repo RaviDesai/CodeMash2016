@@ -41,9 +41,9 @@ class UpdateUserViewModel: ViewModelBase {
     }
     
     var contactAddress: String? {
-        get { return self.user?.emailAddress?.addressString }
+        get { return self.user?.emailAddress?.description }
         set {
-            self.user?.emailAddress = EmailAddress.convertToEmailAddress(newValue)
+            self.user?.emailAddress = EmailAddress(string: newValue)
         }
     }
     

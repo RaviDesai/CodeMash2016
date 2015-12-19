@@ -14,6 +14,7 @@ private let userInfoNotImplemented = [NSLocalizedDescriptionKey: "API is not imp
 private let errorNotImplemented = NSError(domain: "com.careevolution.direct", code: 48103001, userInfo: userInfoNotImplemented)
 
 class MockApi: ApiProtocol {
+
     func getUser(id: NSUUID, completionHandler: (User?, NSError?) -> ()) {
         completionHandler(nil, errorNotImplemented)
     }
@@ -27,6 +28,9 @@ class MockApi: ApiProtocol {
         completionHandler(nil, errorNotImplemented)
     }
     func deleteUser(user: User, completionHandler: (User?, NSError?) -> ()) {
+        completionHandler(nil, errorNotImplemented)
+    }
+    func createGame(game: Game, completionHandler: (Game?, NSError?) -> ()) {
         completionHandler(nil, errorNotImplemented)
     }
     func getAllGames(user: User?, completionHandler: ([Game]?, NSError?) -> ()) {

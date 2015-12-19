@@ -29,21 +29,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ApplicationMockLoginProto
         let mockData = arguments.contains("--mockdata") || true
         if (mockData) {
             let initialUsers = [
-                User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
-                User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
-                User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
-                User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFour")),
-                User(id: NSUUID(), name: "Admin", password: "admin", emailAddress: EmailAddress(user: "ravidesai", host: "me.com", displayValue: nil), image: nil)
+                User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberOne")),
+                User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberTwo")),
+                User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberThree")),
+                User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberFour")),
+                User(id: NSUUID(), name: "Admin", password: "admin", emailAddress: EmailAddress(user: "ravidesai", host: "me.com"), image: nil)
             ]
             
             let initialGames = [
-                Game(id: NSUUID(), title: "Glorantha", owner: initialUsers[4], users: [initialUsers[0], initialUsers[1]]),
-                Game(id: NSUUID(), title: "Darkmoon", owner: initialUsers[1], users: [initialUsers[2], initialUsers[3]])
+                Game(id: NSUUID(), title: "Glorantha", owner: initialUsers[4].id!, users: [initialUsers[0].id!, initialUsers[1].id!]),
+                Game(id: NSUUID(), title: "Darkmoon", owner: initialUsers[1].id!, users: [initialUsers[2].id!, initialUsers[3].id!])
+            ]
+            
+            let initialMessages = [
+                Message(id: NSUUID(), from: initialUsers[0].id!, to: nil, game: initialGames[0].id!, subject: "King of Sartar", message: "avoiding death at all costs", date: NSDate()),
+                Message(id: NSUUID(), from: initialUsers[1].id!, to: nil, game: initialGames[0].id!, subject: "Re: King of Sartar", message: "death comes to all", date: NSDate())
             ]
             
             Client.sharedClient.setSite(self.site, authenticated: false)
             validLogin = LoginParameters(username: "Admin", password: "admin")
-            self.mockedRest = MockedRESTCalls(site: self.site, initialUsers: initialUsers, initialGames: initialGames, initialMessages: [])
+            self.mockedRest = MockedRESTCalls(site: self.site, initialUsers: initialUsers, initialGames: initialGames, initialMessages: initialMessages)
             self.mockedRest?.hijackAll()
         }
         

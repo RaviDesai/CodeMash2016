@@ -12,14 +12,12 @@ import RSDRESTServices
 
 class PartialMockLoginViewModel: NSObject, LoginViewModelProtocol {
     var vm: LoginViewModel
-    var fakedUsers: [User]?
-    var fakedGames: [Game]?
-    var loginSucceeds: Bool
+    var loginCallback: (()-> (User?, NSError?))?
+    var getAllUsersCallback: (() -> ([User]?, NSError?))?
+    var getAllGamesCallback: (() -> ([Game]?, NSError?))?
     
-    init(vm: LoginViewModel, fakedUsers: [User]?, fakedGames: [Game]?, loginSucceeds: Bool) {
+    init(vm: LoginViewModel) {
         self.vm = vm
-        self.fakedUsers = fakedUsers
-        self.loginSucceeds = loginSucceeds
     }
     
     var isLoggingIn: Bool {
@@ -65,22 +63,27 @@ class PartialMockLoginViewModel: NSObject, LoginViewModelProtocol {
     }
     
     func executeLogin(completionHandler: (User?, NSError?)->()) {
-        if self.loginSucceeds {
-            let user = self.fakedUsers?[0];
-            completionHandler(user, nil)
+        if let callback = self.loginCallback {
+            completionHandler(callback())
         } else {
-            completionHandler(nil, self.generateError(401, message: "unauthorized"))
+            completionHandler(nil, self.generateError(405, message: "unimplemented"))
         }
     }
     
     func getAllUsers(completionHandler: ([User]?, NSError?)->()) {
-        let userError = fakedUsers == nil ? generateError(500, message: "internal error") : nil
-        completionHandler(fakedUsers, userError)
+        if let callback = self.getAllUsersCallback {
+            completionHandler(callback())
+        } else {
+            completionHandler(nil, self.generateError(405, message: "unimplemented"))
+        }
     }
     
     func getAllGames(completionHandler: ([Game]?, NSError?)->()) {
-        let gamesError = fakedGames == nil ? generateError(500, message: "internal error") : nil
-        completionHandler(fakedGames, gamesError)
+        if let callback = self.getAllGamesCallback {
+            completionHandler(callback())
+        } else {
+            completionHandler(nil, self.generateError(405, message: "unimplemented"))
+        }
     }
 
 

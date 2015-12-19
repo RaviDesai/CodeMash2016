@@ -20,20 +20,25 @@ extension NSDate {
 
 class MessageCell: UITableViewCell {
     var message: Message?
+    var users: [User]?
 
     @IBOutlet weak var subjectLabel: UILabel!
     @IBOutlet weak var messageLabel: UILabel!
     @IBOutlet weak var fromLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
 
-    func setMessage(message: Message?) {
+    func setMessage(message: Message?, users: [User]?) {
         self.message = message
+        self.users = users
+        self.initializeComponentsFromViewModel()
     }
     
     func initializeComponentsFromViewModel() {
+        if let fromUser = self.users?.filter({ $0.id == self.message?.from }).first {
+            fromLabel.text = (message != nil) ? "\(fromUser.name)" : nil
+        }
         subjectLabel.text = message?.subject
         messageLabel.text = message?.message
-        fromLabel.text = "\(message?.from)"
         dateLabel.text = message?.date.toLocalString()
     }
 }

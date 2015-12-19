@@ -14,12 +14,14 @@ enum DeletedOrSaved {
 }
 
 extension UIViewController {
-    public func popBackToCallerWithMissingDataMessage() {
+    public func generateMissingDataMessage() -> NSError {
         let userInfo = [NSLocalizedDescriptionKey: "Cannot show screen", NSLocalizedFailureReasonErrorKey: "Required data could not be retrieved"]
         
-        let error = NSError(domain: "com.careevolution.direct", code: 48103001, userInfo: userInfo)
-        
-        self.notifyUserOfError(error, withCallbackOnDismissal: { () -> () in
+        return NSError(domain: "com.careevolution.direct", code: 48103001, userInfo: userInfo)
+    }
+    
+    public func popBackToCallerWithMissingDataMessage() {
+        self.notifyUserOfError(self.generateMissingDataMessage(), withCallbackOnDismissal: { () -> () in
             self.navigationController?.popViewControllerAnimated(true)
         })
     }

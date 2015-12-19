@@ -17,7 +17,7 @@ class MessageListController: UITableViewController {
         self.viewModel = MessageListViewModel(cellInstantiator: { (message, tableView, indexPath) -> UITableViewCell in
             let resultCell = self.tableView.dequeueReusableCellWithIdentifier(MessageListViewModel.cellIdentifier, forIndexPath: indexPath) as! MessageCell
             
-            resultCell.setMessage(message)
+            resultCell.setMessage(message, users: self.viewModel?.users)
             return resultCell
         })
     }
@@ -31,11 +31,19 @@ class MessageListController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func setMessages(currentUser: User?, game: Game?, messages: [Message]?, error: NSError?) {
+    func setMessages(currentUser: User?, game: Game?, users: [User]?, messages: [Message]?, error: NSError?) {
         guard let myMessages = messages where error == nil else {
             self.popBackToCallerWithMissingDataMessage()
             return
         }
-        self.viewModel?.setMessages(currentUser, game: game, messages: myMessages)
+        self.ensureViewModelIsCreated()
+        self.viewModel?.setMessages(currentUser, game: game, users: users, messages: myMessages)
+        self.initializeComponentsFromViewModel()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.ensureViewModelIsCreated()
+        self.initializeComponentsFromViewModel()
     }
 }

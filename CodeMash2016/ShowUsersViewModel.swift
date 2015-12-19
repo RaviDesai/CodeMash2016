@@ -9,8 +9,21 @@
 import UIKit
 import RSDRESTServices
 
-class ShowUsersViewModel: ViewModelBase, UITableViewDataSource {
-    var cellIdentifier = "userCellIdentifier"
+protocol ShowUsersViewModelProtocol: UITableViewDataSource {
+    var users: [User]? { get }
+    var loggedInUser: User? { get }
+    var isLoaded: Bool { get }
+    var totalUsers: Int { get }
+    
+    func getUserAtIndexPath(indexPath: NSIndexPath) -> User?
+    func updateUser(user: User, atIndexPath indexPath: NSIndexPath)
+    func deleteUserAtIndexPath(indexPath: NSIndexPath)
+    func setUsers(users: [User], loggedInUser: User?)
+    func instantiateCell(user: User?, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
+}
+
+class ShowUsersViewModel: ViewModelBase, ShowUsersViewModelProtocol {
+    static var cellIdentifier = "userCellIdentifier"
     var users: [User]?
     var loggedInUser: User?
     var isLoaded: Bool { get { return users != nil } }
@@ -21,11 +34,9 @@ class ShowUsersViewModel: ViewModelBase, UITableViewDataSource {
         self.cellInstantiator = cellInstantiator
     }
 
-    func setUsers(users: [User], loggedInUser: User?, completionHandler: (NSError?)->()) {
-        let handler = self.fireOnMainThread(completionHandler)
+    func setUsers(users: [User], loggedInUser: User?) {
         self.users = users
         self.loggedInUser = loggedInUser
-        handler(nil)
     }
  
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

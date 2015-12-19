@@ -81,11 +81,12 @@ class MockedRESTLogin {
             if let requestData = NSURLProtocol.propertyForKey("PostedData", inRequest: request) as? NSData {
                 if let json = try? NSJSONSerialization.JSONObjectWithData(requestData, options: NSJSONReadingOptions.AllowFragments) {
                     if let login = LoginParameters.createFromJSON(json) {
-                        let foundUser = self.userStore.store.filter { $0.name.lowercaseString == login.username.lowercaseString && $0.password == login.password }.first
-                        if let loggedInUserId = foundUser?.id {
-                            self.userLoginChange(foundUser!)
-                            let response = MockedRESTLogin.sampleAuthenticateData(loggedInUserId)
-                            return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "application/json"])
+                        if let foundUser = self.userStore.store.filter({ $0.name.lowercaseString == login.username.lowercaseString && $0.password == login.password }).first {
+                            if let loggedInUserId = foundUser.id {
+                                self.userLoginChange(foundUser)
+                                let response = MockedRESTLogin.sampleAuthenticateData(loggedInUserId)
+                                return OHHTTPStubsResponse(data: response, statusCode: 200, headers: ["Content-Type": "application/json"])
+                            }
                         }
                     }
                 }
@@ -277,38 +278,20 @@ class MockedMessagesStore: MockedRESTStore<Message>, MessageStore, StoreWithLogg
     private var getForGameStub: OHHTTPStubsDescriptor?
     private var getForUserStub: OHHTTPStubsDescriptor?
     var loggedInUser: User?
+    private var gamesStore: GamesStore
 
-    override init(host: String?, endpoint: String, initialValues: [Message]?) {
+    init(host: String?, endpoint: String, games: GamesStore, initialValues: [Message]?) {
+        self.gamesStore = games
         super.init(host: host, endpoint: endpoint, initialValues: initialValues)
         self.authFilterForReading = {(message) in
             if let authuser = self.loggedInUser {
-                if let game = message.game where game.isAuthorizedForReading(authuser) {
-                    return true
-                }
-                if message.from == authuser {
-                    return true
-                }
-                let matchingUsersCount = message.to?.filter { $0 == authuser }.count ?? 0
-                if (matchingUsersCount > 0) {
-                    return true
-                }
-                return false
+                return message.isAuthorizedForReading(self.gamesStore.store, authuser: authuser)
             }
             return true
         }
         self.authFilterForUpdating = {(message) in
             if let authuser = self.loggedInUser {
-                if let game = message.game where game.isAuthorizedForUpdating(authuser) {
-                    return true
-                }
-                if message.from == authuser {
-                    return true
-                }
-                let matchingUsersCount = message.to?.filter { $0 == authuser }.count ?? 0
-                if (matchingUsersCount > 0) {
-                    return true
-                }
-                return false
+                return message.isAuthorizedForUpdating(authuser)
             }
             return true
         }
@@ -351,7 +334,7 @@ class MockedMessagesStore: MockedRESTStore<Message>, MessageStore, StoreWithLogg
                     return MockHTTPResponder<Message>.produceArrayResponse(nil, error: StoreError.NotFound)
                 }
 
-                let response = self.getAll().filter { $0.game?.id?.UUIDString == gameString }.sort(<)
+                let response = self.getAll().filter { $0.game?.UUIDString == gameString }.sort(<)
                 return MockHTTPResponder<Message>.produceArrayResponse(response, error: nil)
             })
     }
@@ -384,7 +367,7 @@ class MockedRESTCalls {
         
         self.gamesStore = MockedGamesStore(host: site.uri?.host, endpoint: "/api/games", initialValues: initialGames)
         
-        self.messagesStore = MockedMessagesStore(host: site.uri?.host, endpoint: "/api/messages", initialValues: initialMessages)
+        self.messagesStore = MockedMessagesStore(host: site.uri?.host, endpoint: "/api/messages", games: self.gamesStore, initialValues: initialMessages)
         
         self.loginStore = MockedRESTLogin(site: site, usersStore: self.userStore, userLoginChange: { (user) -> () in
             self.userStore.loggedInUser = user

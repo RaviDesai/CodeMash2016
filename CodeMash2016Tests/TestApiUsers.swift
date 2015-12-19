@@ -22,17 +22,17 @@ class TestApiUsers: AsynchronousTestCase {
     
     func getFakeUsers() -> [User] {
         return [
-            User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
-            User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
-            User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
-            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFour"))]
+            User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberOne")),
+            User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberTwo")),
+            User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberThree")),
+            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberFour"))]
     }
 
     func getFakeGames() -> [Game] {
         var users = getFakeUsers()
         return [
-            Game(id: NSUUID(), title: "RuneQuest", owner: users[0], users: [users[1], users[2]]),
-            Game(id: NSUUID(), title: "ElfQuest", owner: users[3], users: [users[0], users[2]])
+            Game(id: NSUUID(), title: "RuneQuest", owner: users[0].id!, users: [users[1].id!, users[2].id!]),
+            Game(id: NSUUID(), title: "ElfQuest", owner: users[3].id!, users: [users[0].id!, users[2].id!])
         ]
     }
     
@@ -106,7 +106,7 @@ class TestApiUsers: AsynchronousTestCase {
     func testDeleteUserFail() {
         let initialCount = self.usersFromStore()!.count
         XCTAssertTrue(initialCount >= 4)
-        let userToDelete = User(id: NSUUID(), name: "Not There", password: "pass", emailAddress: EmailAddress(user: "not", host: "there.com", displayValue: "not there, dude"), image: nil)
+        let userToDelete = User(id: NSUUID(), name: "Not There", password: "pass", emailAddress: EmailAddress(user: "not", host: "there.com"), image: nil)
         var resultUser: User?
         var resultError: NSError?
         

@@ -24,26 +24,34 @@ class LoginControllerTests: AsynchronousTestCase {
         return UIStoryboard(name: name, bundle: storyboardBundle)
     }
     
+    func getLoginUser() -> User {
+        return User(id: NSUUID(), name: "Admin", password: "pass", emailAddress: EmailAddress(user: "admin", host: "desai.com"), image: nil)
+    }
+    
     func getFakeUsers() -> [User] {
         return [
-            User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberOne")),
-            User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberTwo")),
-            User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberThree")),
-            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com", displayValue: nil), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
+            User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberOne")),
+            User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberTwo")),
+            User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberThree")),
+            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberFourxr"))]
     }
     
     func getFakeGames() -> [Game] {
         let users = getFakeUsers()
-        return [Game(id: NSUUID(), title: "D&D", owner: users[0], users: [users[1], users[3]])]
+        return [Game(id: NSUUID(), title: "D&D", owner: users[0].id!, users: [users[1].id!, users[3].id!])]
     }
     
     class override func setUp() {
         super.setUp()
+        Swizzler<LoginController>.swizzlePrepareForSegue()
         Swizzler<LoginController>.swizzlePerformSegueWithIdentifier()
+        Swizzler<LoginController>.swizzlePresentViewControllerAnimated()
     }
 
     class override func tearDown() {
+        Swizzler<LoginController>.swizzlePrepareForSegue()
         Swizzler<LoginController>.swizzlePerformSegueWithIdentifier()
+        Swizzler<LoginController>.swizzlePresentViewControllerAnimated()
         super.tearDown()
     }
     
@@ -54,13 +62,15 @@ class LoginControllerTests: AsynchronousTestCase {
         
         self.controller?.view.hidden = false
 
-        mockViewModel = PartialMockLoginViewModel(vm: self.controller!.viewModel! as! LoginViewModel, fakedUsers: getFakeUsers(), fakedGames: getFakeGames(), loginSucceeds: true)
+        mockViewModel = PartialMockLoginViewModel(vm: self.controller!.viewModel! as! LoginViewModel)
         
         self.controller?.viewModel = mockViewModel
+        self.called = false
     }
     
     override func tearDown() {
         self.controller = nil
+        self.called = false
         super.tearDown()
     }
     
@@ -96,7 +106,9 @@ class LoginControllerTests: AsynchronousTestCase {
         self.mockViewModel!.username = "system"
         self.mockViewModel!.password = "password"
         self.mockViewModel!.loginButtonLabel = "letmein"
-        self.mockViewModel!.loginSucceeds = true
+        self.mockViewModel!.loginCallback = {() -> (User?, NSError?) in
+            return (self.getLoginUser(), nil)
+        }
         
         self.controller!.tableView.reloadData()
         
@@ -114,5 +126,55 @@ class LoginControllerTests: AsynchronousTestCase {
         
         XCTAssertTrue(self.waitForResponse { self.called })
         XCTAssertTrue(segueCalled == .Some("TabController"))
+    }
+
+    func testLoginFailureUnauthorized() {
+        self.mockViewModel!.username = "system"
+        self.mockViewModel!.password = "password"
+        self.mockViewModel!.loginButtonLabel = "letmein"
+        self.mockViewModel!.loginCallback = {() -> (User?, NSError?) in
+            return (nil, self.mockViewModel!.generateError(401, message: "unauthorized"))
+        }
+        
+        self.controller!.tableView.reloadData()
+        
+        let loginButtonCell = self.controller!.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 2, inSection: 0))
+        let loginButton = loginButtonCell?.viewWithTag(100) as? UIButton
+        XCTAssertTrue(loginButton != nil)
+        
+        var alertView: UIViewController?
+        self.controller!.presentViewControllerAnimatedInterceptCallback = PresentViewControllerAnimatedInterceptCallbackWrapper({(viewController, animated) -> Bool in
+            alertView = viewController
+            self.called = true
+            return false
+        })
+        
+        loginButton!.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(alertView != nil)
+        let alertController = alertView as? UIAlertController
+        XCTAssertTrue(alertController != nil)
+        XCTAssertTrue(alertController!.message == .Some("You will be logged off."))
+    }
+    
+    func testCreateUserCausesSegue() {
+        self.controller!.tableView.reloadData()
+
+        let createUserButtonCell = self.controller!.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 3, inSection: 0))
+        let createUserButton = createUserButtonCell?.viewWithTag(100) as? UIButton
+        XCTAssertTrue(createUserButton != nil)
+
+        var segueIdentifier: String?
+        self.controller?.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue) -> Bool in
+            segueIdentifier = segue.identifier
+            self.called = true
+            return false
+        })
+        
+        createUserButton!.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(segueIdentifier == "CreateUser")
     }
 }

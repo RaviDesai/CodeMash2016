@@ -15,15 +15,15 @@ import OHHTTPStubs
 import RSDRESTServices
 @testable import CodeMash2016
 
-private let ravi = User(id: NSUUID(), name: "Ravi", password: "pass", emailAddress: EmailAddress(user: "ravi", host: "desai.com", displayValue: "Ravi Desai"), image: nil)
-private let xander = User(id: NSUUID(), name: "Xander", password: "pass", emailAddress: EmailAddress(user: "xander", host: "desai.com", displayValue: "Xander Desai"), image: nil)
-private let emerson = User(id: NSUUID(), name: "Emerson", password: "pass", emailAddress: EmailAddress(user: "emerson", host: "desai.com", displayValue: "Emerson Desai"), image: nil)
-private let walker = User(id: NSUUID(), name: "Walker", password: "pass", emailAddress: EmailAddress(user: "walker", host: "desai.com", displayValue: "Walker Desai"), image: nil)
-private let rq2 = Game(id: NSUUID(), title: "RQ2", owner: ravi, users: [walker, xander])
-private let dd = Game(id: NSUUID(), title: "D&D", owner: walker, users: [ravi, emerson])
+private let ravi = User(id: NSUUID(), name: "Ravi", password: "pass", emailAddress: EmailAddress(user: "ravi", host: "desai.com"), image: nil)
+private let xander = User(id: NSUUID(), name: "Xander", password: "pass", emailAddress: EmailAddress(user: "xander", host: "desai.com"), image: nil)
+private let emerson = User(id: NSUUID(), name: "Emerson", password: "pass", emailAddress: EmailAddress(user: "emerson", host: "desai.com"), image: nil)
+private let walker = User(id: NSUUID(), name: "Walker", password: "pass", emailAddress: EmailAddress(user: "walker", host: "desai.com"), image: nil)
+private let rq2 = Game(id: NSUUID(), title: "RQ2", owner: ravi.id!, users: [walker.id!, xander.id!])
+private let dd = Game(id: NSUUID(), title: "D&D", owner: walker.id!, users: [ravi.id!, emerson.id!])
 
-private let rq1Message = Message(id: NSUUID(), from: ravi, to: nil, game: rq2, subject: "Supplies", message: "Need paper and pencils", date: NSDate(timeIntervalSince1970: 0))
-private let dd1Message = Message(id: NSUUID(), from: walker, to: nil, game: dd, subject: "Next Session", message: "on wednesday", date: NSDate(timeIntervalSince1970: 200000))
+private let rq1Message = Message(id: NSUUID(), from: ravi.id!, to: nil, game: rq2.id!, subject: "Supplies", message: "Need paper and pencils", date: NSDate(timeIntervalSince1970: 0))
+private let dd1Message = Message(id: NSUUID(), from: walker.id!, to: nil, game: dd.id!, subject: "Next Session", message: "on wednesday", date: NSDate(timeIntervalSince1970: 200000))
 
 class TestApiMessages: AsynchronousTestCase {
     

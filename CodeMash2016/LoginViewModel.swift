@@ -25,6 +25,8 @@ protocol LoginViewModelProtocol: UITableViewDataSource {
     
     func instantiateCell(cellIdentifier: LoginTableCellIdentifier, value: String, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
     func executeLogin(completionHandler: (User?, NSError?)->())
+    func getAllUsers(completionHandler: ([User]?, NSError?)->())
+    func getAllGames(completionHandler: ([Game]?, NSError?) -> ())
 }
 
 class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
@@ -103,4 +105,13 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
         })
     }
     
+    func getAllUsers(completionHandler: ([User]?, NSError?)->()) {
+        let handler = self.fireOnMainThread(completionHandler)
+        Api.sharedInstance.getAllUsers(handler)
+    }
+    
+    func getAllGames(completionHandler: ([Game]?, NSError?) -> ()) {
+        let handler = self.fireOnMainThread(completionHandler)
+        Api.sharedInstance.getAllGames(self.loggedInUser, completionHandler: handler)
+    }
 }

@@ -28,30 +28,36 @@ class MockMessageCell: UITableViewCell {
 }
 
 class MockMessagesApi: MockApi {
-    var messages: [Message]
-    init(messages: [Message]) {
-        self.messages = messages
-    }
+    var messages: [Message]?
+    var createdGame: Game?
     
     override func getMessagesForGame(game: Game, completionHandler: ([Message]?, NSError?) -> ()) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
             completionHandler(self.messages, nil)
         })
     }
+    
+    override func createGame(game: Game, completionHandler: (Game?, NSError?) -> ()) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
+            completionHandler(self.createdGame, nil)
+        })
+    }
 }
 
-private let admin = User(id: NSUUID(), name: "Admin", password: "pass", emailAddress: EmailAddress(user: "admin", host: "desai.com", displayValue: "Admin"), image: nil)
-private let ravi = User(id: NSUUID(), name: "Ravi", password: "pass", emailAddress: EmailAddress(user: "ravi", host: "desai.com", displayValue: "Ravi"), image: nil)
-private let games = [Game(id: NSUUID(), title: "Glorantha", owner: admin, users: [ravi])]
+private let admin = User(id: NSUUID(), name: "Admin", password: "pass", emailAddress: EmailAddress(user: "admin", host: "desai.com"), image: nil)
+private let ravi = User(id: NSUUID(), name: "Ravi", password: "pass", emailAddress: EmailAddress(user: "ravi", host: "desai.com"), image: nil)
+private let users = [admin, ravi]
+private let games = [Game(id: NSUUID(), title: "Glorantha", owner: admin.id!, users: [ravi.id!])]
 
-private let message = Message(id: NSUUID(), from: admin, to: nil, game: games[0], subject: "test", message: "message", date: NSDate(timeIntervalSinceNow: 0))
+private let message = Message(id: NSUUID(), from: admin.id!, to: nil, game: games[0].id!, subject: "test", message: "message", date: NSDate(timeIntervalSinceNow: 0))
+private let message2 = Message(id: NSUUID(), from: admin.id!, to: nil, game: games[0].id!, subject: "test2", message: "message2", date: NSDate(timeIntervalSinceNow: 0))
+private let message3 = Message(id: NSUUID(), from: admin.id!, to: nil, game: games[0].id!, subject: "test3", message: "message3", date: NSDate(timeIntervalSinceNow: 0))
 
 class GamesViewModelTests: AsynchronousTestCase {
     var vm: GamesViewModel?
     var mockTableView = UITableView()
     var called = false
-    
-    let mockApi = MockMessagesApi(messages: [message])
+    var mockApi = MockMessagesApi()
     
     override func setUp() {
         super.setUp()
@@ -64,7 +70,7 @@ class GamesViewModelTests: AsynchronousTestCase {
         
         Api.injectApiHandler(mockApi)
         
-        self.vm?.setCurrentUserAndGames(admin, games: games)
+        self.vm?.setCurrentUserAndGames(admin, games: games, users: users)
         self.called = false
     }
     
@@ -74,7 +80,19 @@ class GamesViewModelTests: AsynchronousTestCase {
         super.tearDown()
     }
     
-    func testGamesGetMessages() {
+    func testLoad() {
+        XCTAssertTrue(self.vm?.numberOfSectionsInTableView(self.mockTableView) == .Some(1))
+        XCTAssertTrue(self.vm?.tableView(self.mockTableView, numberOfRowsInSection: 0) == .Some(1))
+        
+        let cell = self.vm?.tableView(self.mockTableView, cellForRowAtIndexPath: NSIndexPath(forRow: 0, inSection: 0)) as? MockMessageCell
+        XCTAssertTrue(cell != nil)
+        XCTAssertTrue(cell?.title == .Some("Glorantha"))
+        XCTAssertTrue(cell?.name == .Some("Admin"))
+    }
+    
+    func testGetMessages() {
+        self.mockApi.messages = [message]
+        
         var resultMessages: [Message]?
         var resultError: NSError?
         var wasOnMainThead: Bool? = nil
@@ -88,6 +106,29 @@ class GamesViewModelTests: AsynchronousTestCase {
         XCTAssertTrue(self.waitForResponse { self.called })
         XCTAssertTrue(wasOnMainThead == .Some(true))
         XCTAssertTrue(resultMessages != nil)
+        XCTAssertTrue(resultError == nil)
+    }
+    
+    func testCreateGame() {
+        let gameToCreate = Game(id: nil, title: "NewGame", owner: ravi.id!, users: [admin.id!])
+        var createdGame = gameToCreate
+        createdGame.id = NSUUID()
+        self.mockApi.createdGame = createdGame
+        
+        var resultGame: Game?
+        var resultError: NSError?
+        var wasOnMainThread: Bool?
+        
+        self.vm?.createGame(gameToCreate, completionHandler: { (game, error) -> () in
+            resultGame = game
+            resultError = error
+            wasOnMainThread = NSThread.isMainThread()
+            self.called = true
+        })
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(wasOnMainThread == .Some(true))
+        XCTAssertTrue(resultGame != nil)
         XCTAssertTrue(resultError == nil)
     }
 }

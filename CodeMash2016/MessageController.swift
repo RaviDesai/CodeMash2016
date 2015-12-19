@@ -46,7 +46,7 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
             toTokenFieldView?.tokenField.addToken(tiToken)
         }
         toTokenFieldView?.forcePickSearchResult = true
-        toTokenFieldView?.tokenField.accessibilityValue = EmailAddress.getCollapsedEmailAddressDisplayText(self.viewModel!.toTokens)
+        toTokenFieldView?.tokenField.accessibilityValue = EmailAddress.getCollapsedDisplayText(self.viewModel!.toTokens)
         
         toTokenFieldView?.tokenField.becomeFirstResponder()
         toTokenFieldView?.tokenField.endEditing(true)
@@ -166,10 +166,10 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
         if let address = token.representedObject as? Box {
             if (tokenField == toTokenFieldView!.tokenField) {
                 self.viewModel?.addToToken(address.unbox)
-                tokenField.accessibilityValue = EmailAddress.getCollapsedEmailAddressDisplayText(self.viewModel?.toTokens ?? [])
+                tokenField.accessibilityValue = EmailAddress.getCollapsedDisplayText(self.viewModel?.toTokens ?? [])
             } else {
                 self.viewModel?.addCCToken(address.unbox)
-                tokenField.accessibilityValue = EmailAddress.getCollapsedEmailAddressDisplayText(self.viewModel?.ccTokens ?? [])
+                tokenField.accessibilityValue = EmailAddress.getCollapsedDisplayText(self.viewModel?.ccTokens ?? [])
             }
         }
     }
@@ -178,10 +178,10 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
         if let address = token.representedObject as? Box {
             if (tokenField == toTokenFieldView!.tokenField) {
                 self.viewModel?.removeToToken(address.unbox)
-                tokenField.accessibilityValue = EmailAddress.getCollapsedEmailAddressDisplayText(self.viewModel?.toTokens ?? [])
+                tokenField.accessibilityValue = EmailAddress.getCollapsedDisplayText(self.viewModel?.toTokens ?? [])
             } else {
                 self.viewModel?.removeCCToken(address.unbox)
-                tokenField.accessibilityValue = EmailAddress.getCollapsedEmailAddressDisplayText(self.viewModel?.ccTokens ?? [])
+                tokenField.accessibilityValue = EmailAddress.getCollapsedDisplayText(self.viewModel?.ccTokens ?? [])
             }
         }
     }

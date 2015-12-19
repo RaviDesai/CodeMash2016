@@ -13,17 +13,17 @@ import RSDSerialization
 struct Game: ModelItem {
     var id: NSUUID?
     var title: String
-    var owner: User
-    var users: [User]?
+    var owner: NSUUID
+    var users: [NSUUID]?
     
-    init(id: NSUUID?, title: String, owner: User, users: [User]?) {
+    init(id: NSUUID?, title: String, owner: NSUUID, users: [NSUUID]?) {
         self.id = id
         self.title = title
         self.owner = owner
         self.users = users
     }
     
-    static func create(id: NSUUID?)(title: String)(owner: User)(users: [User]?) -> Game {
+    static func create(id: NSUUID?)(title: String)(owner: NSUUID)(users: [NSUUID]?) -> Game {
         return Game(id: id, title: title, owner: owner, users: users)
     }
     
@@ -31,8 +31,8 @@ struct Game: ModelItem {
         return JSONDictionary(tuples:
             ("ID", self.id?.UUIDString),
             ("Title", self.title),
-            ("Owner", self.owner.convertToJSON()),
-            ("Users", self.users?.convertToJSONArray())
+            ("Owner", self.owner.UUIDString),
+            ("Users", self.users?.map { $0.UUIDString })
         )
     }
     
@@ -41,8 +41,8 @@ struct Game: ModelItem {
             return Game.create
                 <**> record["ID"] >>- asUUID
                 <*> record["Title"] >>- asString
-                <*> record["Owner"] >>- User.createFromJSON
-                <**> record["Users"] >>- ModelFactory<User>.createFromJSONArray
+                <*> record["Owner"] >>- asUUID
+                <**> record["Users"] >>- NSUUID.createFromJSONArray
         }
         return nil;
     }
@@ -55,11 +55,10 @@ extension Game {
     }
     
     func isAuthorizedForReading(userIdString: String?) -> Bool {
-        if self.owner.id?.UUIDString == userIdString {
+        if self.owner.UUIDString == userIdString {
             return true
         }
-        let matchingUsersCount = self.users?.filter { $0.id?.UUIDString == userIdString }.count ?? 0
-        if (matchingUsersCount > 0) {
+        if let matchingUsersCount = self.users?.filter({ $0.UUIDString == userIdString }).count where matchingUsersCount > 0 {
             return true
         }
         return false
@@ -71,7 +70,7 @@ extension Game {
     }
     
     func isAuthorizedForUpdating(userIdString: String?) -> Bool {
-        if self.owner.id?.UUIDString == userIdString {
+        if self.owner.UUIDString == userIdString {
             return true
         }
         return false
@@ -91,8 +90,5 @@ func==%(lhs: Game, rhs: Game) -> Bool {
 }
 
 func<(lhs: Game, rhs: Game) -> Bool {
-    if (lhs.title == rhs.title) {
-        return lhs.owner < rhs.owner
-    }
     return lhs.title < rhs.title
 }

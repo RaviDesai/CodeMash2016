@@ -11,9 +11,14 @@ import UIKit
 class TabController: UITabBarController {
     var viewModel: TabBarViewModelProtocol?
     
-    func setLoggedInUser(loggedInUser: User?) {
+    func setLoggedInUser(loggedInUser: User?, users: [User]?, games: [Game]?, error: NSError?) {
+        if (loggedInUser == nil || users == nil || games == nil || error != nil) {
+            self.popBackToCallerWithMissingDataMessage()
+            return
+        }
         ensureViewModelIsCreated()
-        viewModel?.setUser(loggedInUser)
+        viewModel?.setUser(loggedInUser, users: users, games: games)
+        instantiateFromViewModel()
     }
     
     func ensureViewModelIsCreated() {
@@ -22,18 +27,19 @@ class TabController: UITabBarController {
     }
     
     func instantiateFromViewModel() {
-        if (self.viewModel == nil) { return }
+        guard let vm = self.viewModel where vm.isLoaded else { return }
         if (!self.isViewLoaded()) { return }
         
+        let composeButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: Selector("compose:"))
+        
+        self.navigationItem.rightBarButtonItem = composeButton
+        
         if let usersController = self.viewControllers?[0] as? ShowUsersController {
-            self.viewModel?.getAllUsers({ (users, error) -> () in
-                usersController.setUsers(users, loggedInUser: self.viewModel?.loggedInUser, error: error)
-                if let gamesController = self.viewControllers?[1] as? GamesController {
-                    self.viewModel?.getAllGames({ (games, error) -> () in
-                        gamesController.setCurrentUserAndGames(self.viewModel?.loggedInUser, games: games, error: error)
-                    })
-                }
-            })
+            usersController.setUsers(self.viewModel?.users, loggedInUser: self.viewModel?.loggedInUser)
+        }
+        
+        if let gamesController = self.viewControllers?[1] as? GamesController {
+            gamesController.setCurrentUserAndGames(self.viewModel?.loggedInUser, games: self.viewModel?.games, users: self.viewModel?.users)
         }
         
     }
@@ -67,4 +73,9 @@ class TabController: UITabBarController {
         instantiateFromViewModel()
     }
 
+    func compose(sender: UIButton) {
+        if let composable = self.selectedViewController as? ComposableControllerProtocol {
+            composable.compose()
+        }
+    }
 }

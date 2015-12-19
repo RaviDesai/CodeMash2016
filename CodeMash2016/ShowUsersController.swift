@@ -9,14 +9,14 @@
 import UIKit
 
 class ShowUsersController: UITableViewController {
-    var viewModel: ShowUsersViewModel?
+    var viewModel: ShowUsersViewModelProtocol?
     
     func ensureViewModelIsCreated() {
         if (self.viewModel != nil) { return }
      
         self.viewModel = ShowUsersViewModel(cellInstantiator: { (user, tableView, indexPath) -> UITableViewCell in
             
-            let resultCell = self.tableView.dequeueReusableCellWithIdentifier(self.viewModel!.cellIdentifier, forIndexPath: indexPath) as! UserTableViewCell
+            let resultCell = self.tableView.dequeueReusableCellWithIdentifier(ShowUsersViewModel.cellIdentifier, forIndexPath: indexPath) as! UserTableViewCell
             
             resultCell.setUser(user)
             return resultCell
@@ -47,15 +47,14 @@ class ShowUsersController: UITableViewController {
         self.tabBarController?.title = "Users"
     }
     
-    func setUsers(users: [User]?, loggedInUser: User?, error: NSError?) {
-        if let _ = error {
-            self.popBackToCallerWithMissingDataMessage()
+    func setUsers(users: [User]?, loggedInUser: User?) {
+        guard let myUsers = users, myLoggedInUser = loggedInUser else {
+            self.notifyUserOfError(self.generateMissingDataMessage(), withCallbackOnDismissal: { () -> () in })
             return
         }
         ensureViewModelIsCreated()
-        self.viewModel?.setUsers(users!, loggedInUser: loggedInUser, completionHandler: { (err) -> () in
-            self.initializeComponentsFromViewModel()
-        })
+        self.viewModel?.setUsers(myUsers, loggedInUser: myLoggedInUser)
+        self.initializeComponentsFromViewModel()
     }
     
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {

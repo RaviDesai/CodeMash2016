@@ -34,7 +34,7 @@ private func== (lhs: UIImage?, rhs: UIImage?) -> Bool {
 }
 
 
-struct User : ModelItem {
+struct User : ModelItem, CustomStringConvertible {
     var id: NSUUID?
     var name: String
     var password: String
@@ -76,6 +76,8 @@ struct User : ModelItem {
     }
     
     var isAdmin: Bool { get { return self.name.lowercaseString == "admin" } }
+    
+    var description: String { get { return self.name } }
 }
 
 extension User {

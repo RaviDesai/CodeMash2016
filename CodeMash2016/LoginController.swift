@@ -112,7 +112,14 @@ class LoginController: UITableViewController {
             }
         } else if segue.identifier == "TabController" {
             if let tabController = segue.destinationViewController as? TabController {
-                tabController.setLoggedInUser(self.viewModel?.loggedInUser)
+                self.viewModel?.getAllUsers({ (users, userError) -> () in
+                    self.viewModel?.getAllGames({ (games, gameError) -> () in
+                        let finalError = userError ?? gameError
+                        tabController.setLoggedInUser(self.viewModel?.loggedInUser, users: users, games: games, error: finalError)
+                    })
+                })
+
+
             }
         }
     }

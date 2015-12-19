@@ -3,6 +3,22 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "MessageCell.initializeComponentsFromViewModel() -&gt; ():MessageCell.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "message">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "GamesController.textField(UITextField, shouldChangeCharactersInRange : _NSRange, replacementString : String) -&gt; Bool:GamesController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "textField.text">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
          contextName = "TabController.instantiateFromViewModel() -&gt; ():TabController.swift">
          <PersistentStrings>
             <PersistentString
@@ -17,6 +33,9 @@
                value = "app.alerts[&quot;\u{201c}CodeMash2016\u{201d} Would Like to Access Your Photos&quot;]">
             </PersistentString>
          </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "APICall.(executeRespondWithArray&lt;A where ...&gt; (APICall&lt;A&gt;) -&gt; (([A.T]?, NSError?) -&gt; ()) -&gt; ()).(closure #1):APICall.swift">
       </ContextState>
       <ContextState
          contextName = "APIRequest.makeRequest&lt;A where ...&gt;() -&gt; NSMutableURLRequest?:APIRequest.swift">

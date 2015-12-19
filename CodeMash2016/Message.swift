@@ -12,14 +12,14 @@ import RSDSerialization
 
 struct Message: ModelItem {
     var id: NSUUID?
-    var from: User
-    var to: [User]?
-    var game: Game?
+    var from: NSUUID
+    var to: [NSUUID]?
+    var game: NSUUID?
     var subject: String
     var message: String
     var date: NSDate
     
-    init(id: NSUUID?, from: User, to: [User]?, game: Game?, subject: String, message: String, date: NSDate) {
+    init(id: NSUUID?, from: NSUUID, to: [NSUUID]?, game: NSUUID?, subject: String, message: String, date: NSDate) {
         self.id = id
         self.from = from
         self.to = to
@@ -29,7 +29,7 @@ struct Message: ModelItem {
         self.date = date
     }
     
-    static func create(id: NSUUID?)(from: User)(to: [User]?)(game: Game?)(subject: String)(message: String)(date: NSDate) -> Message {
+    static func create(id: NSUUID?)(from: NSUUID)(to: [NSUUID]?)(game: NSUUID?)(subject: String)(message: String)(date: NSDate) -> Message {
         return Message(id: id, from: from, to: to, game: game, subject: subject, message: message, date: date)
     }
     
@@ -48,9 +48,9 @@ struct Message: ModelItem {
         if let record = json as? JSONDictionary {
             return Message.create
                 <**> record["ID"] >>- asUUID
-                <*> record["From"] >>- User.createFromJSON
-                <**> record["To"] >>-  ModelFactory<User>.createFromJSONArray
-                <**> record["Game"] >>- Game.createFromJSON
+                <*> record["From"] >>- NSUUID.createFromJSON
+                <**> record["To"] >>-  NSUUID.createFromJSONArray
+                <**> record["Game"] >>- NSUUID.createFromJSON
                 <*> record["Subject"] >>- asString
                 <*> record["Message"] >>- asString
                 <*> record["Date"] >>- asDate("yyyy-MM-dd'T'HH:mm:ssX")
@@ -60,28 +60,27 @@ struct Message: ModelItem {
 }
 
 extension Message {
-    func isAuthorizedForReading(authuser: User) -> Bool {
+    func isAuthorizedForReading(games: [Game]?, authuser: User) -> Bool {
         if (authuser.isAdmin) {
             return true
         }
-        if let game = self.game where game.isAuthorizedForReading(authuser) {
+        if let game = games?.filter({ $0.id == self.game }).first where game.isAuthorizedForReading(authuser) {
             return true
         }
-        if self.from == authuser {
+        if self.from == authuser.id {
             return true
         }
-        let matchingUsersCount = self.to?.filter { $0 == authuser }.count ?? 0
-        if (matchingUsersCount > 0) {
+        if let matchingUsersCount = self.to?.filter({ $0 == authuser.id }).count where matchingUsersCount > 0 {
             return true
         }
         return false
     }
     
-    func isAuthorizedForUpdate(authuser: User) -> Bool {
+    func isAuthorizedForUpdating(authuser: User) -> Bool {
         if (authuser.isAdmin) {
             return true
         }
-        if self.from == authuser {
+        if self.from == authuser.id {
             return true
         }
         return false

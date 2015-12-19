@@ -157,7 +157,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
         if (textField == self.emailTextField) {
             let newString = textField.text?.stringByReplacingCharactersInRange(range, withString: string)
-            if (EmailAddress.convertToEmailAddress(newString) == nil) {
+            if (EmailAddress(string: newString) == nil) {
                 self.emailTextField.textColor = UIColor.redColor()
             } else {
                 self.emailTextField.textColor = UIColor.blackColor()

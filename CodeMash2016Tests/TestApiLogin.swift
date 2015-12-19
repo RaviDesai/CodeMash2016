@@ -18,7 +18,7 @@ import OHHTTPStubs
 class TestApiLogin: AsynchronousTestCase {
     var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
     var called = false
-    let initialUsers = [User(id: NSUUID(), name: "Admin", password: "Admin", emailAddress: EmailAddress(user: "admin", host: "desai.com", displayValue: nil), image: nil)]
+    let initialUsers = [User(id: NSUUID(), name: "Admin", password: "Admin", emailAddress: EmailAddress(user: "admin", host: "desai.com"), image: nil)]
     var mockedRest: MockedRESTLogin?
     
     override func setUp() {

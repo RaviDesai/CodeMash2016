@@ -16,6 +16,7 @@ protocol ApiProtocol {
     func saveUser(user: User, completionHandler: (User?, NSError?) -> ())
     func createUser(user: User, completionHandler: (User?, NSError?) -> ())
     func deleteUser(user: User, completionHandler: (User?, NSError?) -> ())
+    func createGame(game: Game, completionHandler: (Game?, NSError?) -> ())
     func getAllGames(user: User?, completionHandler: ([Game]?, NSError?) -> ())
     func getMessagesForGame(game: Game, completionHandler: ([Message]?, NSError?)->())
     func logout(completionHandler: ()->())
@@ -78,7 +79,19 @@ class Api: ApiProtocol {
             completionHandler(nil, nil)
         }
     }
-    
+
+    func createGame(game: Game, completionHandler: (Game?, NSError?) -> ()) {
+        if (game.id == nil) {
+            let parser = APIJSONSerializableResponseParser<Game>()
+            let encoder = APIJSONBodyEncoder(model: game)
+            let endpoint = APIEndpoint.POST(URLAndParameters(url: "api/games"))
+            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
+            call.executeRespondWithObject(completionHandler)
+        } else {
+            completionHandler(nil, nil)
+        }
+    }
+
     func getAllGames(user: User?, completionHandler: ([Game]?, NSError?)->()) {
         let parser = APIJSONSerializableResponseParser<Game>()
         let endpoint = APIEndpoint.GET(URLAndParameters(url: "api/games"))

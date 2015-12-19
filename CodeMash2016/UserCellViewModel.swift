@@ -19,7 +19,7 @@ class UserCellViewModel {
     }
     
     var contactAddress: String? {
-        return self.user?.emailAddress?.addressString
+        return self.user?.emailAddress?.description
     }
     
     var uuidString: String? {

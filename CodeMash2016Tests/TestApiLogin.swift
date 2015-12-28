@@ -16,7 +16,7 @@ import OHHTTPStubs
 
 
 class TestApiLogin: AsynchronousTestCase {
-    var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
+    var loginSite = APISite(name: "Sample", uri: "http://sample.desai.com/")
     var called = false
     let initialUsers = [User(id: NSUUID(), name: "Admin", password: "Admin", emailAddress: EmailAddress(user: "admin", host: "desai.com"), image: nil)]
     var mockedRest: MockedRESTLogin?
@@ -35,18 +35,37 @@ class TestApiLogin: AsynchronousTestCase {
         super.tearDown()
     }
     
-    func testLogin() {
+    func testLoginSuccess() {
         mockedRest?.hijackAll()
         
         var returnedError: NSError?
-        
+        var returnedUserUUID: NSUUID?
         Client.sharedClient.authenticate(self.loginSite, username: "Admin", password: "Admin", completion: { (nsuuid, error) -> () in
-            self.called = true
             returnedError = error
+            returnedUserUUID = nsuuid
+            self.called = true
         })
         
         
         XCTAssertTrue(self.waitForResponse { self.called })
         XCTAssertTrue(returnedError == nil)
+        XCTAssertTrue(returnedUserUUID != nil)
+    }
+    
+    func testLoginFailure() {
+        mockedRest?.hijackAll()
+        
+        var returnedError: NSError?
+        var returnedUserUUID: NSUUID?
+        Client.sharedClient.authenticate(self.loginSite, username: "Bad", password: "wolf", completion: { (nsuuid, error) -> () in
+            returnedError = error
+            returnedUserUUID = nsuuid
+            self.called = true
+        })
+        
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(returnedError != nil)
+        XCTAssertTrue(returnedUserUUID == nil)
     }
 }

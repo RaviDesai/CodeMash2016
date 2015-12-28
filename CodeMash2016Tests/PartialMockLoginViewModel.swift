@@ -10,7 +10,7 @@ import Foundation
 import RSDRESTServices
 @testable import CodeMash2016
 
-class PartialMockLoginViewModel: NSObject, LoginViewModelProtocol {
+class PartialMockLoginViewModel: PartialMockViewModelBase, LoginViewModelProtocol {
     var vm: LoginViewModel
     var loginCallback: (()-> (User?, NSError?))?
     var getAllUsersCallback: (() -> ([User]?, NSError?))?
@@ -51,12 +51,6 @@ class PartialMockLoginViewModel: NSObject, LoginViewModelProtocol {
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         return self.vm.tableView(tableView, cellForRowAtIndexPath: indexPath)
     }
-
-    
-    func generateError(statusCode: Int, message: String) -> NSError? {
-        let response = NetworkResponse.HTTPStatusCodeFailure(statusCode, message)
-        return response.getError()
-    }
     
     func instantiateCell(cellIdentifier: LoginTableCellIdentifier, value: String, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell {
         return self.vm.instantiateCell(cellIdentifier, value: value, tableView: tableView, indexPath: indexPath)
@@ -64,7 +58,9 @@ class PartialMockLoginViewModel: NSObject, LoginViewModelProtocol {
     
     func executeLogin(completionHandler: (User?, NSError?)->()) {
         if let callback = self.loginCallback {
-            completionHandler(callback())
+            let (user, error) = callback()
+            self.vm.loggedInUser = user
+            completionHandler(user, error)
         } else {
             completionHandler(nil, self.generateError(405, message: "unimplemented"))
         }

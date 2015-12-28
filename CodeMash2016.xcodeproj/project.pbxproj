@@ -7,15 +7,23 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4136F0511C31A1790071DA6E /* UITableViewRowAction+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0501C31A1790071DA6E /* UITableViewRowAction+Extension.swift */; };
+		4136F0531C31D1150071DA6E /* TestApiGames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0521C31D1150071DA6E /* TestApiGames.swift */; };
 		413892FC1BE58DF400AB940D /* JSONHelperForImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */; };
 		413C92A91BF799750027ACB2 /* TestApiUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92A81BF799750027ACB2 /* TestApiUsers.swift */; };
 		413C92AB1BF7A9F90027ACB2 /* LoginControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */; };
 		413C92AD1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */; };
+		414EB53C1C28863000697DD3 /* TestModelMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414EB53B1C28863000697DD3 /* TestModelMessage.swift */; };
+		414EB53E1C28916C00697DD3 /* PrintableAndEquatableProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 414EB53D1C28916C00697DD3 /* PrintableAndEquatableProtocol.swift */; };
 		4153CEDD1BFABCED00B6E37B /* GamesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4153CEDC1BFABCED00B6E37B /* GamesViewModel.swift */; };
 		4153CEDF1BFABCFF00B6E37B /* GamesController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4153CEDE1BFABCFF00B6E37B /* GamesController.swift */; };
 		4153CEE11BFABFE300B6E37B /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4153CEE01BFABFE300B6E37B /* Game.swift */; };
 		416B4A611C19C442001351EB /* TabController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416B4A601C19C442001351EB /* TabController.swift */; };
 		416B4A631C19C4A2001351EB /* TabBarViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 416B4A621C19C4A2001351EB /* TabBarViewModel.swift */; };
+		4175CAE61C3170FE00577FA7 /* PartialMockGamesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4175CAE51C3170FE00577FA7 /* PartialMockGamesViewModel.swift */; };
+		4175CAE81C31741400577FA7 /* PartialMockViewModelBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4175CAE71C31741400577FA7 /* PartialMockViewModelBase.swift */; };
+		4175CAEA1C31753600577FA7 /* GamesControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4175CAE91C31753600577FA7 /* GamesControllerTests.swift */; };
+		4175CAEC1C317DC900577FA7 /* ControllerTestsBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4175CAEB1C317DC900577FA7 /* ControllerTestsBase.swift */; };
 		417AB69E1C234985005AD254 /* NSUUID+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417AB69D1C234985005AD254 /* NSUUID+Extensions.swift */; };
 		417CCA5A1C21890C00592CF3 /* MessageListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417CCA591C21890C00592CF3 /* MessageListViewModel.swift */; };
 		417CCA5C1C21934700592CF3 /* MessageListController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 417CCA5B1C21934700592CF3 /* MessageListController.swift */; };
@@ -85,15 +93,23 @@
 
 /* Begin PBXFileReference section */
 		3045416F80F09C4FAF35E994 /* Pods-CodeMash2016.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CodeMash2016.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CodeMash2016/Pods-CodeMash2016.debug.xcconfig"; sourceTree = "<group>"; };
+		4136F0501C31A1790071DA6E /* UITableViewRowAction+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableViewRowAction+Extension.swift"; sourceTree = "<group>"; };
+		4136F0521C31D1150071DA6E /* TestApiGames.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiGames.swift; sourceTree = "<group>"; };
 		413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelperForImage.swift; sourceTree = "<group>"; };
 		413C92A81BF799750027ACB2 /* TestApiUsers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiUsers.swift; sourceTree = "<group>"; };
 		413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginControllerTests.swift; sourceTree = "<group>"; };
 		413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartialMockLoginViewModel.swift; sourceTree = "<group>"; };
+		414EB53B1C28863000697DD3 /* TestModelMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestModelMessage.swift; sourceTree = "<group>"; };
+		414EB53D1C28916C00697DD3 /* PrintableAndEquatableProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrintableAndEquatableProtocol.swift; sourceTree = "<group>"; };
 		4153CEDC1BFABCED00B6E37B /* GamesViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamesViewModel.swift; sourceTree = "<group>"; };
 		4153CEDE1BFABCFF00B6E37B /* GamesController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamesController.swift; sourceTree = "<group>"; };
 		4153CEE01BFABFE300B6E37B /* Game.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
 		416B4A601C19C442001351EB /* TabController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabController.swift; sourceTree = "<group>"; };
 		416B4A621C19C4A2001351EB /* TabBarViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TabBarViewModel.swift; sourceTree = "<group>"; };
+		4175CAE51C3170FE00577FA7 /* PartialMockGamesViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartialMockGamesViewModel.swift; sourceTree = "<group>"; };
+		4175CAE71C31741400577FA7 /* PartialMockViewModelBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PartialMockViewModelBase.swift; sourceTree = "<group>"; };
+		4175CAE91C31753600577FA7 /* GamesControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GamesControllerTests.swift; sourceTree = "<group>"; };
+		4175CAEB1C317DC900577FA7 /* ControllerTestsBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControllerTestsBase.swift; sourceTree = "<group>"; };
 		417AB69D1C234985005AD254 /* NSUUID+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSUUID+Extensions.swift"; sourceTree = "<group>"; };
 		417CCA591C21890C00592CF3 /* MessageListViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageListViewModel.swift; sourceTree = "<group>"; };
 		417CCA5B1C21934700592CF3 /* MessageListController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MessageListController.swift; sourceTree = "<group>"; };
@@ -229,13 +245,19 @@
 				418F73201C25AEE400D754B1 /* TestModelUser.swift */,
 				418F73221C25B1B100D754B1 /* TestModelGame.swift */,
 				418F73241C25B36700D754B1 /* TestModelEmailAddress.swift */,
+				414EB53B1C28863000697DD3 /* TestModelMessage.swift */,
 				41B2AACA1BDD260800C66703 /* TestApiLogin.swift */,
 				413C92A81BF799750027ACB2 /* TestApiUsers.swift */,
+				4136F0521C31D1150071DA6E /* TestApiGames.swift */,
 				419B84071C20EF5D00ABB826 /* TestApiMessages.swift */,
+				4175CAEB1C317DC900577FA7 /* ControllerTestsBase.swift */,
 				41F3251A1BEE484900FAD3C1 /* LoginViewModelTests.swift */,
 				413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */,
-				413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */,
 				417CCA5F1C21B7D100592CF3 /* GamesViewModelTests.swift */,
+				4175CAE91C31753600577FA7 /* GamesControllerTests.swift */,
+				4175CAE71C31741400577FA7 /* PartialMockViewModelBase.swift */,
+				413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */,
+				4175CAE51C3170FE00577FA7 /* PartialMockGamesViewModel.swift */,
 				417CCA611C21BBF100592CF3 /* MockApi.swift */,
 			);
 			path = CodeMash2016Tests;
@@ -265,6 +287,7 @@
 				4153CEE01BFABFE300B6E37B /* Game.swift */,
 				419B84051C20D4E500ABB826 /* Message.swift */,
 				417AB69D1C234985005AD254 /* NSUUID+Extensions.swift */,
+				414EB53D1C28916C00697DD3 /* PrintableAndEquatableProtocol.swift */,
 			);
 			name = Api;
 			sourceTree = "<group>";
@@ -309,6 +332,7 @@
 				416B4A601C19C442001351EB /* TabController.swift */,
 				417CCA5B1C21934700592CF3 /* MessageListController.swift */,
 				417CCA5D1C21941A00592CF3 /* MessageCell.swift */,
+				4136F0501C31A1790071DA6E /* UITableViewRowAction+Extension.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -603,6 +627,7 @@
 				41F8DD281BE6D43500ACADF4 /* MessageController.swift in Sources */,
 				41F9CA561BE1136000DD6592 /* ControllerBase.swift in Sources */,
 				4153CEDF1BFABCFF00B6E37B /* GamesController.swift in Sources */,
+				414EB53E1C28916C00697DD3 /* PrintableAndEquatableProtocol.swift in Sources */,
 				41C88DDC1BE2D54F00C5C115 /* StringExtensions.swift in Sources */,
 				41C88DD91BE2A4E500C5C115 /* UpdateUserViewModel.swift in Sources */,
 				41B2AAC71BDD25BB00C66703 /* LoginParameters.swift in Sources */,
@@ -613,6 +638,7 @@
 				41F9CA581BE1148C00DD6592 /* ShowUsersController.swift in Sources */,
 				413892FC1BE58DF400AB940D /* JSONHelperForImage.swift in Sources */,
 				4153CEE11BFABFE300B6E37B /* Game.swift in Sources */,
+				4136F0511C31A1790071DA6E /* UITableViewRowAction+Extension.swift in Sources */,
 				417CCA5C1C21934700592CF3 /* MessageListController.swift in Sources */,
 				419089931BDB2095004F6F46 /* AppDelegate.swift in Sources */,
 				41F8DD2C1BE6D8B000ACADF4 /* Box.swift in Sources */,
@@ -627,14 +653,20 @@
 			files = (
 				413C92AD1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift in Sources */,
 				418F73231C25B1B100D754B1 /* TestModelGame.swift in Sources */,
+				4175CAE81C31741400577FA7 /* PartialMockViewModelBase.swift in Sources */,
 				41F3251B1BEE484900FAD3C1 /* LoginViewModelTests.swift in Sources */,
+				4136F0531C31D1150071DA6E /* TestApiGames.swift in Sources */,
+				4175CAEC1C317DC900577FA7 /* ControllerTestsBase.swift in Sources */,
 				417CCA621C21BBF100592CF3 /* MockApi.swift in Sources */,
 				413C92AB1BF7A9F90027ACB2 /* LoginControllerTests.swift in Sources */,
 				413C92A91BF799750027ACB2 /* TestApiUsers.swift in Sources */,
 				41B2AACB1BDD260800C66703 /* TestApiLogin.swift in Sources */,
 				419B84081C20EF5D00ABB826 /* TestApiMessages.swift in Sources */,
+				4175CAEA1C31753600577FA7 /* GamesControllerTests.swift in Sources */,
+				4175CAE61C3170FE00577FA7 /* PartialMockGamesViewModel.swift in Sources */,
 				417CCA601C21B7D100592CF3 /* GamesViewModelTests.swift in Sources */,
 				418F73251C25B36700D754B1 /* TestModelEmailAddress.swift in Sources */,
+				414EB53C1C28863000697DD3 /* TestModelMessage.swift in Sources */,
 				418F73211C25AEE400D754B1 /* TestModelUser.swift in Sources */,
 				419089A81BDB2095004F6F46 /* CodeMash2016Tests.swift in Sources */,
 			);

@@ -8,7 +8,11 @@
 
 import UIKit
 
-class TabController: UITabBarController {
+protocol NamedTabProtocol {
+    var tabName: String { get }
+}
+
+class TabController: UITabBarController, UITabBarControllerDelegate {
     var viewModel: TabBarViewModelProtocol?
     
     func setLoggedInUser(loggedInUser: User?, users: [User]?, games: [Game]?, error: NSError?) {
@@ -34,14 +38,15 @@ class TabController: UITabBarController {
         
         self.navigationItem.rightBarButtonItem = composeButton
         
-        if let usersController = self.viewControllers?[0] as? ShowUsersController {
-            usersController.setUsers(self.viewModel?.users, loggedInUser: self.viewModel?.loggedInUser)
-        }
-        
         if let gamesController = self.viewControllers?[1] as? GamesController {
             gamesController.setCurrentUserAndGames(self.viewModel?.loggedInUser, games: self.viewModel?.games, users: self.viewModel?.users)
+            self.title = gamesController.title
         }
-        
+
+        if let usersController = self.viewControllers?[0] as? ShowUsersController {
+            usersController.setUsers(self.viewModel?.users, loggedInUser: self.viewModel?.loggedInUser)
+            self.title = usersController.title
+        }
     }
 
     override func navigationShouldPopOnBackButton() -> Bool {
@@ -69,6 +74,7 @@ class TabController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.delegate = self
         ensureViewModelIsCreated()
         instantiateFromViewModel()
     }
@@ -76,6 +82,12 @@ class TabController: UITabBarController {
     func compose(sender: UIButton) {
         if let composable = self.selectedViewController as? ComposableControllerProtocol {
             composable.compose()
+        }
+    }
+    
+    func tabBarController(tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {
+        if let namedTab = viewController as? NamedTabProtocol {
+            self.title = namedTab.tabName
         }
     }
 }

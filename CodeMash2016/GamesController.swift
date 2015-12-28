@@ -12,9 +12,10 @@ protocol ComposableControllerProtocol {
     func compose()
 }
 
-class GamesController: UITableViewController, UITextFieldDelegate, ComposableControllerProtocol {
-    var viewModel: GamesViewModel?
+class GamesController: UITableViewController, UITextFieldDelegate, ComposableControllerProtocol, NamedTabProtocol {
+    var viewModel: GamesViewModelProtocol?
     var gameTitle: UITextField?
+    var tabName: String { return "Games" }
 
     func ensureViewModelIsCreated() {
         if (self.viewModel != nil) { return }
@@ -45,10 +46,10 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
         instantiateFromViewModel()
     }
     
-    override func viewDidAppear(animated: Bool) {
-        self.tabBarController?.title = "Games"
-    }
-    
+//    override func viewDidAppear(animated: Bool) {
+//        super.viewDidAppear(animated)
+//        self.tabBarController?.title = "Games"
+//    }
 
     func setCurrentUserAndGames(owner: User?, games: [Game]?, users: [User]?) {
         guard let mygames = games, myowner = owner, myusers = users else {
@@ -71,6 +72,18 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
         }
     }
     
+    override func tableView(tableView: UITableView, editActionsForRowAtIndexPath indexPath: NSIndexPath) -> [UITableViewRowAction]? {
+        let deleteAction = UITableViewRowAction(title: "Delete", style: UITableViewRowActionStyle.Default) { (action, indexPath) -> Void in
+            self.viewModel?.deleteGameAtIndexPath(indexPath, completionHandler: { (error) -> () in
+                self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Fade)
+            })
+        }
+        if (self.viewModel?.canDeleteGameAtIndexPath(indexPath) == .Some(true)) {
+            return [deleteAction]
+        }
+        return []
+    }
+
     
     func compose() {
         let gameLabel = UILabel(frame: CGRectMake(20, 40, 100, 25))
@@ -125,9 +138,15 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
         if let owner = self.viewModel?.currentUser?.id, title = gameTitle?.text where title.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) != "" {
             let game = Game(id: nil, title: title, owner: owner, users: self.viewModel?.users?.map({ $0.id }).filter({ $0 != nil }).map({ $0! }).filter({ $0 != owner}))
             self.viewModel?.createGame(game, completionHandler: {(game, error)->() in
-                self.tableView.reloadData()
-                self.dismissViewControllerAnimated(true, completion: nil)
-                self.gameTitle = nil
+                if let returnedError = error {
+                    self.notifyUserOfError(returnedError, withCallbackOnDismissal: { () -> () in
+                        self.gameTitle = nil
+                    })
+                } else {
+                    self.tableView.reloadData()
+                    self.dismissViewControllerAnimated(true, completion: nil)
+                    self.gameTitle = nil
+                }
             })
         } else {
             self.dismissViewControllerAnimated(true, completion: nil)

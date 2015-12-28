@@ -102,7 +102,7 @@ class LoginControllerTests: AsynchronousTestCase {
         XCTAssertTrue(loginButton!.titleForState(UIControlState.Normal) == "letmein")
     }
     
-    func testLoginSuccess() {
+    func testLoginSuccessNoSegue() {
         self.mockViewModel!.username = "system"
         self.mockViewModel!.password = "password"
         self.mockViewModel!.loginButtonLabel = "letmein"
@@ -126,6 +126,63 @@ class LoginControllerTests: AsynchronousTestCase {
         
         XCTAssertTrue(self.waitForResponse { self.called })
         XCTAssertTrue(segueCalled == .Some("TabController"))
+    }
+
+    func testLoginSuccessWithSegue() {
+        self.mockViewModel!.username = "system"
+        self.mockViewModel!.password = "password"
+        self.mockViewModel!.loginButtonLabel = "letmein"
+        self.mockViewModel!.loginCallback = {() -> (User?, NSError?) in
+            return (self.getLoginUser(), nil)
+        }
+        self.mockViewModel!.getAllUsersCallback = {() -> ([User]?, NSError?) in
+            return (self.getFakeUsers(), nil)
+        }
+        self.mockViewModel!.getAllGamesCallback = {() -> ([Game]?, NSError?) in
+            return (self.getFakeGames(), nil)
+        }
+        
+        self.controller!.tableView.reloadData()
+        
+        let loginButtonCell = self.controller!.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 2, inSection: 0))
+        let loginButton = loginButtonCell?.viewWithTag(100) as? UIButton
+        XCTAssertTrue(loginButton != nil)
+        
+        var tabController: TabController?
+        self.controller!.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue)->Bool in
+            tabController = segue.destinationViewController as? TabController
+            self.called = true
+            return true
+        })
+        
+        loginButton!.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(tabController != nil)
+        
+        XCTAssertTrue(self.waitForResponse { tabController!.viewControllers?.count == .Some(2) })
+
+        let showUsersController = tabController!.viewControllers![0] as? ShowUsersController
+        let gamesController = tabController!.viewControllers![1] as? GamesController
+        XCTAssertTrue(showUsersController != nil)
+        XCTAssertTrue(gamesController != nil)
+        
+        tabController!.view.hidden = false
+        
+        XCTAssertTrue(gamesController!.viewModel != nil)
+        XCTAssertTrue(showUsersController!.viewModel != nil)
+        
+        let showUsersViewModel = showUsersController!.viewModel
+        let gamesViewModel = gamesController!.viewModel
+        XCTAssertTrue(showUsersViewModel != nil)
+        XCTAssertTrue(gamesViewModel != nil)
+        XCTAssertTrue(showUsersViewModel!.totalUsers == 4)
+        XCTAssertTrue(gamesViewModel!.totalGames == 1)
+                
+        XCTAssertTrue(tabController!.title == "Users")
+        tabController!.selectedViewController = gamesController
+        tabController!.tabBarController(tabController!, didSelectViewController: gamesController!)
+        XCTAssertTrue(tabController!.title == "Games")
     }
 
     func testLoginFailureUnauthorized() {

@@ -8,8 +8,9 @@
 
 import UIKit
 
-class ShowUsersController: UITableViewController {
+class ShowUsersController: UITableViewController, NamedTabProtocol {
     var viewModel: ShowUsersViewModelProtocol?
+    var tabName: String { return "Users" }
     
     func ensureViewModelIsCreated() {
         if (self.viewModel != nil) { return }
@@ -42,10 +43,10 @@ class ShowUsersController: UITableViewController {
         initializeComponentsFromViewModel()
     }
     
-    override func viewDidAppear(animated: Bool) {
-        super.viewDidAppear(animated)
-        self.tabBarController?.title = "Users"
-    }
+//    override func viewDidAppear(animated: Bool) {
+//        super.viewDidAppear(animated)
+//        self.tabBarController?.title = "Users"
+//    }
     
     func setUsers(users: [User]?, loggedInUser: User?) {
         guard let myUsers = users, myLoggedInUser = loggedInUser else {

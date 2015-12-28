@@ -79,14 +79,14 @@ extension Game {
 
 func==(lhs: Game, rhs: Game) -> Bool {
     if (lhs.id == nil || rhs.id == nil) {
-        return lhs.title == rhs.title && lhs.owner == rhs.owner
+        return lhs ==% rhs
     }
     
     return lhs.id == rhs.id
 }
 
 func==%(lhs: Game, rhs: Game) -> Bool {
-    return lhs.title == rhs.title
+    return lhs.title == rhs.title && lhs.owner == rhs.owner && lhs.owner == rhs.owner
 }
 
 func<(lhs: Game, rhs: Game) -> Bool {

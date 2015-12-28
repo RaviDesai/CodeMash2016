@@ -89,14 +89,14 @@ extension Message {
 
 func==(lhs: Message, rhs: Message) -> Bool {
     if (lhs.id == nil || rhs.id == nil) {
-        return lhs.from == rhs.from && lhs.to ?? [] == rhs.to ?? [] && lhs.game == rhs.game && lhs.subject == rhs.subject && lhs.message == rhs.message && lhs.date == rhs.date
+        return lhs ==% rhs
     }
     
     return lhs.id == rhs.id
 }
 
 func==%(lhs: Message, rhs: Message) -> Bool {
-    return lhs == rhs
+    return lhs.from == rhs.from && lhs.to ?? [] == rhs.to ?? [] && lhs.game == rhs.game && lhs.subject == rhs.subject && lhs.message == rhs.message && lhs.date.toUTCString("yyyy-MM-dd'T'HH:mm:ssX") == rhs.date.toUTCString("yyyy-MM-dd'T'HH:mm:ssX")
 }
 
 func<(lhs: Message, rhs: Message) -> Bool {

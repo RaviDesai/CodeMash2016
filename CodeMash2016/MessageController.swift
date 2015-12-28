@@ -163,7 +163,7 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
     }
     
     func tokenField(tokenField: TITokenField!, didAddToken token: TIToken!) {
-        if let address = token.representedObject as? Box {
+        if let address = token.representedObject as? Box<EmailAddress> {
             if (tokenField == toTokenFieldView!.tokenField) {
                 self.viewModel?.addToToken(address.unbox)
                 tokenField.accessibilityValue = EmailAddress.getCollapsedDisplayText(self.viewModel?.toTokens ?? [])
@@ -175,7 +175,7 @@ class MessageController: UIViewController, TITokenFieldDelegate, IWebViewEditorD
     }
     
     func tokenField(tokenField: TITokenField!, didRemoveToken token: TIToken!) {
-        if let address = token.representedObject as? Box {
+        if let address = token.representedObject as? Box<EmailAddress> {
             if (tokenField == toTokenFieldView!.tokenField) {
                 self.viewModel?.removeToToken(address.unbox)
                 tokenField.accessibilityValue = EmailAddress.getCollapsedDisplayText(self.viewModel?.toTokens ?? [])

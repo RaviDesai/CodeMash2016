@@ -8,14 +8,14 @@
 
 import Foundation
 
-class Box : NSObject {
-    let unbox: EmailAddress
-    init(_ value: EmailAddress) {
+class Box<T: PrintableAndEquatable> : NSObject {
+    let unbox: T
+    init(_ value: T) {
         self.unbox = value
     }
     override var description: String { get { return unbox.description } }
 }
 
-func ==(lhs: Box, rhs: Box) -> Bool {
+func ==<T: PrintableAndEquatable>(lhs: Box<T>, rhs: Box<T>) -> Bool {
     return lhs.unbox == rhs.unbox
 }

@@ -9,7 +9,7 @@
 import Foundation
 import RSDSerialization
 
-struct EmailAddress: JSONSerializable, Comparable, CustomStringConvertible {
+struct EmailAddress: JSONSerializable, Comparable, PrintableAndEquatable {
     var user: String
     var host: String
     

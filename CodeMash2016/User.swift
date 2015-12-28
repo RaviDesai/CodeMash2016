@@ -92,14 +92,14 @@ extension User {
 
 func==(lhs: User, rhs: User) -> Bool {
     if (lhs.id == nil || rhs.id == nil) {
-        return lhs.name == rhs.name && lhs.password == rhs.password && lhs.emailAddress == rhs.emailAddress && lhs.image == rhs.image
+        return lhs ==% rhs
     }
     
     return lhs.id == rhs.id
 }
 
 func==%(lhs: User, rhs: User) -> Bool {
-    return lhs.name == rhs.name
+    return lhs.name == rhs.name && lhs.password == rhs.password && lhs.emailAddress == rhs.emailAddress && lhs.image == rhs.image
 }
 
 func<(lhs: User, rhs: User) -> Bool {

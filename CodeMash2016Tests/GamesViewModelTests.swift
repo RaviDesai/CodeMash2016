@@ -30,16 +30,23 @@ class MockMessageCell: UITableViewCell {
 class MockMessagesApi: MockApi {
     var messages: [Message]?
     var createdGame: Game?
+    var mockError: NSError?
     
     override func getMessagesForGame(game: Game, completionHandler: ([Message]?, NSError?) -> ()) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-            completionHandler(self.messages, nil)
+            completionHandler(self.messages, self.mockError)
         })
     }
     
     override func createGame(game: Game, completionHandler: (Game?, NSError?) -> ()) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
-            completionHandler(self.createdGame, nil)
+            completionHandler(self.createdGame, self.mockError)
+        })
+    }
+    
+    override func deleteGame(game: Game, completionHandler: (NSError?) -> ()) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), {
+            completionHandler(self.mockError)
         })
     }
 }
@@ -92,6 +99,7 @@ class GamesViewModelTests: AsynchronousTestCase {
     
     func testGetMessages() {
         self.mockApi.messages = [message]
+        self.mockApi.mockError = nil
         
         var resultMessages: [Message]?
         var resultError: NSError?
@@ -109,11 +117,14 @@ class GamesViewModelTests: AsynchronousTestCase {
         XCTAssertTrue(resultError == nil)
     }
     
-    func testCreateGame() {
+    func testCreateGameSuccess() {
+        XCTAssertTrue(self.vm!.totalGames == 1)
+
         let gameToCreate = Game(id: nil, title: "NewGame", owner: ravi.id!, users: [admin.id!])
         var createdGame = gameToCreate
         createdGame.id = NSUUID()
         self.mockApi.createdGame = createdGame
+        self.mockApi.mockError = nil
         
         var resultGame: Game?
         var resultError: NSError?
@@ -130,5 +141,81 @@ class GamesViewModelTests: AsynchronousTestCase {
         XCTAssertTrue(wasOnMainThread == .Some(true))
         XCTAssertTrue(resultGame != nil)
         XCTAssertTrue(resultError == nil)
+        
+        XCTAssertTrue(self.vm!.totalGames == 2)
     }
+
+    func testCreateGameFailure() {
+        XCTAssertTrue(self.vm!.totalGames == 1)
+
+        let fakeUserInfo = [NSLocalizedDescriptionKey: "Faked Error", NSLocalizedFailureReasonErrorKey: "Faked Error"]
+        let fakeError = NSError(domain: "com.careevolution.direct", code: 48103001, userInfo: fakeUserInfo)
+
+        let gameToCreate = Game(id: nil, title: "NewGame", owner: ravi.id!, users: [admin.id!])
+        var createdGame = gameToCreate
+        createdGame.id = NSUUID()
+        self.mockApi.createdGame = nil
+        self.mockApi.mockError = fakeError
+        
+        var resultGame: Game?
+        var resultError: NSError?
+        var wasOnMainThread: Bool?
+        
+        self.vm?.createGame(gameToCreate, completionHandler: { (game, error) -> () in
+            resultGame = game
+            resultError = error
+            wasOnMainThread = NSThread.isMainThread()
+            self.called = true
+        })
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(wasOnMainThread == .Some(true))
+        XCTAssertTrue(resultGame == nil)
+        XCTAssertTrue(resultError != nil)
+        
+        XCTAssertTrue(self.vm!.totalGames == 1)
+    }
+
+    
+    func testDeleteGameSuccess() {
+        XCTAssertTrue(self.vm!.totalGames == 1)
+        self.mockApi.mockError = nil
+        
+        var resultError: NSError?
+        var wasOnMainThread: Bool?
+        
+        self.vm?.deleteGameAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), completionHandler: { (error) -> () in
+            resultError = error
+            wasOnMainThread = NSThread.isMainThread()
+            self.called = true
+        })
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(wasOnMainThread == .Some(true))
+        XCTAssertTrue(resultError == nil)
+        XCTAssertTrue(self.vm!.totalGames == 0)
+    }
+    
+    func testDeleteGameFailure() {
+        let fakeUserInfo = [NSLocalizedDescriptionKey: "Faked Error", NSLocalizedFailureReasonErrorKey: "Faked Error"]
+        let fakeError = NSError(domain: "com.careevolution.direct", code: 48103001, userInfo: fakeUserInfo)
+
+        XCTAssertTrue(self.vm!.totalGames == 1)
+        self.mockApi.mockError = fakeError
+        
+        var resultError: NSError?
+        var wasOnMainThread: Bool?
+        
+        self.vm?.deleteGameAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), completionHandler: { (error) -> () in
+            resultError = error
+            wasOnMainThread = NSThread.isMainThread()
+            self.called = true
+        })
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+        XCTAssertTrue(wasOnMainThread == .Some(true))
+        XCTAssertTrue(resultError != nil)
+        XCTAssertTrue(self.vm!.totalGames == 1)
+    }
+    
 }

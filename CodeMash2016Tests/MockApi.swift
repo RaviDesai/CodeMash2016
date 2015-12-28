@@ -33,6 +33,9 @@ class MockApi: ApiProtocol {
     func createGame(game: Game, completionHandler: (Game?, NSError?) -> ()) {
         completionHandler(nil, errorNotImplemented)
     }
+    func deleteGame(game: Game, completionHandler: (NSError?) -> ()) {
+        completionHandler(errorNotImplemented)
+    }
     func getAllGames(user: User?, completionHandler: ([Game]?, NSError?) -> ()) {
         completionHandler(nil, errorNotImplemented)
     }

@@ -39,7 +39,7 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
     var password: String = ""
     var loginButtonLabel: String = "Login"
     var createNewUserLabel: String = "Create New User"
-    private(set) var loggedInUser: User?
+    internal(set) var loggedInUser: User?
     
     func getCellIdentifier(indexPath: NSIndexPath) -> LoginTableCellIdentifier {
         switch(indexPath.row) {

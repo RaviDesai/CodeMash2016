@@ -8,19 +8,28 @@
 
 import UIKit
 
-protocol GamesViewModelProtocol {
-    var currentUser: User? { get set }
-    var games: [Game]? { get set }
+protocol GamesViewModelProtocol: UITableViewDataSource {
+    var currentUser: User? { get }
+    var games: [Game]? { get }
+    var users: [User]? { get }
+    var totalGames: Int { get }
+    
+    func setCurrentUserAndGames(user: User?, games: [Game]?, users: [User]?)
     func instantiateCell(title: String?, name: String?, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
     func createGame(game: Game, completionHandler: (Game?, NSError?)->())
+    func getMessagesForGame(indexPath: NSIndexPath, completionHandler: ([Message]?, NSError?)->())
+    func canDeleteGameAtIndexPath(indexPath: NSIndexPath) -> Bool
+    func deleteGameAtIndexPath(indexPath: NSIndexPath, completionHandler: (NSError?)->())
 }
 
-class GamesViewModel: ViewModelBase, UITableViewDataSource, GamesViewModelProtocol {
+class GamesViewModel: ViewModelBase, GamesViewModelProtocol {
     var currentUser: User?
     var cellInstantiator: (String?, String?, UITableView, NSIndexPath) -> UITableViewCell
     var games: [Game]?
     var users: [User]?
     static let cellIdentifier = "gamesIRunCell"
+    var totalGames: Int { get { return games?.count ?? 0 } }
+
     
     init(cellInstantiator: (String?, String?, UITableView, NSIndexPath) -> UITableViewCell) {
         self.cellInstantiator = cellInstantiator
@@ -32,20 +41,27 @@ class GamesViewModel: ViewModelBase, UITableViewDataSource, GamesViewModelProtoc
         self.games = games
     }
     
+    func getGameAtIndexPath(indexPath: NSIndexPath) -> Game? {
+        if let games = self.games where indexPath.row < games.count {
+            return games[indexPath.row]
+        }
+        return nil
+    }
+    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return games?.count ?? 0
+        return self.totalGames
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         var title: String?
         var userName: String?
-        if let games = self.games where indexPath.row < games.count {
-            title = games[indexPath.row].title
-            if let owner = self.users?.filter({ $0.id == games[indexPath.row].owner }).first {
+        if let game = self.getGameAtIndexPath(indexPath) {
+            title = game.title
+            if let owner = self.users?.filter({ $0.id == game.owner }).first {
                 userName = owner.name
             }
             
@@ -60,8 +76,7 @@ class GamesViewModel: ViewModelBase, UITableViewDataSource, GamesViewModelProtoc
     func getMessagesForGame(indexPath: NSIndexPath, completionHandler: ([Message]?, NSError?)->()) {
         let handler = self.fireOnMainThread(completionHandler)
         
-        if let games = self.games where indexPath.row < games.count {
-            let game = games[indexPath.row];
+        if let game = self.getGameAtIndexPath(indexPath) {
             Api.sharedInstance.getMessagesForGame(game, completionHandler: handler)
         } else {
             handler(nil, nil)
@@ -71,12 +86,39 @@ class GamesViewModel: ViewModelBase, UITableViewDataSource, GamesViewModelProtoc
     func createGame(game: Game, completionHandler: (Game?, NSError?) -> ()) {
         let handler = self.fireOnMainThread(completionHandler)
         Api.sharedInstance.createGame(game, completionHandler: {(game, error)->() in
-            if let mygame = game where error == nil {
-                self.games?.append(mygame)
-                self.games?.sortInPlace(<)
-            }
+            self.appendGameToList(game, error: error)
             handler(game, error)
         })
+    }
+    
+    func appendGameToList(game: Game?, error: NSError?) {
+        if let mygame = game where error == nil {
+            self.games?.append(mygame)
+            self.games?.sortInPlace(<)
+        }
+    }
+    
+    func removeGameFromList(game: Game?, error: NSError?) {
+        if let mygame = game where error == nil {
+            self.games = self.games?.filter { $0 != mygame }
+        }
+    }
+    
+    func canDeleteGameAtIndexPath(indexPath: NSIndexPath) -> Bool {
+        if let game = self.getGameAtIndexPath(indexPath), currentUser = self.currentUser {
+            return currentUser.isAdmin || game.owner == currentUser.id
+        }
+        return false
+    }
+    
+    func deleteGameAtIndexPath(indexPath: NSIndexPath, completionHandler: (NSError?)->()) {
+        let handler = self.fireOnMainThread(completionHandler)
+        if let game = self.getGameAtIndexPath(indexPath) {
+            Api.sharedInstance.deleteGame(game, completionHandler: {(error)->() in
+                self.removeGameFromList(game, error: error)
+                handler(error)
+            })
+        }
     }
     
 }

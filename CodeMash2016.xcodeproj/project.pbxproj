@@ -196,6 +196,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4136F0541C31DBF50071DA6E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				41B2AAC61BDD25BB00C66703 /* LoginParameters.swift */,
+				41B2AAC81BDD25D200C66703 /* LoginResponse.swift */,
+				41F9CA5B1BE1160400DD6592 /* User.swift */,
+				41F9CA5D1BE11A5A00DD6592 /* EmailAddress.swift */,
+				413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */,
+				41F8DD2B1BE6D8B000ACADF4 /* Box.swift */,
+				4153CEE01BFABFE300B6E37B /* Game.swift */,
+				419B84051C20D4E500ABB826 /* Message.swift */,
+				417AB69D1C234985005AD254 /* NSUUID+Extensions.swift */,
+				414EB53D1C28916C00697DD3 /* PrintableAndEquatableProtocol.swift */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
 		419089861BDB2095004F6F46 = {
 			isa = PBXGroup;
 			children = (
@@ -226,6 +243,7 @@
 				41C88DDA1BE2D53C00C5C115 /* Helpers */,
 				41F9CA541BE1134500DD6592 /* ViewModels */,
 				41F9CA521BE1133300DD6592 /* Controllers */,
+				4136F0541C31DBF50071DA6E /* Model */,
 				41B2AAC31BDD259200C66703 /* Api */,
 				419089921BDB2095004F6F46 /* AppDelegate.swift */,
 				419089941BDB2095004F6F46 /* ViewController.swift */,
@@ -276,18 +294,8 @@
 			isa = PBXGroup;
 			children = (
 				41B2AAC41BDD25A100C66703 /* Client.swift */,
-				41B2AAC61BDD25BB00C66703 /* LoginParameters.swift */,
-				41B2AAC81BDD25D200C66703 /* LoginResponse.swift */,
 				41B2AACC1BDD263800C66703 /* MockedRESTCalls.swift */,
-				41F9CA5B1BE1160400DD6592 /* User.swift */,
-				41F9CA5D1BE11A5A00DD6592 /* EmailAddress.swift */,
 				41F9CA631BE13B0E00DD6592 /* Api.swift */,
-				413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */,
-				41F8DD2B1BE6D8B000ACADF4 /* Box.swift */,
-				4153CEE01BFABFE300B6E37B /* Game.swift */,
-				419B84051C20D4E500ABB826 /* Message.swift */,
-				417AB69D1C234985005AD254 /* NSUUID+Extensions.swift */,
-				414EB53D1C28916C00697DD3 /* PrintableAndEquatableProtocol.swift */,
 			);
 			name = Api;
 			sourceTree = "<group>";

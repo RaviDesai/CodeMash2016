@@ -11,6 +11,8 @@
 		4136F0531C31D1150071DA6E /* TestApiGames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0521C31D1150071DA6E /* TestApiGames.swift */; };
 		4136F0561C31F0B50071DA6E /* ShowUsersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0551C31F0B50071DA6E /* ShowUsersViewModelTests.swift */; };
 		4136F0581C3209910071DA6E /* ShowUsersControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0571C3209910071DA6E /* ShowUsersControllerTests.swift */; };
+		4136F05B1C323BF30071DA6E /* ActionFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F05A1C323BF30071DA6E /* ActionFactory.swift */; };
+		4136F05D1C323C310071DA6E /* MockAlertAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F05C1C323C310071DA6E /* MockAlertAction.swift */; };
 		413892FC1BE58DF400AB940D /* JSONHelperForImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */; };
 		413C92A91BF799750027ACB2 /* TestApiUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92A81BF799750027ACB2 /* TestApiUsers.swift */; };
 		413C92AB1BF7A9F90027ACB2 /* LoginControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */; };
@@ -98,6 +100,8 @@
 		4136F0521C31D1150071DA6E /* TestApiGames.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiGames.swift; sourceTree = "<group>"; };
 		4136F0551C31F0B50071DA6E /* ShowUsersViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowUsersViewModelTests.swift; sourceTree = "<group>"; };
 		4136F0571C3209910071DA6E /* ShowUsersControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowUsersControllerTests.swift; sourceTree = "<group>"; };
+		4136F05A1C323BF30071DA6E /* ActionFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActionFactory.swift; sourceTree = "<group>"; };
+		4136F05C1C323C310071DA6E /* MockAlertAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MockAlertAction.swift; sourceTree = "<group>"; };
 		413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelperForImage.swift; sourceTree = "<group>"; };
 		413C92A81BF799750027ACB2 /* TestApiUsers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiUsers.swift; sourceTree = "<group>"; };
 		413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginControllerTests.swift; sourceTree = "<group>"; };
@@ -272,6 +276,7 @@
 			children = (
 				419089A91BDB2095004F6F46 /* Info.plist */,
 				417CCA611C21BBF100592CF3 /* MockApi.swift */,
+				4136F05C1C323C310071DA6E /* MockAlertAction.swift */,
 				418F73201C25AEE400D754B1 /* TestModelUser.swift */,
 				418F73221C25B1B100D754B1 /* TestModelGame.swift */,
 				418F73241C25B36700D754B1 /* TestModelEmailAddress.swift */,
@@ -352,6 +357,7 @@
 				417CCA5B1C21934700592CF3 /* MessageListController.swift */,
 				417CCA5D1C21941A00592CF3 /* MessageCell.swift */,
 				4136F0501C31A1790071DA6E /* UITableViewRowAction+Extension.swift */,
+				4136F05A1C323BF30071DA6E /* ActionFactory.swift */,
 			);
 			name = Controllers;
 			sourceTree = "<group>";
@@ -660,6 +666,7 @@
 				4136F0511C31A1790071DA6E /* UITableViewRowAction+Extension.swift in Sources */,
 				417CCA5C1C21934700592CF3 /* MessageListController.swift in Sources */,
 				419089931BDB2095004F6F46 /* AppDelegate.swift in Sources */,
+				4136F05B1C323BF30071DA6E /* ActionFactory.swift in Sources */,
 				41F8DD2C1BE6D8B000ACADF4 /* Box.swift in Sources */,
 				41C88DD71BE2A4B900C5C115 /* UpdateUserController.swift in Sources */,
 				41F8DD2A1BE6D59300ACADF4 /* MessageViewModel.swift in Sources */,
@@ -686,6 +693,7 @@
 				4175CAEA1C31753600577FA7 /* GamesControllerTests.swift in Sources */,
 				4175CAE61C3170FE00577FA7 /* PartialMockGamesViewModel.swift in Sources */,
 				417CCA601C21B7D100592CF3 /* GamesViewModelTests.swift in Sources */,
+				4136F05D1C323C310071DA6E /* MockAlertAction.swift in Sources */,
 				418F73251C25B36700D754B1 /* TestModelEmailAddress.swift in Sources */,
 				414EB53C1C28863000697DD3 /* TestModelMessage.swift in Sources */,
 				418F73211C25AEE400D754B1 /* TestModelUser.swift in Sources */,

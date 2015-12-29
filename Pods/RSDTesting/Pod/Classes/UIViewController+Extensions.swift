@@ -14,6 +14,9 @@ private var prepareSegueAssociation: UInt8 = 0
 private var prepareForSegueInterceptCallbackAssociation: UInt8 = 0
 private var performSegueWithIdentifierInterceptCallbackAssociation: UInt8 = 0
 private var presentViewControllerAnimatedInterceptCallbackAssociation: UInt8 = 0
+private var pushViewControllerAnimatedInterceptCallbackAssociation: UInt8 = 0
+private var popViewControllerAnimatedInterceptCallbackAssociation: UInt8 = 0
+private var popToRootViewControllerAnimatedInterceptCallbackAssociation: UInt8 = 0
 private var presentedViewControllerAssociation: UInt8 = 0
 private var navigationControllerAssociation: UInt8 = 0
 private var dismissViewControllerAnimatedInterceptCallbackAssociation: UInt8 = 0
@@ -49,7 +52,7 @@ public class PresentViewControllerAnimatedInterceptCallbackWrapper {
         self.closure = closure
     }
     
-    public func call(viewController: UIViewController, animated: Bool) -> Bool{
+    public func call(viewController: UIViewController, animated: Bool) -> Bool {
         return self.closure?(viewController, animated) ?? true
     }
 }
@@ -65,6 +68,49 @@ public class DismissViewControllerAnimatedInterceptCallbackWrapper {
     }
 }
 
+public class PushViewControllerAnimatedInterceptCallbackWrapper {
+    var closure: ((UIViewController, Bool) -> Bool)?
+    public init(_ closure: ((UIViewController, Bool)->Bool)?) {
+        self.closure = closure
+    }
+    
+    public func call(viewController: UIViewController, animated: Bool) -> Bool {
+        return self.closure?(viewController, animated) ?? true
+    }
+}
+
+public class PopViewControllerAnimatedInterceptCallbackWrapper {
+    var closure: ((Bool) -> Bool)?
+    public init(_ closure: ((Bool)->Bool)?) {
+        self.closure = closure
+    }
+    
+    public func call(animated: Bool) -> Bool {
+        return self.closure?(animated) ?? true
+    }
+}
+
+public class PopToRootViewControllerAnimatedInterceptCallbackWrapper {
+    var closure: ((Bool) -> Bool)?
+    public init(_ closure: ((Bool)->Bool)?) {
+        self.closure = closure
+    }
+    
+    public func call(animated: Bool) -> Bool {
+        return self.closure?(animated) ?? true
+    }
+}
+
+public class NavigationControllerInterceptCallbackWrapper {
+    var closure: (() -> (UINavigationController?))?
+    public init(_ closure: (() -> (UINavigationController?))) {
+        self.closure = closure
+    }
+    
+    public func call() -> UINavigationController? {
+        return self.closure?()
+    }
+}
 
 public extension UIViewController {
     var prepareForSegueInterceptCallback: PrepareForSegueInterceptCallbackWrapper? {
@@ -95,7 +141,6 @@ public extension UIViewController {
         set {
             objc_setAssociatedObject(self, &presentViewControllerAnimatedInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
-        
     }
     
     var dismissViewControllerAnimatedInterceptCallback: DismissViewControllerAnimatedInterceptCallbackWrapper? {
@@ -106,9 +151,25 @@ public extension UIViewController {
         set {
             objc_setAssociatedObject(self, &dismissViewControllerAnimatedInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
-        
+    }
+    
+    var navigationControllerInterceptCallback: NavigationControllerInterceptCallbackWrapper? {
+        get {
+            let wrapper: AnyObject? = objc_getAssociatedObject(self, &navigationControllerAssociation)
+            return wrapper as? NavigationControllerInterceptCallbackWrapper
+        }
+        set {
+            objc_setAssociatedObject(self, &navigationControllerAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
     }
 
+    func testImpl_navigationController() -> UINavigationController? {
+        var controller = self.navigationControllerInterceptCallback?.call()
+        if (controller == nil) {
+            controller = testImpl_navigationController()
+        }
+        return controller
+    }
     
     func testImpl_performSegueWithIdentifier(identifier: String?, sender: AnyObject?) -> () {
         let callOriginalMethod = self.performSegueWithIdentifierInterceptCallback?.call(identifier) ?? true
@@ -145,37 +206,114 @@ public extension UIViewController {
 
 // Mock global navigation controller - useful for intercepting segues across Storyboards
 // (when performSegue isn't used)
-public class MockNavigationController: UINavigationController {
-    public var pushedViewController: UIViewController?
-    public var presentedNavigationController: UINavigationController?
-    
-    override public func pushViewController(viewController: UIViewController, animated: Bool) {
-        self.pushedViewController = viewController
-    }
-    
-    override public func presentViewController(viewControllerToPresent: UIViewController, animated flag: Bool, completion: (() -> Void)?) {
-        self.presentedNavigationController = viewControllerToPresent as? UINavigationController
-    }
-}
-
-public var GlobalMockNavigationController: MockNavigationController = MockNavigationController()
-
-public extension UIViewController {
-    public var mockNavigationController: MockNavigationController? {
+public extension UINavigationController {
+    var pushViewControllerAnimatedInterceptCallback: PushViewControllerAnimatedInterceptCallbackWrapper? {
         get {
-            let navCtl: AnyObject? = objc_getAssociatedObject(self, &navigationControllerAssociation)
-            return (navCtl as? MockNavigationController) ?? GlobalMockNavigationController
+            let wrapper: AnyObject? = objc_getAssociatedObject(self, &pushViewControllerAnimatedInterceptCallbackAssociation)
+            return wrapper as? PushViewControllerAnimatedInterceptCallbackWrapper
         }
         set {
-            objc_setAssociatedObject(self, &navigationControllerAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+            objc_setAssociatedObject(self, &pushViewControllerAnimatedInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
     
-    func testImpl_navigationController() -> UINavigationController? {
-        return self.mockNavigationController
+    var popViewControllerAnimatedInterceptCallback: PopViewControllerAnimatedInterceptCallbackWrapper? {
+        get {
+            let wrapper: AnyObject? = objc_getAssociatedObject(self, &popViewControllerAnimatedInterceptCallbackAssociation)
+            return wrapper as? PopViewControllerAnimatedInterceptCallbackWrapper
+        }
+        set {
+            objc_setAssociatedObject(self, &popViewControllerAnimatedInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+    
+    var popToRootViewControllerAnimatedInterceptCallback: PopToRootViewControllerAnimatedInterceptCallbackWrapper? {
+        get {
+            let wrapper: AnyObject? = objc_getAssociatedObject(self, &popToRootViewControllerAnimatedInterceptCallbackAssociation)
+            return wrapper as? PopToRootViewControllerAnimatedInterceptCallbackWrapper
+        }
+        set {
+            objc_setAssociatedObject(self, &popToRootViewControllerAnimatedInterceptCallbackAssociation, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
+        }
+    }
+
+    public func testImpl_popToRootViewControllerAnimated(animated: Bool) -> [UIViewController]? {
+        let callOriginalMethod = self.popToRootViewControllerAnimatedInterceptCallback?.call(animated) ?? true
+        if (callOriginalMethod) {
+            return testImpl_popToRootViewControllerAnimated(animated)
+        }
+        return nil
+    }
+    
+    public func testImpl_popViewControllerAnimated(animated: Bool) -> UIViewController? {
+        let callOriginalMethod = self.popViewControllerAnimatedInterceptCallback?.call(animated) ?? true
+        if (callOriginalMethod) {
+            return testImpl_popViewControllerAnimated(animated)
+        }
+        return nil
+    }
+    
+    public func testImpl_pushViewController(viewController: UIViewController, animated: Bool) {
+        let callOriginalMethod = self.pushViewControllerAnimatedInterceptCallback?.call(viewController, animated: animated) ?? true
+        if (callOriginalMethod) {
+            testImpl_pushViewController(viewController, animated: animated)
+        }
     }
 }
 
+public class SwizzlerForNavigationController {
+    public class func swizzlePresentViewController() {
+        let vcClass: AnyClass = UINavigationController.classForCoder()
+        let realMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("presentViewController:animated:completion:"))
+        
+        let testMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("testImpl_presentViewController:animated:completion:"))
+        
+        method_exchangeImplementations(realMethod, testMethod)
+    }
+
+    public class func swizzlePushViewControllerAnimated() {
+        let vcClass: AnyClass = UINavigationController.classForCoder()
+        let realMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("pushViewController:animated:"))
+        
+        let testMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("testImpl_pushViewController:animated:"))
+        
+        method_exchangeImplementations(realMethod, testMethod)
+    }
+
+    public class func swizzlePopViewControllerAnimated() {
+        let vcClass: AnyClass = UINavigationController.classForCoder()
+        let realMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("popViewControllerAnimated:"))
+        
+        let testMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("testImpl_popViewControllerAnimated:"))
+        
+        method_exchangeImplementations(realMethod, testMethod)
+    }
+    
+    public class func swizzlePopToRootViewControllerAnimated() {
+        let vcClass: AnyClass = UINavigationController.classForCoder()
+        let realMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("popToRootViewControllerAnimated:"))
+        
+        let testMethod: Method = class_getInstanceMethod(
+            vcClass,
+            Selector("testImpl_popToRootViewControllerAnimated:"))
+        
+        method_exchangeImplementations(realMethod, testMethod)
+    }
+}
 
 public class Swizzler<T where T: UIViewController> {
     public class func swizzlePrepareForSegue() {

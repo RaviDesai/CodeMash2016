@@ -14,6 +14,7 @@ protocol NamedTabProtocol {
 
 class TabController: UITabBarController, UITabBarControllerDelegate {
     var viewModel: TabBarViewModelProtocol?
+    var composeButton: UIBarButtonItem?
     
     func setLoggedInUser(loggedInUser: User?, users: [User]?, games: [Game]?, error: NSError?) {
         if (loggedInUser == nil || users == nil || games == nil || error != nil) {
@@ -34,13 +35,9 @@ class TabController: UITabBarController, UITabBarControllerDelegate {
         guard let vm = self.viewModel where vm.isLoaded else { return }
         if (!self.isViewLoaded()) { return }
         
-        let composeButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: Selector("compose:"))
-        
-        self.navigationItem.rightBarButtonItem = composeButton
-        
+        self.composeButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: Selector("compose:"))
         if let gamesController = self.viewControllers?[1] as? GamesController {
             gamesController.setCurrentUserAndGames(self.viewModel?.loggedInUser, games: self.viewModel?.games, users: self.viewModel?.users)
-            self.title = gamesController.title
         }
 
         if let usersController = self.viewControllers?[0] as? ShowUsersController {
@@ -88,6 +85,13 @@ class TabController: UITabBarController, UITabBarControllerDelegate {
     func tabBarController(tabBarController: UITabBarController, didSelectViewController viewController: UIViewController) {
         if let namedTab = viewController as? NamedTabProtocol {
             self.title = namedTab.tabName
+        }
+        if viewController is ComposableControllerProtocol {
+            if let composeButton = self.composeButton {
+                self.navigationItem.rightBarButtonItem = composeButton
+            }
+        } else {
+            self.navigationItem.rightBarButtonItem = nil
         }
     }
 }

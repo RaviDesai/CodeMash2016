@@ -13,6 +13,7 @@ enum DeletedOrSaved {
     case Saved
 }
 
+
 extension UIViewController {
     public func generateMissingDataMessage() -> NSError {
         let userInfo = [NSLocalizedDescriptionKey: "Cannot show screen", NSLocalizedFailureReasonErrorKey: "Required data could not be retrieved"]
@@ -36,7 +37,7 @@ extension UIViewController {
             }
         }
         let alert = UIAlertController(title: error.localizedDescription, message: message, preferredStyle: UIAlertControllerStyle.Alert)
-        let dismissAction = UIAlertAction(title: "Dismiss", style: UIAlertActionStyle.Default, handler: { (action) -> Void in
+        let dismissAction = ActionFactory.Action("Dismiss", UIAlertActionStyle.Default, { (action) -> Void in
             if (error.isNetworkResponseUnauthorized) {
                 Client.sharedClient.logout({ () -> () in
                     self.navigationController?.popToRootViewControllerAnimated(true)

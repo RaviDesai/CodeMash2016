@@ -26,11 +26,15 @@ class GamesControllerTests: ControllerTestsBase {
 
     class override func setUp() {
         super.setUp()
+        SwizzlerForNavigationController.swizzlePopToRootViewControllerAnimated()
+        Swizzler<GamesController>.swizzleNavigationControllerProperty()
         Swizzler<GamesController>.swizzlePresentViewControllerAnimated()
         Swizzler<GamesController>.swizzleDismissViewControllerAnimated()
     }
     
     class override func tearDown() {
+        SwizzlerForNavigationController.swizzlePopToRootViewControllerAnimated()
+        Swizzler<GamesController>.swizzleNavigationControllerProperty()
         Swizzler<GamesController>.swizzlePresentViewControllerAnimated()
         Swizzler<GamesController>.swizzleDismissViewControllerAnimated()
 
@@ -39,6 +43,11 @@ class GamesControllerTests: ControllerTestsBase {
     
     override func setUp() {
         super.setUp()
+        
+        ActionFactory.Action = {(title: String, style: UIAlertActionStyle, handler: ((UIAlertAction)->()))->UIAlertAction in
+            return MockAlertAction(title: title, style: style, handler: handler)
+        }
+
         let storyboard = self.getStoryboard("Main")
         self.controller = storyboard?.instantiateViewControllerWithIdentifier("gamesController") as? GamesController
         
@@ -51,6 +60,7 @@ class GamesControllerTests: ControllerTestsBase {
     }
     
     override func tearDown() {
+        ActionFactory.restoreDefault()
         self.controller = nil
         self.called = false
         super.tearDown()
@@ -153,6 +163,55 @@ class GamesControllerTests: ControllerTestsBase {
         XCTAssertTrue(alertView?.title == .Some("Entity already exists"))
     }
 
+    func testComposeNewGameClickCreateFailureUnauthorized() {
+        self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 1)
+        
+        var alertView: UIAlertController?
+        self.controller!.presentViewControllerAnimatedInterceptCallback = PresentViewControllerAnimatedInterceptCallbackWrapper({(viewController, animated) -> Bool in
+            alertView = viewController as? UIAlertController
+            self.called = true
+            return false
+        })
+        
+        self.controller!.compose()
+        
+        XCTAssertTrue(alertView != nil)
+        let gameTextField: UITextField? = alertView?.view?.embeddedView()
+        XCTAssertTrue(gameTextField != nil)
+        gameTextField!.text = "D&D"
+        
+        let createButton: UIButton? = alertView?.view?.embeddedView {(button: UIButton)-> Bool in
+            return button.titleLabel?.text == .Some("OK")
+        }
+        XCTAssertTrue(createButton != nil)
+        
+        self.mockViewModel!.createGameCallback = {(game: Game) -> (Game?, NSError?) in
+            return (nil, self.mockViewModel!.generateError(401, message: "Unauthorized"))
+        }
+        
+        alertView = nil
+        createButton?.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
+        XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 1)
+        XCTAssertTrue(alertView?.message == .Some("You will be logged off."))
+        
+        let mockedNavigationController = UINavigationController()
+        mockedNavigationController.popToRootViewControllerAnimatedInterceptCallback = PopToRootViewControllerAnimatedInterceptCallbackWrapper({(animated)->Bool in
+            self.called = true
+            return false
+        })
+
+        self.controller!.navigationControllerInterceptCallback = NavigationControllerInterceptCallbackWrapper({() -> UINavigationController? in
+            return mockedNavigationController
+        })
+        
+        self.called = false
+        let dismissAction = alertView?.actions[0] as? MockAlertAction
+        XCTAssertTrue(dismissAction != nil)
+        dismissAction!.call()
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
+    }
     
     func testComposeNewGameClickCancel() {
         self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())

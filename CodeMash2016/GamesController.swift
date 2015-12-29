@@ -16,6 +16,7 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
     var viewModel: GamesViewModelProtocol?
     var gameTitle: UITextField?
     var tabName: String { return "Games" }
+    
 
     func ensureViewModelIsCreated() {
         if (self.viewModel != nil) { return }

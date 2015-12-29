@@ -161,7 +161,7 @@
         <!--Users-->
         <scene sceneID="lVo-9H-wbQ">
             <objects>
-                <tableViewController title="Users" id="F7s-5R-BcN" customClass="ShowUsersController" customModule="CodeMash2016" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="showUsersController" title="Users" id="F7s-5R-BcN" customClass="ShowUsersController" customModule="CodeMash2016" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" id="1nM-zG-tHR">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -532,6 +532,6 @@
         <image name="Users.png" width="29" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="Ena-XQ-kBA"/>
+        <segue reference="BzA-Ug-Cni"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -13,7 +13,7 @@ import RSDSerialization
 import OHHTTPStubs
 @testable import CodeMash2016
 
-class MockMessageCell: UITableViewCell {
+class MockGameCell: UITableViewCell {
     var title: String?
     var name: String?
     init(title: String?, name: String?) {
@@ -27,7 +27,7 @@ class MockMessageCell: UITableViewCell {
     }
 }
 
-class MockMessagesApi: MockApi {
+class MockGamesApi: MockApi {
     var messages: [Message]?
     var createdGame: Game?
     var mockError: NSError?
@@ -64,13 +64,13 @@ class GamesViewModelTests: AsynchronousTestCase {
     var vm: GamesViewModel?
     var mockTableView = UITableView()
     var called = false
-    var mockApi = MockMessagesApi()
+    var mockApi = MockGamesApi()
     
     override func setUp() {
         super.setUp()
         
         self.vm = GamesViewModel(cellInstantiator: { (title, name, tableView, indexPath) -> UITableViewCell in
-            return MockMessageCell(title: title, name: name)
+            return MockGameCell(title: title, name: name)
         })
         
         self.mockTableView.dataSource = self.vm
@@ -91,7 +91,7 @@ class GamesViewModelTests: AsynchronousTestCase {
         XCTAssertTrue(self.vm?.numberOfSectionsInTableView(self.mockTableView) == .Some(1))
         XCTAssertTrue(self.vm?.tableView(self.mockTableView, numberOfRowsInSection: 0) == .Some(1))
         
-        let cell = self.vm?.tableView(self.mockTableView, cellForRowAtIndexPath: NSIndexPath(forRow: 0, inSection: 0)) as? MockMessageCell
+        let cell = self.vm?.tableView(self.mockTableView, cellForRowAtIndexPath: NSIndexPath(forRow: 0, inSection: 0)) as? MockGameCell
         XCTAssertTrue(cell != nil)
         XCTAssertTrue(cell?.title == .Some("Glorantha"))
         XCTAssertTrue(cell?.name == .Some("Admin"))

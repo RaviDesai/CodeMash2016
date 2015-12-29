@@ -14,6 +14,13 @@ import RSDSerialization
 import OHHTTPStubs
 @testable import CodeMash2016
 
+private var user1 = User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberOne"))
+private var user2 = User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberTwo"))
+private var user3 = User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberThree"))
+private var user4 = User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberFour"))
+
+private var game1 = Game(id: NSUUID(), title: "RuneQuest", owner: user1.id!, users: [user2.id!, user3.id!])
+private var game2 = Game(id: NSUUID(), title: "ElfQuest", owner: user4.id!, users: [user1.id!, user3.id!])
 
 class TestApiUsers: AsynchronousTestCase {
     var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
@@ -21,19 +28,11 @@ class TestApiUsers: AsynchronousTestCase {
     var mockedRest: MockedRESTCalls?
     
     func getFakeUsers() -> [User] {
-        return [
-            User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberOne")),
-            User(id: NSUUID(), name: "Two", password: "pass", emailAddress: EmailAddress(user: "two", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberTwo")),
-            User(id: NSUUID(), name: "Three", password: "pass", emailAddress: EmailAddress(user: "three", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberThree")),
-            User(id: NSUUID(), name: "Four", password: "pass", emailAddress: EmailAddress(user: "four", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberFour"))]
+        return [user1, user2, user3, user4]
     }
 
     func getFakeGames() -> [Game] {
-        var users = getFakeUsers()
-        return [
-            Game(id: NSUUID(), title: "RuneQuest", owner: users[0].id!, users: [users[1].id!, users[2].id!]),
-            Game(id: NSUUID(), title: "ElfQuest", owner: users[3].id!, users: [users[0].id!, users[2].id!])
-        ]
+        return [ game1, game2 ]
     }
     
     override func setUp() {

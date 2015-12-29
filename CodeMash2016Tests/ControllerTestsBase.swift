@@ -27,11 +27,11 @@ private var messageDDFour = Message(id: NSUUID(), from: userOne.id!, to: nil, ga
 
 class ControllerTestsBase: AsynchronousTestCase {
     func getLoginUser() -> User {
-        return User(id: NSUUID(), name: "Admin", password: "pass", emailAddress: EmailAddress(user: "admin", host: "desai.com"), image: nil)
+        return loginUser
     }
     
     func getFakeUsers() -> [User] {
-        return [userOne, userTwo, userThree, userFour]
+        return [loginUser, userOne, userTwo, userThree, userFour]
     }
     
     func getFakeGames() -> [Game] {

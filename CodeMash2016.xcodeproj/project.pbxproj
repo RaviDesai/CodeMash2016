@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		4136F0511C31A1790071DA6E /* UITableViewRowAction+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0501C31A1790071DA6E /* UITableViewRowAction+Extension.swift */; };
 		4136F0531C31D1150071DA6E /* TestApiGames.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0521C31D1150071DA6E /* TestApiGames.swift */; };
+		4136F0561C31F0B50071DA6E /* ShowUsersViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0551C31F0B50071DA6E /* ShowUsersViewModelTests.swift */; };
+		4136F0581C3209910071DA6E /* ShowUsersControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4136F0571C3209910071DA6E /* ShowUsersControllerTests.swift */; };
 		413892FC1BE58DF400AB940D /* JSONHelperForImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */; };
 		413C92A91BF799750027ACB2 /* TestApiUsers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92A81BF799750027ACB2 /* TestApiUsers.swift */; };
 		413C92AB1BF7A9F90027ACB2 /* LoginControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */; };
@@ -38,7 +40,6 @@
 		419089981BDB2095004F6F46 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 419089961BDB2095004F6F46 /* Main.storyboard */; };
 		4190899A1BDB2095004F6F46 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 419089991BDB2095004F6F46 /* Assets.xcassets */; };
 		4190899D1BDB2095004F6F46 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4190899B1BDB2095004F6F46 /* LaunchScreen.storyboard */; };
-		419089A81BDB2095004F6F46 /* CodeMash2016Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419089A71BDB2095004F6F46 /* CodeMash2016Tests.swift */; };
 		419089B31BDB2095004F6F46 /* CodeMash2016UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419089B21BDB2095004F6F46 /* CodeMash2016UITests.swift */; };
 		419089C11BDB22C7004F6F46 /* LoginController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419089C01BDB22C7004F6F46 /* LoginController.swift */; };
 		419089C31BDB231D004F6F46 /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419089C21BDB231D004F6F46 /* LoginViewModel.swift */; };
@@ -95,6 +96,8 @@
 		3045416F80F09C4FAF35E994 /* Pods-CodeMash2016.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CodeMash2016.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CodeMash2016/Pods-CodeMash2016.debug.xcconfig"; sourceTree = "<group>"; };
 		4136F0501C31A1790071DA6E /* UITableViewRowAction+Extension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UITableViewRowAction+Extension.swift"; sourceTree = "<group>"; };
 		4136F0521C31D1150071DA6E /* TestApiGames.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiGames.swift; sourceTree = "<group>"; };
+		4136F0551C31F0B50071DA6E /* ShowUsersViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowUsersViewModelTests.swift; sourceTree = "<group>"; };
+		4136F0571C3209910071DA6E /* ShowUsersControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ShowUsersControllerTests.swift; sourceTree = "<group>"; };
 		413892FB1BE58DF400AB940D /* JSONHelperForImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONHelperForImage.swift; sourceTree = "<group>"; };
 		413C92A81BF799750027ACB2 /* TestApiUsers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiUsers.swift; sourceTree = "<group>"; };
 		413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginControllerTests.swift; sourceTree = "<group>"; };
@@ -127,7 +130,6 @@
 		4190899C1BDB2095004F6F46 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		4190899E1BDB2095004F6F46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		419089A31BDB2095004F6F46 /* CodeMash2016Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodeMash2016Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		419089A71BDB2095004F6F46 /* CodeMash2016Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeMash2016Tests.swift; sourceTree = "<group>"; };
 		419089A91BDB2095004F6F46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		419089AE1BDB2095004F6F46 /* CodeMash2016UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodeMash2016UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		419089B21BDB2095004F6F46 /* CodeMash2016UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeMash2016UITests.swift; sourceTree = "<group>"; };
@@ -213,6 +215,16 @@
 			name = Model;
 			sourceTree = "<group>";
 		};
+		4136F0591C3215BE0071DA6E /* Partial Mocks */ = {
+			isa = PBXGroup;
+			children = (
+				4175CAE71C31741400577FA7 /* PartialMockViewModelBase.swift */,
+				413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */,
+				4175CAE51C3170FE00577FA7 /* PartialMockGamesViewModel.swift */,
+			);
+			name = "Partial Mocks";
+			sourceTree = "<group>";
+		};
 		419089861BDB2095004F6F46 = {
 			isa = PBXGroup;
 			children = (
@@ -258,8 +270,8 @@
 		419089A61BDB2095004F6F46 /* CodeMash2016Tests */ = {
 			isa = PBXGroup;
 			children = (
-				419089A71BDB2095004F6F46 /* CodeMash2016Tests.swift */,
 				419089A91BDB2095004F6F46 /* Info.plist */,
+				417CCA611C21BBF100592CF3 /* MockApi.swift */,
 				418F73201C25AEE400D754B1 /* TestModelUser.swift */,
 				418F73221C25B1B100D754B1 /* TestModelGame.swift */,
 				418F73241C25B36700D754B1 /* TestModelEmailAddress.swift */,
@@ -273,10 +285,9 @@
 				413C92AA1BF7A9F90027ACB2 /* LoginControllerTests.swift */,
 				417CCA5F1C21B7D100592CF3 /* GamesViewModelTests.swift */,
 				4175CAE91C31753600577FA7 /* GamesControllerTests.swift */,
-				4175CAE71C31741400577FA7 /* PartialMockViewModelBase.swift */,
-				413C92AC1BF7AB2B0027ACB2 /* PartialMockLoginViewModel.swift */,
-				4175CAE51C3170FE00577FA7 /* PartialMockGamesViewModel.swift */,
-				417CCA611C21BBF100592CF3 /* MockApi.swift */,
+				4136F0551C31F0B50071DA6E /* ShowUsersViewModelTests.swift */,
+				4136F0571C3209910071DA6E /* ShowUsersControllerTests.swift */,
+				4136F0591C3215BE0071DA6E /* Partial Mocks */,
 			);
 			path = CodeMash2016Tests;
 			sourceTree = "<group>";
@@ -668,7 +679,9 @@
 				417CCA621C21BBF100592CF3 /* MockApi.swift in Sources */,
 				413C92AB1BF7A9F90027ACB2 /* LoginControllerTests.swift in Sources */,
 				413C92A91BF799750027ACB2 /* TestApiUsers.swift in Sources */,
+				4136F0561C31F0B50071DA6E /* ShowUsersViewModelTests.swift in Sources */,
 				41B2AACB1BDD260800C66703 /* TestApiLogin.swift in Sources */,
+				4136F0581C3209910071DA6E /* ShowUsersControllerTests.swift in Sources */,
 				419B84081C20EF5D00ABB826 /* TestApiMessages.swift in Sources */,
 				4175CAEA1C31753600577FA7 /* GamesControllerTests.swift in Sources */,
 				4175CAE61C3170FE00577FA7 /* PartialMockGamesViewModel.swift in Sources */,
@@ -676,7 +689,6 @@
 				418F73251C25B36700D754B1 /* TestModelEmailAddress.swift in Sources */,
 				414EB53C1C28863000697DD3 /* TestModelMessage.swift in Sources */,
 				418F73211C25AEE400D754B1 /* TestModelUser.swift in Sources */,
-				419089A81BDB2095004F6F46 /* CodeMash2016Tests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

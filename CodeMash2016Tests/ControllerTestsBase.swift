@@ -30,6 +30,14 @@ class ControllerTestsBase: AsynchronousTestCase {
         return loginUser
     }
     
+    func getUserOne() -> User {
+        return userOne
+    }
+
+    func getUserTwo() -> User {
+        return userTwo
+    }
+    
     func getFakeUsers() -> [User] {
         return [loginUser, userOne, userTwo, userThree, userFour]
     }

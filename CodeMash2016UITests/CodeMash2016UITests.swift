@@ -14,31 +14,30 @@ class CodeMash2016UITests: XCTestCase {
         super.setUp()
         continueAfterFailure = false
         let app = XCUIApplication()
-        app.launchArguments = ["--noanimations"]
+        app.launchArguments = ["--mockdata"]
         app.launch()
+        XCUIDevice.sharedDevice().orientation = .Portrait
     }
     
     override func tearDown() {
+        XCUIDevice.sharedDevice().orientation = .Portrait
         super.tearDown()
     }
     
-    func testForCoverage() {
-        
+    func testRotate() {
         let app = XCUIApplication()
         let tablesQuery = app.tables
         tablesQuery.buttons["Login"].tap()
-        tablesQuery.staticTexts["Four"].tap()
-        
-        let textField = app.otherElements.containingType(.NavigationBar, identifier:"CodeMash2016.UpdateUser").childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.TextField).elementBoundByIndex(0)
-        textField.tap()
-        textField.typeText("a")
-        app.navigationBars["CodeMash2016.UpdateUser"].childrenMatchingType(.Button).matchingIdentifier("Back").elementBoundByIndex(0).tap()
-        app.sheets["Save changes"].collectionViews.buttons["Save changes"].tap()
-        
+        tablesQuery.staticTexts["Two"].tap()
+
+        let textField = app.otherElements.containingType(.NavigationBar, identifier:"Edit User").childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.TextField).elementBoundByIndex(0)
+        let beforeRect = textField.frame
+        XCUIDevice.sharedDevice().orientation = .LandscapeRight
+        let afterRect = textField.frame
+        XCTAssertGreaterThan(afterRect.width, beforeRect.width)
     }
     
-    func testChoosePhoto() {
-        
+    func testChoosePhotoThatFails() {
         let app = XCUIApplication()
         let tablesQuery = app.tables
         tablesQuery.buttons["Login"].tap()
@@ -78,11 +77,11 @@ class CodeMash2016UITests: XCTestCase {
         tablesQuery.buttons["Login"].tap()
         tablesQuery.staticTexts["Three"].tap()
         
-        let backButton = app.navigationBars["CodeMash2016.UpdateUser"].childrenMatchingType(.Button).matchingIdentifier("Back").elementBoundByIndex(0)
+        let backButton = app.navigationBars["Edit User"].buttons["Users"]
         backButton.tap()
         tablesQuery.staticTexts["Two"].tap()
         
-        let textField = app.otherElements.containingType(.NavigationBar, identifier:"CodeMash2016.UpdateUser").childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.TextField).elementBoundByIndex(0)
+        let textField = app.otherElements.containingType(.NavigationBar, identifier:"Edit User").childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.TextField).elementBoundByIndex(0)
         textField.tap()
         textField.typeText("abx")
         backButton.tap()
@@ -92,45 +91,9 @@ class CodeMash2016UITests: XCTestCase {
         let saveChangesButton = collectionViewsQuery.buttons["Save changes"]
         saveChangesButton.tap()
         
-        app.tables.staticTexts["One"].tap()
-        
-        let textField2 = app.otherElements.containingType(.NavigationBar, identifier:"CodeMash2016.UpdateUser").childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.Other).element.childrenMatchingType(.TextField).elementBoundByIndex(0)
-        textField2.tap()
-        textField2.typeText("s")
-        app.navigationBars["CodeMash2016.UpdateUser"].childrenMatchingType(.Button).matchingIdentifier("Back").elementBoundByIndex(0).tap()
-        app.sheets["Save changes"].collectionViews.buttons["Exit without saving"].tap()
-        
-        // test fails after executing this line...
-        app.navigationBars["CodeMash2016.ShowUsers"].buttons["Compose"].tap()
-        
-        // but only if you comment out the following 4 lines...
-        let navBarText = app.navigationBars.containingType(.StaticText, identifier: "Compose").element
-        let navBarTextExists = NSPredicate(format: "exists == 1")
-        self.expectationForPredicate(navBarTextExists, evaluatedWithObject: navBarText, handler: nil)
-        self.waitForExpectationsWithTimeout(5, handler: nil)
-        // ...stop commenting out here
-        
-        let toTextField = app.textFields.containingType(.StaticText, identifier:"To:").element
-        toTextField.tap()
-        toTextField.typeText("a")
-        app.tables.staticTexts["four@desai.com"].tap()
-        toTextField.typeText("a")
-        app.tables.staticTexts["three@desai.com"].tap()
-        
-        let ccTextField = app.scrollViews.otherElements.textFields
-            .containingType(.StaticText, identifier:"Cc:").element
-        
-        ccTextField.tap()
-        ccTextField.typeText("a")
-        app.staticTexts["one@desai.com"].tap()
-        ccTextField.typeText("a")
-        app.staticTexts["two@desai.com"].tap()
-        
-        app.navigationBars["Compose"]
-            .childrenMatchingType(.Button)
-            .matchingIdentifier("Back")
-            .elementBoundByIndex(0)
-            .tap()
+        let changedValue = tablesQuery.staticTexts["Twoabx"]
+        XCTAssertTrue(changedValue.exists)
     }
     
+
 }

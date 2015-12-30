@@ -19,7 +19,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
     @IBOutlet weak var removePhotoButton: UIButton!
     @IBOutlet weak var choosePhotoButton: UIButton!
     
-    var viewModel: UpdateUserViewModel?
+    var viewModel: UpdateUserViewModelProtocol?
     var userModificationHandler: ((DeletedOrSaved, User?) -> ())?
     
     func ensureViewModelIsCreated() {
@@ -57,7 +57,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         emailTextField.delegate = self
         
         let deleteButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Trash, target: self, action: Selector("deleteUser:"))
-        deleteButton.enabled = self.viewModel!.canBeUpdated
+        deleteButton.enabled = self.viewModel!.canBeUpdated && self.viewModel!.user != self.viewModel!.loggedInUser
 
         self.navigationItem.rightBarButtonItem = deleteButton
         self.navigationItem.title = "Edit User"
@@ -95,11 +95,11 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertControllerStyle.ActionSheet)
         
-        let exitAction = UIAlertAction(title: "Exit without saving", style: UIAlertActionStyle.Default) { (action) -> Void in
+        let exitAction = ActionFactory.Action("Exit without saving", UIAlertActionStyle.Default) { (action) -> Void in
             self.navigationController?.popViewControllerAnimated(true)
         }
         
-        let saveAction = UIAlertAction(title: "Save changes", style: UIAlertActionStyle.Default) { (action) -> Void in
+        let saveAction = ActionFactory.Action("Save changes", UIAlertActionStyle.Default) { (action) -> Void in
             if (userIsBeingUpdated) {
                 self.viewModel!.saveUser({ (returnedUser, returnedError) -> () in
                     guard let myError = returnedError else {
@@ -121,7 +121,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
             }
         }
         
-        let cancelAction = UIAlertAction(title: "Cancel", style: UIAlertActionStyle.Cancel) { (action) -> Void in
+        let cancelAction = ActionFactory.Action("Cancel", UIAlertActionStyle.Cancel) { (action) -> Void in
         }
         
         alert.addAction(exitAction)

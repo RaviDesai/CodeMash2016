@@ -8,7 +8,25 @@
 
 import UIKit
 
-class UpdateUserViewModel: ViewModelBase {
+protocol UpdateUserViewModelProtocol {
+    var user: User? { get }
+    var loggedInUser: User? { get }
+    var canBeUpdated: Bool { get }
+    var contactName: String? { get set }
+    var contactAddress: String? { get set }
+    var contactImage: UIImage? { get set }
+
+    var uuidString: String? { get }
+    var hasValidEmailAddress: Bool { get }
+    var hasInformationChanged: Bool { get }
+
+    func setUser(user: User?, loggedInUser: User?)
+    func saveUser(completionHandler: (User?, NSError?)->())
+    func createUser(completionHandler: (User?, NSError?) -> ())
+    func deleteUser(completionHandler: (User?, NSError?)->())
+}
+
+class UpdateUserViewModel: ViewModelBase, UpdateUserViewModelProtocol {
     var originalUser: User?
     var user: User?
     var loggedInUser: User?

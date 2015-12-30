@@ -9,9 +9,7 @@
 import UIKit
 
 class MockAlertAction : UIAlertAction {
-    
-    typealias Handler = ((UIAlertAction) -> Void)
-    private var handler: Handler?
+    private var handler: ((UIAlertAction) -> Void)?
     private var mockTitle: String?
     private var mockStyle: UIAlertActionStyle
     
@@ -27,7 +25,6 @@ class MockAlertAction : UIAlertAction {
     
     override init() {
         mockStyle = .Default
-        
         super.init()
     }
     

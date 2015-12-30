@@ -3,6 +3,17 @@
    version = "1.0">
    <ContextStates>
       <ContextState
+         contextName = "APIRequest.makeRequest&lt;A where ...&gt;() -&gt; NSMutableURLRequest?:APIRequest.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.endpoint">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
+      <ContextState
+         contextName = "APICall.(executeRespondWithArray&lt;A where ...&gt; (APICall&lt;A&gt;) -&gt; (([A.T]?, NSError?) -&gt; ()) -&gt; ()).(closure #1):APICall.swift">
+      </ContextState>
+      <ContextState
          contextName = "MessageCell.initializeComponentsFromViewModel() -&gt; ():MessageCell.swift">
          <PersistentStrings>
             <PersistentString
@@ -27,21 +38,18 @@
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "CodeMash2016UITests.testChoosePhoto() -&gt; ():CodeMash2016UITests.swift">
+         contextName = "GamesControllerTests.testComposeNewGameClickCreateFailureUnauthorized() -&gt; ():GamesControllerTests.swift">
          <PersistentStrings>
             <PersistentString
-               value = "app.alerts[&quot;\u{201c}CodeMash2016\u{201d} Would Like to Access Your Photos&quot;]">
+               value = "alertView!.actions[0]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>
       <ContextState
-         contextName = "APICall.(executeRespondWithArray&lt;A where ...&gt; (APICall&lt;A&gt;) -&gt; (([A.T]?, NSError?) -&gt; ()) -&gt; ()).(closure #1):APICall.swift">
-      </ContextState>
-      <ContextState
-         contextName = "APIRequest.makeRequest&lt;A where ...&gt;() -&gt; NSMutableURLRequest?:APIRequest.swift">
+         contextName = "CodeMash2016UITests.testChoosePhoto() -&gt; ():CodeMash2016UITests.swift">
          <PersistentStrings>
             <PersistentString
-               value = "self.endpoint">
+               value = "app.alerts[&quot;\u{201c}CodeMash2016\u{201d} Would Like to Access Your Photos&quot;]">
             </PersistentString>
          </PersistentStrings>
       </ContextState>

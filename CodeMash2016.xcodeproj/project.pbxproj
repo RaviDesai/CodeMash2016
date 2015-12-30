@@ -48,6 +48,7 @@
 		419089C51BDB2530004F6F46 /* ViewModelBase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419089C41BDB2530004F6F46 /* ViewModelBase.swift */; };
 		419B84061C20D4E500ABB826 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419B84051C20D4E500ABB826 /* Message.swift */; };
 		419B84081C20EF5D00ABB826 /* TestApiMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419B84071C20EF5D00ABB826 /* TestApiMessages.swift */; };
+		41A209EA1C33837400952879 /* UpdateUserViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41A209E91C33837400952879 /* UpdateUserViewModelTests.swift */; };
 		41B2AAC51BDD25A100C66703 /* Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AAC41BDD25A100C66703 /* Client.swift */; };
 		41B2AAC71BDD25BB00C66703 /* LoginParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AAC61BDD25BB00C66703 /* LoginParameters.swift */; };
 		41B2AAC91BDD25D200C66703 /* LoginResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41B2AAC81BDD25D200C66703 /* LoginResponse.swift */; };
@@ -143,6 +144,7 @@
 		419089C41BDB2530004F6F46 /* ViewModelBase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModelBase.swift; sourceTree = "<group>"; };
 		419B84051C20D4E500ABB826 /* Message.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		419B84071C20EF5D00ABB826 /* TestApiMessages.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestApiMessages.swift; sourceTree = "<group>"; };
+		41A209E91C33837400952879 /* UpdateUserViewModelTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateUserViewModelTests.swift; sourceTree = "<group>"; };
 		41B2AAC41BDD25A100C66703 /* Client.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Client.swift; sourceTree = "<group>"; };
 		41B2AAC61BDD25BB00C66703 /* LoginParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginParameters.swift; sourceTree = "<group>"; };
 		41B2AAC81BDD25D200C66703 /* LoginResponse.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginResponse.swift; sourceTree = "<group>"; };
@@ -292,6 +294,7 @@
 				4175CAE91C31753600577FA7 /* GamesControllerTests.swift */,
 				4136F0551C31F0B50071DA6E /* ShowUsersViewModelTests.swift */,
 				4136F0571C3209910071DA6E /* ShowUsersControllerTests.swift */,
+				41A209E91C33837400952879 /* UpdateUserViewModelTests.swift */,
 				4136F0591C3215BE0071DA6E /* Partial Mocks */,
 			);
 			path = CodeMash2016Tests;
@@ -681,6 +684,7 @@
 				418F73231C25B1B100D754B1 /* TestModelGame.swift in Sources */,
 				4175CAE81C31741400577FA7 /* PartialMockViewModelBase.swift in Sources */,
 				41F3251B1BEE484900FAD3C1 /* LoginViewModelTests.swift in Sources */,
+				41A209EA1C33837400952879 /* UpdateUserViewModelTests.swift in Sources */,
 				4136F0531C31D1150071DA6E /* TestApiGames.swift in Sources */,
 				4175CAEC1C317DC900577FA7 /* ControllerTestsBase.swift in Sources */,
 				417CCA621C21BBF100592CF3 /* MockApi.swift in Sources */,

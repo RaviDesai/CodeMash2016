@@ -14,7 +14,7 @@ protocol TabBarViewModelProtocol {
     var games: [Game]? { get }
     var isLoaded: Bool { get }
     
-    func setUser(loggedInUser: User?, users: [User]?, games: [Game]?)
+    func loadData(loggedInUser: User?, users: [User]?, games: [Game]?)
     func logout(completionHandler: ()->())
 }
 
@@ -25,7 +25,7 @@ class TabBarViewModel: ViewModelBase, TabBarViewModelProtocol {
     
     var isLoaded: Bool { get { return loggedInUser != nil && users != nil && games != nil } }
     
-    func setUser(loggedInUser: User?, users: [User]?, games: [Game]?) {
+    func loadData(loggedInUser: User?, users: [User]?, games: [Game]?) {
         self.loggedInUser = loggedInUser
         self.users = users
         self.games = games

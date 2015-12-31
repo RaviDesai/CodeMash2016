@@ -52,13 +52,13 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
 //        self.tabBarController?.title = "Games"
 //    }
 
-    func setCurrentUserAndGames(owner: User?, games: [Game]?, users: [User]?) {
+    func loadData(owner: User?, games: [Game]?, users: [User]?) {
         guard let mygames = games, myowner = owner, myusers = users else {
             self.notifyUserOfError(self.generateMissingDataMessage(), withCallbackOnDismissal: { () -> () in })
             return
         }
         ensureViewModelIsCreated()
-        self.viewModel?.setCurrentUserAndGames(myowner, games: mygames, users: myusers)
+        self.viewModel?.loadData(myowner, games: mygames, users: myusers)
         instantiateFromViewModel()
     }
 
@@ -67,7 +67,7 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
             if let controller = segue.destinationViewController as? MessageListController,
                 let indexPath = self.tableView.indexPathForSelectedRow {
                 self.viewModel?.getMessagesForGame(indexPath, completionHandler: { (messages, error) -> () in
-                    controller.setMessages(self.viewModel?.currentUser, game: self.viewModel?.games?[indexPath.row], users: self.viewModel?.users, messages: messages, error: error)
+                    controller.loadData(self.viewModel?.loggedInUser, game: self.viewModel?.games?[indexPath.row], users: self.viewModel?.users, messages: messages, error: error)
                 })
             }
         }
@@ -136,7 +136,7 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
     }
     
     func createGame(sender: UIButton) {
-        if let owner = self.viewModel?.currentUser?.id, title = gameTitle?.text where title.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) != "" {
+        if let owner = self.viewModel?.loggedInUser?.id, title = gameTitle?.text where title.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet()) != "" {
             let game = Game(id: nil, title: title, owner: owner, users: self.viewModel?.users?.map({ $0.id }).filter({ $0 != nil }).map({ $0! }).filter({ $0 != owner}))
             self.viewModel?.createGame(game, completionHandler: {(game, error)->() in
                 if let returnedError = error {

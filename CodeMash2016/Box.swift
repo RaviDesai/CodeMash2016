@@ -13,9 +13,14 @@ class Box<T: PrintableAndEquatable> : NSObject {
     init(_ value: T) {
         self.unbox = value
     }
+    
     override var description: String { get { return unbox.description } }
+    
+    override func isEqual(object: AnyObject?) -> Bool {
+        if let otherBox = object as? Box<T> {
+            return unbox == otherBox.unbox
+        }
+        return false
+    }
 }
 
-func ==<T: PrintableAndEquatable>(lhs: Box<T>, rhs: Box<T>) -> Bool {
-    return lhs.unbox == rhs.unbox
-}

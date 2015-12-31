@@ -45,13 +45,13 @@ class ShowUsersController: UITableViewController, NamedTabProtocol {
 //        self.tabBarController?.title = "Users"
 //    }
     
-    func setUsers(users: [User]?, loggedInUser: User?) {
+    func loadData(users: [User]?, loggedInUser: User?) {
         guard let myUsers = users, myLoggedInUser = loggedInUser else {
             self.notifyUserOfError(self.generateMissingDataMessage(), withCallbackOnDismissal: { () -> () in })
             return
         }
         ensureViewModelIsCreated()
-        self.viewModel?.setUsers(myUsers, loggedInUser: myLoggedInUser)
+        self.viewModel?.loadData(myUsers, loggedInUser: myLoggedInUser)
         self.initializeComponentsFromViewModel()
     }
     
@@ -63,14 +63,14 @@ class ShowUsersController: UITableViewController, NamedTabProtocol {
         if (segue.identifier == "ModifyUser") {
             if let updateUserController = segue.destinationViewController as? UpdateUserController {
                 if let indexPath = self.tableView.indexPathForSelectedRow {
-                    updateUserController.setUser(self.viewModel?.getUserAtIndexPath(indexPath), loggedInUser: self.viewModel?.loggedInUser, userWasModified: {(deletedOrSaved, user)->() in
+                    updateUserController.loadData(self.viewModel?.getUserAtIndexPath(indexPath), loggedInUser: self.viewModel?.loggedInUser, userWasModified: {(deletedOrSaved, user)->() in
                         if deletedOrSaved == .Saved {
                             if let updatedUser = user {
-                                self.viewModel?.updateUser(updatedUser, atIndexPath: indexPath)
+                                self.viewModel?.userWasUpdated(updatedUser, atIndexPath: indexPath)
                                 self.tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.None)
                             }
                         } else {
-                            self.viewModel?.deleteUserAtIndexPath(indexPath)
+                            self.viewModel?.userWasDeleted(indexPath)
                             self.tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
                         }
                     })

@@ -69,10 +69,10 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         initializeComponentsFromViewModel()
     }
     
-    func setUser(user : User?, loggedInUser: User?, userWasModified: (DeletedOrSaved, User?)->()) {
+    func loadData(user : User?, loggedInUser: User?, userWasModified: (DeletedOrSaved, User?)->()) {
         self.userModificationHandler = userWasModified
         ensureViewModelIsCreated()
-        self.viewModel?.setUser(user, loggedInUser: loggedInUser)
+        self.viewModel?.loadData(user, loggedInUser: loggedInUser)
         initializeComponentsFromViewModel()
     }
     

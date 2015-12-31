@@ -16,9 +16,9 @@ protocol ShowUsersViewModelProtocol: UITableViewDataSource {
     var totalUsers: Int { get }
     
     func getUserAtIndexPath(indexPath: NSIndexPath) -> User?
-    func updateUser(user: User, atIndexPath indexPath: NSIndexPath)
-    func deleteUserAtIndexPath(indexPath: NSIndexPath)
-    func setUsers(users: [User], loggedInUser: User?)
+    func userWasUpdated(user: User, atIndexPath indexPath: NSIndexPath)
+    func userWasDeleted(indexPath: NSIndexPath)
+    func loadData(users: [User], loggedInUser: User?)
     func instantiateCell(user: User?, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
 }
 
@@ -34,7 +34,7 @@ class ShowUsersViewModel: ViewModelBase, ShowUsersViewModelProtocol {
         self.cellInstantiator = cellInstantiator
     }
 
-    func setUsers(users: [User], loggedInUser: User?) {
+    func loadData(users: [User], loggedInUser: User?) {
         self.users = users
         self.loggedInUser = loggedInUser
     }
@@ -66,7 +66,7 @@ class ShowUsersViewModel: ViewModelBase, ShowUsersViewModelProtocol {
         return self.cellInstantiator(user, tableView, indexPath)
     }
     
-    func updateUser(user: User, atIndexPath indexPath: NSIndexPath) {
+    func userWasUpdated(user: User, atIndexPath indexPath: NSIndexPath) {
         if (self.users == nil || indexPath.row >= self.users!.count || indexPath.row < 0) {
             return
         }
@@ -74,7 +74,7 @@ class ShowUsersViewModel: ViewModelBase, ShowUsersViewModelProtocol {
         self.users?[indexPath.row] = user;
     }
     
-    func deleteUserAtIndexPath(indexPath: NSIndexPath) {
+    func userWasDeleted(indexPath: NSIndexPath) {
         if (self.users == nil || indexPath.row >= self.users!.count || indexPath.row < 0) {
             return
         }

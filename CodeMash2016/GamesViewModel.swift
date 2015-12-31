@@ -9,12 +9,12 @@
 import UIKit
 
 protocol GamesViewModelProtocol: UITableViewDataSource {
-    var currentUser: User? { get }
+    var loggedInUser: User? { get }
     var games: [Game]? { get }
     var users: [User]? { get }
     var totalGames: Int { get }
     
-    func setCurrentUserAndGames(user: User?, games: [Game]?, users: [User]?)
+    func loadData(user: User?, games: [Game]?, users: [User]?)
     func instantiateCell(title: String?, name: String?, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
     func createGame(game: Game, completionHandler: (Game?, NSError?)->())
     func getMessagesForGame(indexPath: NSIndexPath, completionHandler: ([Message]?, NSError?)->())
@@ -23,7 +23,7 @@ protocol GamesViewModelProtocol: UITableViewDataSource {
 }
 
 class GamesViewModel: ViewModelBase, GamesViewModelProtocol {
-    var currentUser: User?
+    var loggedInUser: User?
     var cellInstantiator: (String?, String?, UITableView, NSIndexPath) -> UITableViewCell
     var games: [Game]?
     var users: [User]?
@@ -35,8 +35,8 @@ class GamesViewModel: ViewModelBase, GamesViewModelProtocol {
         self.cellInstantiator = cellInstantiator
     }
     
-    func setCurrentUserAndGames(user: User?, games: [Game]?, users: [User]?) {
-        self.currentUser = user
+    func loadData(user: User?, games: [Game]?, users: [User]?) {
+        self.loggedInUser = user
         self.users = users
         self.games = games
     }
@@ -105,8 +105,8 @@ class GamesViewModel: ViewModelBase, GamesViewModelProtocol {
     }
     
     func canDeleteGameAtIndexPath(indexPath: NSIndexPath) -> Bool {
-        if let game = self.getGameAtIndexPath(indexPath), currentUser = self.currentUser {
-            return currentUser.isAdmin || game.owner == currentUser.id
+        if let game = self.getGameAtIndexPath(indexPath), loggedInUser = self.loggedInUser {
+            return loggedInUser.isAdmin || game.owner == loggedInUser.id
         }
         return false
     }

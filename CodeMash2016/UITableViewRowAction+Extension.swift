@@ -9,7 +9,7 @@
 import UIKit
 import ObjectiveC
 
-var ActionTriggerHandle: UInt8 = 0
+private var actionTriggerHandle: UInt8 = 0
 
 private class ActionTrigger {
     private var handler: (UITableViewRowAction!, NSIndexPath!) -> ()
@@ -29,11 +29,11 @@ public extension  UITableViewRowAction  {
     public convenience init(title: String!, style: UITableViewRowActionStyle, exposedHandler: (UITableViewRowAction!, NSIndexPath!) -> Void) {
         self.init(style: style, title: title, handler: exposedHandler)
         let actionTrigger = ActionTrigger(action: self, handler: exposedHandler)
-        objc_setAssociatedObject(self, &ActionTriggerHandle, actionTrigger, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, &actionTriggerHandle, actionTrigger, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN_NONATOMIC)
     }
     
     public func trigger(indexPath:NSIndexPath) {
-        if let storedActionTrigger = objc_getAssociatedObject(self, &ActionTriggerHandle) as? ActionTrigger {
+        if let storedActionTrigger = objc_getAssociatedObject(self, &actionTriggerHandle) as? ActionTrigger {
             storedActionTrigger.trigger(indexPath)
         }
     }

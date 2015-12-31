@@ -20,8 +20,12 @@ protocol ApiProtocol {
     func deleteGame(game: Game, completionHandler: (NSError?) -> ())
     func getAllGames(user: User?, completionHandler: ([Game]?, NSError?) -> ())
     func getMessagesForGame(game: Game, completionHandler: ([Message]?, NSError?)->())
+    
+    func login(site: APISite, username: String, password: String, completionHandler: (NSUUID?, NSError?)->())
     func logout(completionHandler: ()->())
 }
+
+private let invalidId = NSError(domain: "com.github.RaviDesai", code: 48118002, userInfo: [NSLocalizedDescriptionKey: "Invalid ID", NSLocalizedFailureReasonErrorKey: "Invalid ID"])
 
 class Api: ApiProtocol {
     static var sharedInstance: ApiProtocol = Api()
@@ -54,7 +58,7 @@ class Api: ApiProtocol {
             let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
             call.executeRespondWithObject(completionHandler)
         } else {
-            completionHandler(nil, nil)
+            completionHandler(nil, invalidId)
         }
     }
     
@@ -66,7 +70,7 @@ class Api: ApiProtocol {
             let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
             call.executeRespondWithObject(completionHandler)
         } else {
-            completionHandler(nil, nil)
+            completionHandler(nil, invalidId)
         }
     }
     
@@ -77,7 +81,7 @@ class Api: ApiProtocol {
             let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser)
             call.executeRespondWithObject(completionHandler)
         } else {
-            completionHandler(nil, nil)
+            completionHandler(nil, invalidId)
         }
     }
 
@@ -89,7 +93,7 @@ class Api: ApiProtocol {
             let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
             call.executeRespondWithObject(completionHandler)
         } else {
-            completionHandler(nil, nil)
+            completionHandler(nil, invalidId)
         }
     }
     
@@ -101,7 +105,7 @@ class Api: ApiProtocol {
             let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
             call.execute(completionHandler)
         } else {
-            completionHandler(nil)
+            completionHandler(invalidId)
         }
     }
 
@@ -119,9 +123,23 @@ class Api: ApiProtocol {
             let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser)
             call.executeRespondWithArray(completionHandler)
         } else {
-            completionHandler(nil, nil)
+            completionHandler(nil, invalidId)
         }
 
+    }
+    
+    func login(site: APISite, username: String, password: String, completionHandler: (NSUUID?, NSError?)->()) {
+        Client.sharedClient.authenticate(site, username: username, password: password, completion: {(userId, error) -> () in
+            if let myerror = error {
+                completionHandler(nil, myerror)
+                return
+            }
+            guard let myUserId = userId else {
+                completionHandler(nil, invalidId)
+                return
+            }
+            completionHandler(myUserId, nil)
+        })
     }
     
     func logout(completionHandler: ()->()) {

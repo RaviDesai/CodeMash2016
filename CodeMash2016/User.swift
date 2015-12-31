@@ -108,3 +108,5 @@ func<(lhs: User, rhs: User) -> Bool {
     }
     return lhs.name < rhs.name
 }
+
+extension User: PrintableAndEquatable { }

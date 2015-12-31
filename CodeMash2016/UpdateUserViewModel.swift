@@ -20,7 +20,7 @@ protocol UpdateUserViewModelProtocol {
     var hasValidEmailAddress: Bool { get }
     var hasInformationChanged: Bool { get }
 
-    func setUser(user: User?, loggedInUser: User?)
+    func loadData(user: User?, loggedInUser: User?)
     func saveUser(completionHandler: (User?, NSError?)->())
     func createUser(completionHandler: (User?, NSError?) -> ())
     func deleteUser(completionHandler: (User?, NSError?)->())
@@ -31,7 +31,7 @@ class UpdateUserViewModel: ViewModelBase, UpdateUserViewModelProtocol {
     var user: User?
     var loggedInUser: User?
     
-    func setUser(user: User?, loggedInUser: User?) {
+    func loadData(user: User?, loggedInUser: User?) {
         self.user = user
         self.loggedInUser = loggedInUser
         self.originalUser = user

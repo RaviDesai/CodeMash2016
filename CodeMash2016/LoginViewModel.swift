@@ -89,11 +89,7 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
     
     func executeLogin(completionHandler: (User?, NSError?)->()) {
         let handler = self.fireOnMainThread(completionHandler)
-        Client.sharedClient.authenticate(LoginViewModel.site, username: self.username, password: self.password, completion: {(userId, error) -> () in
-            if let myerror = error {
-                handler(nil, myerror)
-                return
-            }
+        Api.sharedInstance.login(LoginViewModel.site, username: self.username, password: self.password, completionHandler: {(userId, error) -> () in
             guard let myUserId = userId else {
                 handler(nil, nil)
                 return

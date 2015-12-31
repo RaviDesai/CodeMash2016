@@ -31,13 +31,13 @@ class MessageListController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func setMessages(currentUser: User?, game: Game?, users: [User]?, messages: [Message]?, error: NSError?) {
+    func loadData(currentUser: User?, game: Game?, users: [User]?, messages: [Message]?, error: NSError?) {
         guard let myMessages = messages where error == nil else {
             self.popBackToCallerWithMissingDataMessage()
             return
         }
         self.ensureViewModelIsCreated()
-        self.viewModel?.setMessages(currentUser, game: game, users: users, messages: myMessages)
+        self.viewModel?.loadData(currentUser, game: game, users: users, messages: myMessages)
         self.initializeComponentsFromViewModel()
     }
     

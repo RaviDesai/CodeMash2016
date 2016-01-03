@@ -40,11 +40,6 @@ class ShowUsersController: UITableViewController, NamedTabProtocol {
         initializeComponentsFromViewModel()
     }
     
-//    override func viewDidAppear(animated: Bool) {
-//        super.viewDidAppear(animated)
-//        self.tabBarController?.title = "Users"
-//    }
-    
     func loadData(users: [User]?, loggedInUser: User?) {
         guard let myUsers = users, myLoggedInUser = loggedInUser else {
             self.notifyUserOfError(self.generateMissingDataMessage(), withCallbackOnDismissal: { () -> () in })
@@ -54,7 +49,7 @@ class ShowUsersController: UITableViewController, NamedTabProtocol {
         self.viewModel?.loadData(myUsers, loggedInUser: myLoggedInUser)
         self.initializeComponentsFromViewModel()
     }
-    
+
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         return 55
     }

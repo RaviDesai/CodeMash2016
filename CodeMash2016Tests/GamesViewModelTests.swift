@@ -77,7 +77,7 @@ class GamesViewModelTests: AsynchronousTestCase {
         
         Api.injectApiHandler(mockApi)
         
-        self.vm?.setCurrentUserAndGames(admin, games: games, users: users)
+        self.vm?.loadData(admin, games: games, users: users)
         self.called = false
     }
     

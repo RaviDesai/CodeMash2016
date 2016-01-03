@@ -11,25 +11,31 @@ import RSDRESTServices
 @testable import CodeMash2016
 
 class PartialMockGamesViewModel: PartialMockViewModelBase, GamesViewModelProtocol {
-    var vm: GamesViewModel
-    var currentUser: User? { get { return self.vm.currentUser } }
-    var games: [Game]? { get { return self.vm.games } }
-    var users: [User]? { get { return self.vm.users } }
-    var totalGames: Int { get { return self.vm.totalGames } }
     var createGameCallback: ((Game) -> (Game?, NSError?))?
-    var getMessagesForGameCallback: (() -> ([Message]?, NSError?))?
+    var getMessagesForGameCallback: ((Game) -> ([Message]?, NSError?))?
     var deleteGameAtIndexPathCallback: ((NSIndexPath)-> NSError?)?
-    
+
+    var vm: GamesViewModel
     init(vm: GamesViewModel) {
         self.vm = vm
     }
+
+    var loggedInUser: User? { get { return self.vm.loggedInUser } }
     
+    var games: [Game]? { get { return self.vm.games } }
+    
+    var users: [User]? { get { return self.vm.users } }
+    
+    var totalGames: Int { get { return self.vm.totalGames } }
+    
+    var isLoaded: Bool { get { return vm.isLoaded } }
+
     func instantiateCell(title: String?, name: String?, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell {
         return self.vm.instantiateCell(title, name: name, tableView: tableView, indexPath: indexPath)
     }
     
-    func setCurrentUserAndGames(user: User?, games: [Game]?, users: [User]?) {
-        self.vm.setCurrentUserAndGames(user, games: games, users: users)
+    func loadData(user: User?, games: [Game]?, users: [User]?) {
+        self.vm.loadData(user, games: games, users: users)
     }
 
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -59,8 +65,9 @@ class PartialMockGamesViewModel: PartialMockViewModelBase, GamesViewModelProtoco
     }
     
     func getMessagesForGame(indexPath: NSIndexPath, completionHandler: ([Message]?, NSError?)->()) {
-        if let getMessagesForGameCallback = self.getMessagesForGameCallback {
-            completionHandler(getMessagesForGameCallback())
+        if let getMessagesForGameCallback = self.getMessagesForGameCallback,
+            let game = self.vm.getGameAtIndexPath(indexPath) {
+            completionHandler(getMessagesForGameCallback(game))
         } else {
             completionHandler(nil, self.generateError(405, message: "unimplemented"))
         }
@@ -68,7 +75,8 @@ class PartialMockGamesViewModel: PartialMockViewModelBase, GamesViewModelProtoco
     
     
     func deleteGameAtIndexPath(indexPath: NSIndexPath, completionHandler: (NSError?) -> ()) {
-        if let deleteGameCallback = self.deleteGameAtIndexPathCallback, let game = self.vm.getGameAtIndexPath(indexPath) {
+        if let deleteGameCallback = self.deleteGameAtIndexPathCallback,
+            let game = self.vm.getGameAtIndexPath(indexPath) {
             let error = deleteGameCallback(indexPath)
             self.vm.removeGameFromList(game, error: error)
             completionHandler(error)

@@ -38,9 +38,9 @@ class TestApiUsers: AsynchronousTestCase {
     override func setUp() {
         super.setUp()
         mockedRest = MockedRESTCalls(site: self.loginSite, initialUsers: getFakeUsers(), initialGames: getFakeGames(), initialMessages: [])
-        self.called = false
         mockedRest?.hijackAll()
         
+        self.called = false
         Client.sharedClient.authenticate(self.loginSite, username: "One", password: "pass", completion: { (nsuuid, error) -> () in
             if (error == nil) {
                 self.called = true

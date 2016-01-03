@@ -64,7 +64,7 @@ class MessageListControllerTests: ControllerTestsBase {
         let game = self.getFakeGames()[0]
         let messages = self.getFakeMessages(game)
         let users = self.getFakeUsers()
-        self.controller!.setMessages(self.getLoginUser(), game: game, users: users, messages: messages, error: nil)
+        self.controller!.loadData(self.getLoginUser(), game: game, users: users, messages: messages, error: nil)
         
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 4)
         let cell = self.controller!.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) as? MessageCell
@@ -105,7 +105,7 @@ class MessageListControllerTests: ControllerTestsBase {
             return false
         })
         
-        self.controller!.setMessages(self.getLoginUser(), game: game, users: users, messages: messages, error: error)
+        self.controller!.loadData(self.getLoginUser(), game: game, users: users, messages: messages, error: error)
         
         XCTAssertTrue(self.waitForResponse { self.called })
         XCTAssertTrue(alertController != nil)

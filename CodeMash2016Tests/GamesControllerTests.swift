@@ -30,6 +30,7 @@ class GamesControllerTests: ControllerTestsBase {
         Swizzler<GamesController>.swizzleNavigationControllerProperty()
         Swizzler<GamesController>.swizzlePresentViewControllerAnimated()
         Swizzler<GamesController>.swizzleDismissViewControllerAnimated()
+        Swizzler<GamesController>.swizzlePrepareForSegue()
     }
     
     class override func tearDown() {
@@ -37,6 +38,7 @@ class GamesControllerTests: ControllerTestsBase {
         Swizzler<GamesController>.swizzleNavigationControllerProperty()
         Swizzler<GamesController>.swizzlePresentViewControllerAnimated()
         Swizzler<GamesController>.swizzleDismissViewControllerAnimated()
+        Swizzler<GamesController>.swizzlePrepareForSegue()
 
         super.tearDown()
     }
@@ -68,7 +70,7 @@ class GamesControllerTests: ControllerTestsBase {
     
 
     func testGameScreenDisplaysInitialized() {
-        self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        self.controller!.loadData(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
         
         XCTAssertTrue(self.controller != nil)
         XCTAssertTrue(self.controller!.numberOfSectionsInTableView(
@@ -100,13 +102,12 @@ class GamesControllerTests: ControllerTestsBase {
     }
 
     func testComposeNewGameClickCreateSuccess() {
-        self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        self.controller!.loadData(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 1)
 
         var alertView: UIAlertController?
         self.controller!.presentViewControllerAnimatedInterceptCallback = PresentViewControllerAnimatedInterceptCallbackWrapper({(viewController, animated) -> Bool in
             alertView = viewController as? UIAlertController
-            self.called = true
             return false
         })
         
@@ -123,7 +124,9 @@ class GamesControllerTests: ControllerTestsBase {
         XCTAssertTrue(createButton != nil)
         
         self.mockViewModel!.createGameCallback = {(game: Game) -> (Game?, NSError?) in
-            return (Game(id: NSUUID(), title: game.title, owner: game.owner, users: game.users), nil)
+            var createdGame = game
+            createdGame.id = NSUUID()
+            return (createdGame, nil)
         }
         
         createButton?.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
@@ -131,7 +134,7 @@ class GamesControllerTests: ControllerTestsBase {
     }
 
     func testComposeNewGameClickCreateFailure() {
-        self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        self.controller!.loadData(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 1)
         
         var alertView: UIAlertController?
@@ -164,7 +167,7 @@ class GamesControllerTests: ControllerTestsBase {
     }
 
     func testComposeNewGameClickCreateFailureUnauthorized() {
-        self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        self.controller!.loadData(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 1)
         
         var alertView: UIAlertController?
@@ -214,7 +217,7 @@ class GamesControllerTests: ControllerTestsBase {
     }
     
     func testComposeNewGameClickCancel() {
-        self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        self.controller!.loadData(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 1)
         
         var alertView: UIAlertController?
@@ -225,6 +228,7 @@ class GamesControllerTests: ControllerTestsBase {
         })
         
         self.controller!.compose()
+        XCTAssertTrue(self.waitForResponse { self.called })
         
         XCTAssertTrue(alertView != nil)
         let gameTextField: UITextField? = alertView?.view?.embeddedView()
@@ -245,7 +249,7 @@ class GamesControllerTests: ControllerTestsBase {
     }
     
     func testDeleteGame() {
-        self.controller!.setCurrentUserAndGames(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        self.controller!.loadData(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
 
         var vmcount = self.controller!.viewModel!.tableView(self.controller!.tableView, numberOfRowsInSection: 0)
         XCTAssertEqual(vmcount, 1)
@@ -275,4 +279,34 @@ class GamesControllerTests: ControllerTestsBase {
         XCTAssertEqual(count, 0)
     }
 
+    func testSegueToMessagesForGame() {
+        self.controller!.loadData(self.getLoginUser(), games: self.getFakeGames(), users: self.getFakeUsers())
+        
+        let count = self.controller!.tableView.numberOfRowsInSection(0)
+        XCTAssertEqual(count, 1)
+        
+        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
+        
+        var messageListController: MessageListController?
+        self.controller!.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue) -> Bool in
+            messageListController = segue.destinationViewController as? MessageListController
+            self.called = true
+            return true
+        })
+
+        var fakeMessages: [Message]?
+        self.mockViewModel!.getMessagesForGameCallback = {(game) -> ([Message]?, NSError?) in
+            fakeMessages = self.getFakeMessages(game)
+            return (fakeMessages, nil)
+        }
+        
+        self.controller!.tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: UITableViewScrollPosition.None)
+
+        self.called = false
+        self.controller!.performSegueWithIdentifier("ShowMessages", sender: self.controller!)
+        XCTAssertTrue(self.waitForResponse { self.called })
+        
+        XCTAssertTrue(messageListController != nil)
+        XCTAssertTrue(messageListController!.viewModel!.messages! == fakeMessages!)
+    }
 }

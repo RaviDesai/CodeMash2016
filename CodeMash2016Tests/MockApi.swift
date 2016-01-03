@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import RSDRESTServices
 @testable import CodeMash2016
 
 private let userInfoNotImplemented = [NSLocalizedDescriptionKey: "API is not implemented", NSLocalizedFailureReasonErrorKey: "API is not implemented"]
@@ -40,6 +41,9 @@ class MockApi: ApiProtocol {
         completionHandler(nil, errorNotImplemented)
     }
     func getMessagesForGame(game: Game, completionHandler: ([Message]?, NSError?)->()) {
+        completionHandler(nil, errorNotImplemented)
+    }
+    func login(site: APISite, username: String, password: String, completionHandler: (NSUUID?, NSError?) -> ()) {
         completionHandler(nil, errorNotImplemented)
     }
     func logout(completionHandler: ()->()) {

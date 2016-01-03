@@ -53,7 +53,7 @@ class MessageListViewModelTests : AsynchronousTestCase {
         
         Api.injectApiHandler(mockApi)
         
-        self.vm?.setMessages(admin, game: games[0], users: users, messages: [message])
+        self.vm?.loadData(admin, game: games[0], users: users, messages: [message])
         self.called = false
     }
     

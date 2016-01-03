@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '5DDF2AD0F507148E2E762267'
+               BlueprintIdentifier = 'EC3BAFA617005EFE39A3E3A3'
                BlueprintName = 'RSDRESTServices'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'RSDRESTServices.framework'>

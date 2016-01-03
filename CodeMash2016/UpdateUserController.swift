@@ -29,7 +29,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
     }
     
     func initializeComponentsFromViewModel() {
-        if (self.viewModel == nil) { return }
+        guard let vm = self.viewModel where vm.isLoaded else { return }
         if (!self.isViewLoaded()) { return }
         
         idLabel.text = "ID"
@@ -57,7 +57,7 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
         emailTextField.delegate = self
         
         let deleteButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Trash, target: self, action: Selector("deleteUser:"))
-        deleteButton.enabled = self.viewModel!.canBeUpdated && self.viewModel!.user != self.viewModel!.loggedInUser
+        deleteButton.enabled = self.viewModel!.canBeDeleted
 
         self.navigationItem.rightBarButtonItem = deleteButton
         self.navigationItem.title = "Edit User"
@@ -157,11 +157,8 @@ class UpdateUserController: UIViewController, UITextFieldDelegate, UIImagePicker
     func textField(textField: UITextField, shouldChangeCharactersInRange range: NSRange, replacementString string: String) -> Bool {
         if (textField == self.emailTextField) {
             let newString = textField.text?.stringByReplacingCharactersInRange(range, withString: string)
-            if (EmailAddress(string: newString) == nil) {
-                self.emailTextField.textColor = UIColor.redColor()
-            } else {
-                self.emailTextField.textColor = UIColor.blackColor()
-            }
+            self.emailTextField.textColor =
+                self.viewModel?.getColorForEmailString(newString) ?? UIColor.blackColor()
         }
         return true
     }

@@ -17,22 +17,44 @@ class PartialMockUpdateUserViewModel: PartialMockViewModelBase, UpdateUserViewMo
     }
     
     var user: User? { get { return vm.user } }
+    
     var loggedInUser: User? { get { return vm.loggedInUser } }
+    
     var canBeUpdated: Bool { get { return vm.canBeUpdated } }
+    
+    var canBeDeleted: Bool { get { return vm.canBeDeleted } }
+    
     var uuidString: String? { get { return vm.uuidString } }
+    
     var hasValidEmailAddress: Bool { get { return vm.hasValidEmailAddress } }
+    
     var hasInformationChanged: Bool { get { return vm.hasInformationChanged } }
+    
+    var isLoaded: Bool { get { return vm.isLoaded } }
 
-    var contactName: String? { get { return vm.contactName } set { vm.contactName = newValue } }
-    var contactAddress: String? { get { return vm.contactAddress } set { vm.contactAddress = newValue } }
-    var contactImage: UIImage? { get { return vm.contactImage } set { vm.contactImage = newValue } }
+    var contactName: String? {
+        get { return vm.contactName }
+        set { vm.contactName = newValue }
+    }
+    
+    var contactAddress: String? {
+        get { return vm.contactAddress }
+        set { vm.contactAddress = newValue }
+    }
+    
+    var contactImage: UIImage? {
+        get { return vm.contactImage }
+        set { vm.contactImage = newValue }
+    }
 
     var saveUserCallback: ((User?) -> (User?, NSError?))?
+    
     var deleteUserCallback: ((User?) -> (User?, NSError?))?
+    
     var createUserCallback: ((User?) -> (User?, NSError?))?
 
-    func setUser(user: User?, loggedInUser: User?) {
-        vm.setUser(user, loggedInUser: loggedInUser)
+    func loadData(user: User?, loggedInUser: User?) {
+        vm.loadData(user, loggedInUser: loggedInUser)
     }
     
     func saveUser(completionHandler: (User?, NSError?)->()) {
@@ -63,4 +85,7 @@ class PartialMockUpdateUserViewModel: PartialMockViewModelBase, UpdateUserViewMo
         }
     }
 
+    func getColorForEmailString(currentString: String?) -> UIColor {
+        return vm.getColorForEmailString(currentString)
+    }
 }

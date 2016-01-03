@@ -40,7 +40,7 @@ class TestApiLogin: AsynchronousTestCase {
         
         var returnedError: NSError?
         var returnedUserUUID: NSUUID?
-        Client.sharedClient.authenticate(self.loginSite, username: "Admin", password: "Admin", completion: { (nsuuid, error) -> () in
+        Api.sharedInstance.login(self.loginSite, username: "Admin", password: "Admin", completionHandler: { (nsuuid, error) -> () in
             returnedError = error
             returnedUserUUID = nsuuid
             self.called = true
@@ -50,6 +50,13 @@ class TestApiLogin: AsynchronousTestCase {
         XCTAssertTrue(self.waitForResponse { self.called })
         XCTAssertTrue(returnedError == nil)
         XCTAssertTrue(returnedUserUUID != nil)
+        
+        self.called = false
+        Api.sharedInstance.logout { () -> () in
+            self.called = true
+        }
+        
+        XCTAssertTrue(self.waitForResponse { self.called })
     }
     
     func testLoginFailure() {
@@ -57,7 +64,7 @@ class TestApiLogin: AsynchronousTestCase {
         
         var returnedError: NSError?
         var returnedUserUUID: NSUUID?
-        Client.sharedClient.authenticate(self.loginSite, username: "Bad", password: "wolf", completion: { (nsuuid, error) -> () in
+        Api.sharedInstance.login(self.loginSite, username: "Bad", password: "wolf", completionHandler: { (nsuuid, error) -> () in
             returnedError = error
             returnedUserUUID = nsuuid
             self.called = true

@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ApplicationMockLoginProto
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
 
         let arguments = NSProcessInfo.processInfo().arguments
-        let mockData = arguments.contains("--mockdata") || true
+        let mockData = arguments.contains("--mockdata")
         if (mockData) {
             let initialUsers = [
                 User(id: NSUUID(), name: "One", password: "pass", emailAddress: EmailAddress(user: "one", host: "desai.com"), image: MockedRESTCalls.getImageWithName("NumberOne")),
@@ -62,6 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, ApplicationMockLoginProto
 
     func logoff() {
         self.mockedRest?.loginStore?.logoff()
+        Client.sharedClient.setSite(self.site, authenticated: false)
     }
     
     func applicationWillResignActive(application: UIApplication) {

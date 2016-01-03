@@ -91,7 +91,7 @@ class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
         let handler = self.fireOnMainThread(completionHandler)
         Api.sharedInstance.login(LoginViewModel.site, username: self.username, password: self.password, completionHandler: {(userId, error) -> () in
             guard let myUserId = userId else {
-                handler(nil, nil)
+                handler(nil, error)
                 return
             }
             Api.sharedInstance.getUser(myUserId, completionHandler: {(user, error) -> () in

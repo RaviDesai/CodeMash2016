@@ -28,11 +28,15 @@ class UpdateUserControllerTests: ControllerTestsBase {
         super.setUp()
         Swizzler<UpdateUserController>.swizzlePresentViewControllerAnimated()
         Swizzler<UpdateUserController>.swizzleDismissViewControllerAnimated()
+        Swizzler<UpdateUserController>.swizzleNavigationControllerProperty()
+        SwizzlerForNavigationController.swizzlePopViewControllerAnimated()
     }
     
     class override func tearDown() {
         Swizzler<UpdateUserController>.swizzlePresentViewControllerAnimated()
         Swizzler<UpdateUserController>.swizzleDismissViewControllerAnimated()
+        Swizzler<UpdateUserController>.swizzleNavigationControllerProperty()
+        SwizzlerForNavigationController.swizzlePopViewControllerAnimated()
         
         super.tearDown()
     }
@@ -65,7 +69,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
     func testInitialLoadCanEdit() {
         let userOne = getUserOne()
         let admin = getLoginUser()
-        self.controller!.setUser(userOne, loggedInUser: admin) { (savedIndicator, savedUser) -> () in
+        self.controller!.loadData(userOne, loggedInUser: admin) { (savedIndicator, savedUser) -> () in
         }
         
         XCTAssertTrue(self.controller!.idValue.text == userOne.id?.compressedUUIDString)
@@ -83,7 +87,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userTwo = getUserTwo()
         let userOne = getUserOne()
 
-        self.controller!.setUser(userOne, loggedInUser: userTwo) { (savedIndicator, savedUser) -> () in
+        self.controller!.loadData(userOne, loggedInUser: userTwo) { (savedIndicator, savedUser) -> () in
         }
 
         XCTAssertTrue(self.controller!.idValue.text == userOne.id?.compressedUUIDString)
@@ -100,7 +104,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
     func testInitialLoadSaveUserCannotDelete() {
         let admin = getLoginUser()
         
-        self.controller!.setUser(admin, loggedInUser: admin) { (savedIndicator, savedUser) -> () in
+        self.controller!.loadData(admin, loggedInUser: admin) { (savedIndicator, savedUser) -> () in
         }
         
         XCTAssertFalse(self.controller!.navigationItem.rightBarButtonItem!.enabled)
@@ -108,7 +112,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
     
     func testAttachPhotoPresentsANewControllerAndCancelIt() {
         let userTwo = getUserTwo()
-        self.controller!.setUser(userTwo, loggedInUser: userTwo) { (savedIndicator, savedUser) -> () in
+        self.controller!.loadData(userTwo, loggedInUser: userTwo) { (savedIndicator, savedUser) -> () in
         }
         
         XCTAssertTrue(self.controller!.idValue.text == userTwo.id?.compressedUUIDString)
@@ -146,7 +150,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
 
     func testAttachPhotoPresentsANewControllerAndChoosePhoto() {
         let userTwo = getUserTwo()
-        self.controller!.setUser(userTwo, loggedInUser: userTwo) { (savedIndicator, savedUser) -> () in
+        self.controller!.loadData(userTwo, loggedInUser: userTwo) { (savedIndicator, savedUser) -> () in
         }
         
         XCTAssertTrue(self.controller!.idValue.text == userTwo.id?.compressedUUIDString)
@@ -185,7 +189,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
     
     func testRemovePhoto() {
         let userOne = getUserOne()
-        self.controller!.setUser(userOne, loggedInUser: userOne) { (savedIndicator, savedUser) -> () in
+        self.controller!.loadData(userOne, loggedInUser: userOne) { (savedIndicator, savedUser) -> () in
         }
         
         self.controller!.removePhotoButton.sendActionsForControlEvents(UIControlEvents.TouchUpInside)
@@ -200,7 +204,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         
         var savedIndicator: DeletedOrSaved?
         var savedUser: User?
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in
             savedIndicator = indicator
             savedUser = user
         }
@@ -220,7 +224,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in
         }
         
         self.mockViewModel!.deleteUserCallback = {(user) -> (User?, NSError?) in
@@ -246,7 +250,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in }
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in }
         
         self.controller!.nameTextField.text = "updated"
         self.controller!.textFieldDidEndEditing(self.controller!.nameTextField)
@@ -258,7 +262,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in }
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in }
 
         self.controller!.emailTextField.text = "zzz"
         self.controller!.textFieldDidEndEditing(self.controller!.emailTextField)
@@ -276,7 +280,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in }
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in }
         let range = self.controller!.emailTextField.text!.NSRangeFromRange(self.controller!.emailTextField.text!.startIndex ..< self.controller!.emailTextField.text!.endIndex)
         self.controller!.textField(self.controller!.emailTextField, shouldChangeCharactersInRange: range, replacementString: "zzz@")
         XCTAssertTrue(self.controller!.emailTextField.textColor == UIColor.redColor())
@@ -286,7 +290,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in }
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in }
         let range = self.controller!.emailTextField.text!.NSRangeFromRange(self.controller!.emailTextField.text!.startIndex ..< self.controller!.emailTextField.text!.endIndex)
         self.controller!.textField(self.controller!.emailTextField, shouldChangeCharactersInRange: range, replacementString: "good@addr.com")
         XCTAssertTrue(self.controller!.emailTextField.textColor == UIColor.blackColor())
@@ -296,7 +300,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in }
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in }
 
         XCTAssertTrue(self.controller!.navigationShouldPopOnBackButton())
     }
@@ -305,7 +309,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in }
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in }
         self.controller!.nameTextField.text = "changed"
         self.controller!.textFieldDidEndEditing(self.controller!.nameTextField)
         
@@ -326,7 +330,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         let userOne = getUserOne()
         let admin = getLoginUser()
         
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in }
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in }
         self.controller!.emailTextField.text = "invalid"
         self.controller!.textFieldDidEndEditing(self.controller!.emailTextField)
         XCTAssertFalse(mockViewModel!.hasValidEmailAddress)
@@ -351,7 +355,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         
         var saveIndicator: DeletedOrSaved?
         var saveUser: User?
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in
             saveIndicator = indicator
             saveUser = user
         }
@@ -376,7 +380,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         }
         
         let mockNavigator = UINavigationController()
-        var popWasCalled = true
+        var popWasCalled = false
         mockNavigator.popViewControllerAnimatedInterceptCallback = PopViewControllerAnimatedInterceptCallbackWrapper({(animated) -> Bool in
             popWasCalled = true
             return false
@@ -399,7 +403,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         
         var saveIndicator: DeletedOrSaved?
         var saveUser: User?
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in
             saveIndicator = indicator
             saveUser = user
         }
@@ -436,7 +440,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         
         var saveIndicator: DeletedOrSaved?
         var saveUser: User?
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in
             saveIndicator = indicator
             saveUser = user
         }
@@ -461,7 +465,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         }
         
         let mockNavigator = UINavigationController()
-        var popWasCalled = true
+        var popWasCalled = false
         mockNavigator.popViewControllerAnimatedInterceptCallback = PopViewControllerAnimatedInterceptCallbackWrapper({(animated) -> Bool in
             popWasCalled = true
             return false
@@ -484,7 +488,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         
         var saveIndicator: DeletedOrSaved?
         var saveUser: User?
-        self.controller!.setUser(userOne, loggedInUser: admin) { (indicator, user) -> () in
+        self.controller!.loadData(userOne, loggedInUser: admin) { (indicator, user) -> () in
             saveIndicator = indicator
             saveUser = user
         }
@@ -512,7 +516,7 @@ class UpdateUserControllerTests: ControllerTestsBase {
         }
         
         let mockNavigator = UINavigationController()
-        var popWasCalled = true
+        var popWasCalled = false
         mockNavigator.popViewControllerAnimatedInterceptCallback = PopViewControllerAnimatedInterceptCallbackWrapper({(animated) -> Bool in
             popWasCalled = true
             return false

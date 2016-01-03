@@ -13,12 +13,15 @@ protocol GamesViewModelProtocol: UITableViewDataSource {
     var games: [Game]? { get }
     var users: [User]? { get }
     var totalGames: Int { get }
+    var isLoaded: Bool { get }
     
     func loadData(user: User?, games: [Game]?, users: [User]?)
     func instantiateCell(title: String?, name: String?, tableView: UITableView, indexPath: NSIndexPath) -> UITableViewCell
+    func canDeleteGameAtIndexPath(indexPath: NSIndexPath) -> Bool
+
+    // methods with asynchronous results
     func createGame(game: Game, completionHandler: (Game?, NSError?)->())
     func getMessagesForGame(indexPath: NSIndexPath, completionHandler: ([Message]?, NSError?)->())
-    func canDeleteGameAtIndexPath(indexPath: NSIndexPath) -> Bool
     func deleteGameAtIndexPath(indexPath: NSIndexPath, completionHandler: (NSError?)->())
 }
 
@@ -29,6 +32,7 @@ class GamesViewModel: ViewModelBase, GamesViewModelProtocol {
     var users: [User]?
     static let cellIdentifier = "gamesIRunCell"
     var totalGames: Int { get { return games?.count ?? 0 } }
+    var isLoaded: Bool { get { return self.games != nil } }
 
     
     init(cellInstantiator: (String?, String?, UITableView, NSIndexPath) -> UITableViewCell) {

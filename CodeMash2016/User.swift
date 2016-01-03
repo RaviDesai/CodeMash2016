@@ -86,7 +86,7 @@ extension User {
     }
     
     func isAuthorizedForUpdating(user: User) -> Bool {
-        return user.isAdmin || self == user
+        return user.isAdmin || self == user || self.id == nil
     }
 }
 
@@ -106,7 +106,7 @@ func<(lhs: User, rhs: User) -> Bool {
     if (lhs.name == rhs.name) {
         return lhs.emailAddress < rhs.emailAddress
     }
-    return lhs.name < rhs.name
+    return lhs.name.lowercaseString < rhs.name.lowercaseString
 }
 
 extension User: PrintableAndEquatable { }

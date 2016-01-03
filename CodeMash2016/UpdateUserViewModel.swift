@@ -10,8 +10,10 @@ import UIKit
 
 protocol UpdateUserViewModelProtocol {
     var user: User? { get }
+    var isLoaded: Bool { get }
     var loggedInUser: User? { get }
     var canBeUpdated: Bool { get }
+    var canBeDeleted: Bool { get }
     var contactName: String? { get set }
     var contactAddress: String? { get set }
     var contactImage: UIImage? { get set }
@@ -21,6 +23,7 @@ protocol UpdateUserViewModelProtocol {
     var hasInformationChanged: Bool { get }
 
     func loadData(user: User?, loggedInUser: User?)
+    func getColorForEmailString(currentValue: String?) -> UIColor
     func saveUser(completionHandler: (User?, NSError?)->())
     func createUser(completionHandler: (User?, NSError?) -> ())
     func deleteUser(completionHandler: (User?, NSError?)->())
@@ -39,13 +42,22 @@ class UpdateUserViewModel: ViewModelBase, UpdateUserViewModelProtocol {
         self.originalUser?.id = nil
     }
     
+    var isLoaded: Bool { get { return self.user != nil } }
+    
     var canBeUpdated: Bool {
         get {
             if let loggedInUser = self.loggedInUser, thisuser = self.user {
                 if (loggedInUser.isAdmin) { return true }
                 if (thisuser.isAuthorizedForUpdating(loggedInUser)) { return true }
+                if (thisuser.id == nil) { return true }
             }
-            return false
+            return self.user != nil && self.user?.id == nil
+        }
+    }
+    
+    var canBeDeleted: Bool {
+        get {
+            return canBeUpdated && self.user != self.loggedInUser && self.user?.id != nil
         }
     }
     
@@ -105,5 +117,12 @@ class UpdateUserViewModel: ViewModelBase, UpdateUserViewModelProtocol {
         } else {
             completionHandler(nil, nil)
         }
+    }
+    
+    func getColorForEmailString(currentValue: String?) -> UIColor {
+        if EmailAddress(string: currentValue) == nil {
+            return UIColor.redColor()
+        }
+        return UIColor.blackColor()
     }
 }

@@ -56,7 +56,7 @@ class UpdateUserViewModelTests: AsynchronousTestCase {
         
         self.vm = UpdateUserViewModel()
         
-        self.vm?.setUser(ravi, loggedInUser: admin)
+        self.vm?.loadData(ravi, loggedInUser: admin)
         self.called = false
     }
     
@@ -68,6 +68,7 @@ class UpdateUserViewModelTests: AsynchronousTestCase {
     
     func testLoadedRavi() {
         XCTAssertTrue(self.vm!.canBeUpdated)
+        XCTAssertTrue(self.vm!.canBeDeleted)
         XCTAssertTrue(self.vm!.contactName == "Ravi")
         XCTAssertTrue(self.vm!.contactAddress == "ravi@desai.com")
         XCTAssertTrue(self.vm!.contactImage == nil)
@@ -77,14 +78,31 @@ class UpdateUserViewModelTests: AsynchronousTestCase {
     }
 
     func testLoadedNewbie() {
-        self.vm!.setUser(newguy, loggedInUser: admin)
+        self.vm!.loadData(newguy, loggedInUser: admin)
         XCTAssertTrue(self.vm!.canBeUpdated)
+        XCTAssertFalse(self.vm!.canBeDeleted)
         XCTAssertTrue(self.vm!.contactName == "Newbie")
         XCTAssertTrue(self.vm!.contactAddress == nil)
         XCTAssertTrue(self.vm!.contactImage == nil)
         XCTAssertTrue(self.vm!.uuidString == nil)
         XCTAssertFalse(self.vm!.hasInformationChanged)
         XCTAssertFalse(self.vm!.hasValidEmailAddress)
+    }
+    
+    func testInvalidEmailAddress() {
+        self.vm!.loadData(ravi, loggedInUser: admin)
+        self.vm!.contactAddress = "aaa"
+        XCTAssertTrue(self.vm!.contactAddress == nil)
+        XCTAssertFalse(self.vm!.hasValidEmailAddress)
+    }
+    
+    func testColorForEmailString() {
+        self.vm!.loadData(ravi, loggedInUser: admin)
+        let badColor = self.vm!.getColorForEmailString("aaa")
+        XCTAssertTrue(badColor == UIColor.redColor())
+        
+        let goodColor = self.vm!.getColorForEmailString("rsd@icloud.com")
+        XCTAssertTrue(goodColor == UIColor.blackColor())
     }
     
     func testUpdateAndSaveSuccess() {
@@ -176,7 +194,7 @@ class UpdateUserViewModelTests: AsynchronousTestCase {
     }
     
     func testCreateSuccess() {
-        self.vm!.setUser(newguy, loggedInUser: admin)
+        self.vm!.loadData(newguy, loggedInUser: admin)
         self.vm!.contactAddress = "newbie@desai.com"
         
         var createdUser = self.vm!.user
@@ -201,7 +219,7 @@ class UpdateUserViewModelTests: AsynchronousTestCase {
     }
     
     func testCreateFailure() {
-        self.vm!.setUser(newguy, loggedInUser: admin)
+        self.vm!.loadData(newguy, loggedInUser: admin)
         self.vm!.contactAddress = "newbie@desai.com"
         
         self.mockApi.mockUser =  nil

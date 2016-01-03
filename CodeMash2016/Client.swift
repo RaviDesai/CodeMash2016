@@ -101,9 +101,6 @@ public class Client {
     
     public func logout(completion: (()->())) {
         self.authenticated = false
-        if let mockLogin = UIApplication.sharedApplication().delegate as? ApplicationMockLoginProtocol {
-            mockLogin.logoff()
-        }
         self.session.reset(completion)
     }
     

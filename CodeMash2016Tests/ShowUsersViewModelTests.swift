@@ -48,7 +48,7 @@ class ShowUsersViewModelTests: AsynchronousTestCase {
         
         self.mockTableView.dataSource = self.vm
         
-        self.vm?.setUsers(users, loggedInUser: admin)
+        self.vm?.loadData(users, loggedInUser: admin)
         self.called = false
     }
     
@@ -91,7 +91,7 @@ class ShowUsersViewModelTests: AsynchronousTestCase {
         var user = ravi
         user.name = "Ravindranath"
         let indexPath = NSIndexPath(forRow: 1, inSection: 0)
-        self.vm!.updateUser(user, atIndexPath: indexPath)
+        self.vm!.userWasUpdated(user, atIndexPath: indexPath)
         
         let testUser = self.vm?.getUserAtIndexPath(indexPath)
         XCTAssertTrue(user == testUser)
@@ -101,7 +101,7 @@ class ShowUsersViewModelTests: AsynchronousTestCase {
         var user = ravi
         user.name = "Ravindranath"
         let indexPath = NSIndexPath(forRow: 12, inSection: 0)
-        self.vm!.updateUser(user, atIndexPath: indexPath)
+        self.vm!.userWasUpdated(user, atIndexPath: indexPath)
         
         let user0 = self.vm?.getUserAtIndexPath(NSIndexPath(forRow: 0, inSection: 0) )
         let user1 = self.vm?.getUserAtIndexPath(NSIndexPath(forRow: 1, inSection: 0) )
@@ -112,7 +112,7 @@ class ShowUsersViewModelTests: AsynchronousTestCase {
     func testDeleteUser() {
         XCTAssertTrue(self.vm!.totalUsers == 2)
         let indexPath = NSIndexPath(forRow: 1, inSection: 0)
-        self.vm!.deleteUserAtIndexPath(indexPath)
+        self.vm!.userWasDeleted(indexPath)
         XCTAssertTrue(self.vm!.totalUsers == 1)
         XCTAssertTrue(self.vm!.getUserAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) == admin)
     }
@@ -120,7 +120,7 @@ class ShowUsersViewModelTests: AsynchronousTestCase {
     func testDeleteUserWithBadIndexPath() {
         XCTAssertTrue(self.vm!.totalUsers == 2)
         let indexPath = NSIndexPath(forRow: 12, inSection: 0)
-        self.vm!.deleteUserAtIndexPath(indexPath)
+        self.vm!.userWasDeleted(indexPath)
         XCTAssertTrue(self.vm!.totalUsers == 2)
     }
 }

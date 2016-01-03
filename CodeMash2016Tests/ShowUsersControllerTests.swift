@@ -55,7 +55,7 @@ class ShowUsersControllerTests: ControllerTestsBase {
     }
     
     func testInitialDisplay() {
-        self.controller!.setUsers(self.getFakeUsers(), loggedInUser: self.getLoginUser())
+        self.controller!.loadData(self.getFakeUsers(), loggedInUser: self.getLoginUser())
         
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 5)
         var userCell = self.controller!.tableView.cellForRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0)) as? UserTableViewCell
@@ -79,9 +79,7 @@ class ShowUsersControllerTests: ControllerTestsBase {
         XCTAssertTrue(userCell?.nameLabel?.text == .Some("Four"))
     }
 
-    func testModifyUserCausesSegueToUpdateScreen() {
-        self.controller!.setUsers(self.getFakeUsers(), loggedInUser: self.getLoginUser())
-
+    func causeSegueToUpdateUserController(indexPath: NSIndexPath) -> (UpdateUserController?, User?) {
         var updateUserController: UpdateUserController?
         self.controller!.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue) -> Bool in
             updateUserController = segue.destinationViewController as? UpdateUserController
@@ -89,36 +87,31 @@ class ShowUsersControllerTests: ControllerTestsBase {
             return true
         })
         
-        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-        let userAtIndexPath = self.controller!.viewModel!.getUserAtIndexPath(NSIndexPath(forRow: 0, inSection: 0))
+        let userAtIndexPath = self.controller!.viewModel!.getUserAtIndexPath(indexPath)
         self.controller!.tableView!.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: UITableViewScrollPosition.None)
         
         self.called = false
         self.controller!.performSegueWithIdentifier("ModifyUser", sender: self.controller!)
         XCTAssertTrue(self.waitForResponse { self.called })
+        return (updateUserController, userAtIndexPath)
+    }
+    
+    func testModifyUserCausesSegueToUpdateScreen() {
+        self.controller!.loadData(self.getFakeUsers(), loggedInUser: self.getLoginUser())
+
+        let indexPath = NSIndexPath(forRow: 0, inSection: 0)
+        let (updateUserController, userAtIndexPath) = self.causeSegueToUpdateUserController(indexPath)
         
         XCTAssertTrue(updateUserController != nil)
         XCTAssertTrue(updateUserController!.viewModel!.user == userAtIndexPath)
     }
 
     func testModifyUserThenIssueDelete() {
-        self.controller!.setUsers(self.getFakeUsers(), loggedInUser: self.getLoginUser())
+        self.controller!.loadData(self.getFakeUsers(), loggedInUser: self.getLoginUser())
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 5)
         
-        var updateUserController: UpdateUserController?
-        self.controller!.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue) -> Bool in
-            updateUserController = segue.destinationViewController as? UpdateUserController
-            self.called = true
-            return true
-        })
-        
         let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-        let userAtIndexPath = self.controller!.viewModel!.getUserAtIndexPath(NSIndexPath(forRow: 0, inSection: 0))
-        self.controller!.tableView!.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: UITableViewScrollPosition.None)
-        
-        self.called = false
-        self.controller!.performSegueWithIdentifier("ModifyUser", sender: self.controller!)
-        XCTAssertTrue(self.waitForResponse { self.called })
+        let (updateUserController, userAtIndexPath) = self.causeSegueToUpdateUserController(indexPath)
         
         XCTAssertTrue(updateUserController != nil)
         XCTAssertTrue(updateUserController!.viewModel!.user == userAtIndexPath)
@@ -128,28 +121,16 @@ class ShowUsersControllerTests: ControllerTestsBase {
     }
     
     func testModifyUsersThenIssueUpdate() {
-        self.controller!.setUsers(self.getFakeUsers(), loggedInUser: self.getLoginUser())
+        self.controller!.loadData(self.getFakeUsers(), loggedInUser: self.getLoginUser())
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 5)
         
-        var updateUserController: UpdateUserController?
-        self.controller!.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue) -> Bool in
-            updateUserController = segue.destinationViewController as? UpdateUserController
-            self.called = true
-            return true
-        })
-        
         let indexPath = NSIndexPath(forRow: 0, inSection: 0)
-        let userAtIndexPath = self.controller!.viewModel!.getUserAtIndexPath(NSIndexPath(forRow: 0, inSection: 0))
-        var updateToUserAtIndexPath = userAtIndexPath
-        updateToUserAtIndexPath!.name = "ChangedName"
-        self.controller!.tableView!.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: UITableViewScrollPosition.None)
-        
-        self.called = false
-        self.controller!.performSegueWithIdentifier("ModifyUser", sender: self.controller!)
-        XCTAssertTrue(self.waitForResponse { self.called })
+        let (updateUserController, userAtIndexPath) = causeSegueToUpdateUserController(indexPath)
         
         XCTAssertTrue(updateUserController != nil)
         XCTAssertTrue(updateUserController!.viewModel!.user == userAtIndexPath)
+        var updateToUserAtIndexPath = userAtIndexPath
+        updateToUserAtIndexPath!.emailAddress = EmailAddress(string: "updated@address.info")
         updateUserController!.userModificationHandler?(.Saved, updateToUserAtIndexPath)
         
         XCTAssertTrue(self.controller!.tableView.numberOfRowsInSection(0) == 5)

@@ -113,7 +113,7 @@ public class NavigationControllerInterceptCallbackWrapper {
 }
 
 public extension UIViewController {
-    var prepareForSegueInterceptCallback: PrepareForSegueInterceptCallbackWrapper? {
+    public var prepareForSegueInterceptCallback: PrepareForSegueInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &prepareForSegueInterceptCallbackAssociation)
             return wrapper as? PrepareForSegueInterceptCallbackWrapper
@@ -123,7 +123,7 @@ public extension UIViewController {
         }
     }
 
-    var performSegueWithIdentifierInterceptCallback: PerformSegueWithIdentifierInterceptCallbackWrapper? {
+    public var performSegueWithIdentifierInterceptCallback: PerformSegueWithIdentifierInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &performSegueWithIdentifierInterceptCallbackAssociation)
             return wrapper as? PerformSegueWithIdentifierInterceptCallbackWrapper
@@ -133,7 +133,7 @@ public extension UIViewController {
         }
     }
     
-    var presentViewControllerAnimatedInterceptCallback: PresentViewControllerAnimatedInterceptCallbackWrapper? {
+    public var presentViewControllerAnimatedInterceptCallback: PresentViewControllerAnimatedInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &presentViewControllerAnimatedInterceptCallbackAssociation)
             return wrapper as? PresentViewControllerAnimatedInterceptCallbackWrapper
@@ -143,7 +143,7 @@ public extension UIViewController {
         }
     }
     
-    var dismissViewControllerAnimatedInterceptCallback: DismissViewControllerAnimatedInterceptCallbackWrapper? {
+    public var dismissViewControllerAnimatedInterceptCallback: DismissViewControllerAnimatedInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &dismissViewControllerAnimatedInterceptCallbackAssociation)
             return wrapper as? DismissViewControllerAnimatedInterceptCallbackWrapper
@@ -153,7 +153,7 @@ public extension UIViewController {
         }
     }
     
-    var navigationControllerInterceptCallback: NavigationControllerInterceptCallbackWrapper? {
+    public var navigationControllerInterceptCallback: NavigationControllerInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &navigationControllerAssociation)
             return wrapper as? NavigationControllerInterceptCallbackWrapper
@@ -207,7 +207,7 @@ public extension UIViewController {
 // Mock global navigation controller - useful for intercepting segues across Storyboards
 // (when performSegue isn't used)
 public extension UINavigationController {
-    var pushViewControllerAnimatedInterceptCallback: PushViewControllerAnimatedInterceptCallbackWrapper? {
+    public var pushViewControllerAnimatedInterceptCallback: PushViewControllerAnimatedInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &pushViewControllerAnimatedInterceptCallbackAssociation)
             return wrapper as? PushViewControllerAnimatedInterceptCallbackWrapper
@@ -217,7 +217,7 @@ public extension UINavigationController {
         }
     }
     
-    var popViewControllerAnimatedInterceptCallback: PopViewControllerAnimatedInterceptCallbackWrapper? {
+    public var popViewControllerAnimatedInterceptCallback: PopViewControllerAnimatedInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &popViewControllerAnimatedInterceptCallbackAssociation)
             return wrapper as? PopViewControllerAnimatedInterceptCallbackWrapper
@@ -227,7 +227,7 @@ public extension UINavigationController {
         }
     }
     
-    var popToRootViewControllerAnimatedInterceptCallback: PopToRootViewControllerAnimatedInterceptCallbackWrapper? {
+    public var popToRootViewControllerAnimatedInterceptCallback: PopToRootViewControllerAnimatedInterceptCallbackWrapper? {
         get {
             let wrapper: AnyObject? = objc_getAssociatedObject(self, &popToRootViewControllerAnimatedInterceptCallbackAssociation)
             return wrapper as? PopToRootViewControllerAnimatedInterceptCallbackWrapper
@@ -237,7 +237,7 @@ public extension UINavigationController {
         }
     }
 
-    public func testImpl_popToRootViewControllerAnimated(animated: Bool) -> [UIViewController]? {
+    func testImpl_popToRootViewControllerAnimated(animated: Bool) -> [UIViewController]? {
         let callOriginalMethod = self.popToRootViewControllerAnimatedInterceptCallback?.call(animated) ?? true
         if (callOriginalMethod) {
             return testImpl_popToRootViewControllerAnimated(animated)
@@ -245,7 +245,7 @@ public extension UINavigationController {
         return nil
     }
     
-    public func testImpl_popViewControllerAnimated(animated: Bool) -> UIViewController? {
+    func testImpl_popViewControllerAnimated(animated: Bool) -> UIViewController? {
         let callOriginalMethod = self.popViewControllerAnimatedInterceptCallback?.call(animated) ?? true
         if (callOriginalMethod) {
             return testImpl_popViewControllerAnimated(animated)
@@ -253,7 +253,7 @@ public extension UINavigationController {
         return nil
     }
     
-    public func testImpl_pushViewController(viewController: UIViewController, animated: Bool) {
+    func testImpl_pushViewController(viewController: UIViewController, animated: Bool) {
         let callOriginalMethod = self.pushViewControllerAnimatedInterceptCallback?.call(viewController, animated: animated) ?? true
         if (callOriginalMethod) {
             testImpl_pushViewController(viewController, animated: animated)

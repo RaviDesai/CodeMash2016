@@ -20,6 +20,7 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
 
     func ensureViewModelIsCreated() {
         if (self.viewModel != nil) { return }
+        
         self.viewModel = GamesViewModel(cellInstantiator: { (title, owner, tableView, indexPath) -> UITableViewCell in
             
             let resultCell = self.tableView.dequeueReusableCellWithIdentifier(GamesViewModel.cellIdentifier, forIndexPath: indexPath)
@@ -32,8 +33,8 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
         })
     }
     
-    func instantiateFromViewModel() {
-        if (self.viewModel == nil) { return }
+    func initializeComponentsFromViewModel() {
+        guard let vm = self.viewModel where vm.isLoaded else { return }
         if (!self.isViewLoaded()) { return }
         
         self.tableView.delegate = self
@@ -44,14 +45,9 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
     override func viewDidLoad() {
         super.viewDidLoad()
         ensureViewModelIsCreated()
-        instantiateFromViewModel()
+        initializeComponentsFromViewModel()
     }
     
-//    override func viewDidAppear(animated: Bool) {
-//        super.viewDidAppear(animated)
-//        self.tabBarController?.title = "Games"
-//    }
-
     func loadData(owner: User?, games: [Game]?, users: [User]?) {
         guard let mygames = games, myowner = owner, myusers = users else {
             self.notifyUserOfError(self.generateMissingDataMessage(), withCallbackOnDismissal: { () -> () in })
@@ -59,7 +55,7 @@ class GamesController: UITableViewController, UITextFieldDelegate, ComposableCon
         }
         ensureViewModelIsCreated()
         self.viewModel?.loadData(myowner, games: mygames, users: myusers)
-        instantiateFromViewModel()
+        initializeComponentsFromViewModel()
     }
 
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {

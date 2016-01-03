@@ -16,26 +16,17 @@ class TabController: UITabBarController, UITabBarControllerDelegate {
     var viewModel: TabBarViewModelProtocol?
     var composeButton: UIBarButtonItem?
     
-    func loadData(loggedInUser: User?, users: [User]?, games: [Game]?, error: NSError?) {
-        if (loggedInUser == nil || users == nil || games == nil || error != nil) {
-            self.popBackToCallerWithMissingDataMessage()
-            return
-        }
-        ensureViewModelIsCreated()
-        viewModel?.loadData(loggedInUser, users: users, games: games)
-        instantiateFromViewModel()
-    }
-    
     func ensureViewModelIsCreated() {
         if (self.viewModel != nil) { return }
         viewModel = TabBarViewModel()
     }
     
-    func instantiateFromViewModel() {
+    func initializeComponentsFromViewModel() {
         guard let vm = self.viewModel where vm.isLoaded else { return }
         if (!self.isViewLoaded()) { return }
         
         self.composeButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: Selector("compose:"))
+        
         if let gamesController = self.viewControllers?[1] as? GamesController {
             gamesController.loadData(self.viewModel?.loggedInUser, games: self.viewModel?.games, users: self.viewModel?.users)
         }
@@ -46,6 +37,23 @@ class TabController: UITabBarController, UITabBarControllerDelegate {
         }
     }
 
+    func loadData(loggedInUser: User?, users: [User]?, games: [Game]?, error: NSError?) {
+        if (loggedInUser == nil || users == nil || games == nil || error != nil) {
+            self.popBackToCallerWithMissingDataMessage()
+            return
+        }
+        ensureViewModelIsCreated()
+        viewModel?.loadData(loggedInUser, users: users, games: games)
+        initializeComponentsFromViewModel()
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.delegate = self
+        ensureViewModelIsCreated()
+        initializeComponentsFromViewModel()
+    }
+    
     override func navigationShouldPopOnBackButton() -> Bool {
         let title = "Logout"
         let message: String? = "Are you sure you wish to log out?"
@@ -54,6 +62,9 @@ class TabController: UITabBarController, UITabBarControllerDelegate {
         
         let exitAction = UIAlertAction(title: "Logout", style: UIAlertActionStyle.Default) { (action) -> Void in
             self.viewModel?.logout {
+                if let mockLogin = UIApplication.sharedApplication().delegate as? ApplicationMockLoginProtocol {
+                    mockLogin.logoff()
+                }
                 self.navigationController?.popViewControllerAnimated(true)
             }
         }
@@ -69,13 +80,6 @@ class TabController: UITabBarController, UITabBarControllerDelegate {
         return false
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        self.delegate = self
-        ensureViewModelIsCreated()
-        instantiateFromViewModel()
-    }
-
     func compose(sender: UIButton) {
         if let composable = self.selectedViewController as? ComposableControllerProtocol {
             composable.compose()

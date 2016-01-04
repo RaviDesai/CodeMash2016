@@ -71,7 +71,7 @@ class CodeMash2016UITests: XCTestCase {
         
     }
     
-    func testAttemptToReproduceUITestException() {
+    func testUpdateUserTwoName() {
         let app = XCUIApplication()
         let tablesQuery = app.tables
         tablesQuery.buttons["Login"].tap()

@@ -39,6 +39,21 @@
                ReferencedContainer = "container:CodeMash2016.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "419089AD1BDB2095004F6F46"
+               BuildableName = "CodeMash2016UITests.xctest"
+               BlueprintName = "CodeMash2016UITests"
+               ReferencedContainer = "container:CodeMash2016.xcodeproj">
+            </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "CodeMash2016UITests/testChoosePhotoThatFails()">
+               </Test>
+            </SkippedTests>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference

@@ -261,8 +261,7 @@ class GamesControllerTests: ControllerTestsBase {
         XCTAssertTrue(gameCell != nil)
         
         self.mockViewModel!.deleteGameAtIndexPathCallback = {(indexPath) -> NSError? in
-            if let game = self.mockViewModel!.vm.getGameAtIndexPath(indexPath) {
-                self.mockViewModel!.vm.removeGameFromList(game, error: nil)
+            if self.mockViewModel!.vm.getGameAtIndexPath(indexPath) != nil {
                 return nil
             }
             return self.mockViewModel!.generateError(403, message: "not found")
@@ -290,7 +289,6 @@ class GamesControllerTests: ControllerTestsBase {
         var messageListController: MessageListController?
         self.controller!.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue) -> Bool in
             messageListController = segue.destinationViewController as? MessageListController
-            self.called = true
             return true
         })
 
@@ -304,7 +302,6 @@ class GamesControllerTests: ControllerTestsBase {
 
         self.called = false
         self.controller!.performSegueWithIdentifier("ShowMessages", sender: self.controller!)
-        XCTAssertTrue(self.waitForResponse { self.called })
         
         XCTAssertTrue(messageListController != nil)
         XCTAssertTrue(messageListController!.viewModel!.messages! == fakeMessages!)

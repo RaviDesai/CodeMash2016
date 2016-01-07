@@ -261,10 +261,7 @@ class GamesControllerTests: ControllerTestsBase {
         XCTAssertTrue(gameCell != nil)
         
         self.mockViewModel!.deleteGameAtIndexPathCallback = {(indexPath) -> NSError? in
-            if self.mockViewModel!.vm.getGameAtIndexPath(indexPath) != nil {
-                return nil
-            }
-            return self.mockViewModel!.generateError(403, message: "not found")
+            return nil
         }
         
         var actions = self.controller!.tableView(self.controller!.tableView, editActionsForRowAtIndexPath: NSIndexPath(forRow: 0, inSection: 0))!

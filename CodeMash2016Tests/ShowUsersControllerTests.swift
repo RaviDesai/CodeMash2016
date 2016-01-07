@@ -83,16 +83,13 @@ class ShowUsersControllerTests: ControllerTestsBase {
         var updateUserController: UpdateUserController?
         self.controller!.prepareForSegueInterceptCallback = PrepareForSegueInterceptCallbackWrapper({(segue) -> Bool in
             updateUserController = segue.destinationViewController as? UpdateUserController
-            self.called = true
             return true
         })
         
         let userAtIndexPath = self.controller!.viewModel!.getUserAtIndexPath(indexPath)
         self.controller!.tableView!.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: UITableViewScrollPosition.None)
         
-        self.called = false
         self.controller!.performSegueWithIdentifier("ModifyUser", sender: self.controller!)
-        XCTAssertTrue(self.waitForResponse { self.called })
         return (updateUserController, userAtIndexPath)
     }
     

@@ -297,7 +297,7 @@ class GamesControllerTests: ControllerTestsBase {
         
         self.controller!.tableView.selectRowAtIndexPath(indexPath, animated: false, scrollPosition: UITableViewScrollPosition.None)
 
-        self.called = false
+        //self.called = false
         self.controller!.performSegueWithIdentifier("ShowMessages", sender: self.controller!)
         
         XCTAssertTrue(messageListController != nil)

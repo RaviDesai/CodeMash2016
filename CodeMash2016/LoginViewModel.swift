@@ -31,7 +31,7 @@ protocol LoginViewModelProtocol: UITableViewDataSource {
 
 class LoginViewModel : ViewModelBase, LoginViewModelProtocol {
     private var cellInstantiator: ((LoginTableCellIdentifier, String, UITableView, NSIndexPath) -> UITableViewCell)
-    static var site = APISite(name: "api", uri: "https://desai.com/")
+    static var site = APISite(name: "api", uri: "https://desai.com")
 
     private(set) var isLoggingIn: Bool
     

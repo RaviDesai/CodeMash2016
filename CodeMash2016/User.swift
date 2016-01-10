@@ -34,12 +34,18 @@ private func== (lhs: UIImage?, rhs: UIImage?) -> Bool {
 }
 
 
-struct User : ModelItem, CustomStringConvertible {
+struct User : ModelResource, CustomStringConvertible {
     var id: NSUUID?
     var name: String
     var password: String
     var emailAddress: EmailAddress?
     var image: UIImage?
+
+    static var resourceApiEndpoint: String { get { return "/api" } }
+    static var resourceName: String { get { return "users" } }
+    static var resourceVersion: String { get { return "1" } }
+    static var resourceVersionRepresentedBy: ModelResourceVersionRepresentation { get  { return ModelResourceVersionRepresentation.CustomRequestHeader } }
+    static var resourceVendor: String { get { return "sample.vendor" } }
 
     init(id: NSUUID?, name: String, password: String, emailAddress: EmailAddress?, image: UIImage?) {
         self.id = id

@@ -177,8 +177,8 @@ protocol StoreWithLoggedInUser {
 class MockedUsersStore: MockedRESTStore<User>, UsersStore, StoreWithLoggedInUser {
     var loggedInUser: User?
     
-    override init(host: String?, endpoint: String, initialValues: [User]?) {
-        super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+    override init(scheme: String, host: String?, initialValues: [User]?) {
+        super.init(scheme: scheme, host: host, initialValues: initialValues)
         self.authFilterForReading = {(user) in
             if let authuser = self.loggedInUser {
                 return user.isAuthorizedForReading(authuser)
@@ -198,8 +198,8 @@ class MockedGamesStore: MockedRESTStore<Game>, GamesStore, StoreWithLoggedInUser
     private var getForUserStub: OHHTTPStubsDescriptor?
     var loggedInUser: User?
 
-    override init(host: String?, endpoint: String, initialValues: [Game]?) {
-        super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+    override init(scheme: String, host: String?, initialValues: [Game]?) {
+        super.init(scheme: scheme, host: host, initialValues: initialValues)
         self.authFilterForReading = {(game) in
             if let user = self.loggedInUser {
                 return game.isAuthorizedForReading(user)
@@ -280,9 +280,9 @@ class MockedMessagesStore: MockedRESTStore<Message>, MessageStore, StoreWithLogg
     var loggedInUser: User?
     private var gamesStore: GamesStore
 
-    init(host: String?, endpoint: String, games: GamesStore, initialValues: [Message]?) {
+    init(scheme: String, host: String?, games: GamesStore, initialValues: [Message]?) {
         self.gamesStore = games
-        super.init(host: host, endpoint: endpoint, initialValues: initialValues)
+        super.init(scheme: scheme, host: host, initialValues: initialValues)
         self.authFilterForReading = {(message) in
             if let authuser = self.loggedInUser {
                 return message.isAuthorizedForReading(self.gamesStore.store, authuser: authuser)
@@ -363,11 +363,11 @@ class MockedRESTCalls {
     
     init(site: APISite, initialUsers: [User], initialGames: [Game], initialMessages: [Message]) {
 
-        self.userStore = MockedUsersStore(host: site.uri?.host, endpoint: "/api/users", initialValues: initialUsers)
+        self.userStore = MockedUsersStore(scheme: site.uri?.scheme ?? "https", host: site.uri?.host, initialValues: initialUsers)
         
-        self.gamesStore = MockedGamesStore(host: site.uri?.host, endpoint: "/api/games", initialValues: initialGames)
+        self.gamesStore = MockedGamesStore(scheme: site.uri?.scheme ?? "https", host: site.uri?.host, initialValues: initialGames)
         
-        self.messagesStore = MockedMessagesStore(host: site.uri?.host, endpoint: "/api/messages", games: self.gamesStore, initialValues: initialMessages)
+        self.messagesStore = MockedMessagesStore(scheme: site.uri?.scheme ?? "https", host: site.uri?.host, games: self.gamesStore, initialValues: initialMessages)
         
         self.loginStore = MockedRESTLogin(site: site, usersStore: self.userStore, userLoginChange: { (user) -> () in
             self.userStore.loggedInUser = user

@@ -31,7 +31,7 @@ private var mess5 = Message(id: NSUUID(), from: game1.users![1], to: nil, game: 
 
 
 class TestApiGames: AsynchronousTestCase {
-    var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
+    var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample")
     var called = false
     var mockedRest: MockedRESTCalls?
     

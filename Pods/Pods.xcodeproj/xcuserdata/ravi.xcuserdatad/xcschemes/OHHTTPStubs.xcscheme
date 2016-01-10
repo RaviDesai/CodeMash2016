@@ -14,7 +14,7 @@
             buildForArchiving = "YES">
             <BuildableReference
                BuildableIdentifier = 'primary'
-               BlueprintIdentifier = '35A8E51644546F250040F11D'
+               BlueprintIdentifier = '80302DC640724760DB2292BC'
                BlueprintName = 'OHHTTPStubs'
                ReferencedContainer = 'container:Pods.xcodeproj'
                BuildableName = 'OHHTTPStubs.framework'>

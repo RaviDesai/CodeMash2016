@@ -14,6 +14,14 @@ public class APIJSONSerializableResponseParser<T: SerializableFromJSON> : APIRes
         self.acceptTypes = ["application/json"]
     }
     
+    public init(versionRepresentation: ModelResourceVersionRepresentation, vendor: String, version: String) {
+        if (versionRepresentation == ModelResourceVersionRepresentation.CustomContentType) {
+            self.acceptTypes = ["application/\(vendor).v\(version)+json"]
+        } else {
+            self.acceptTypes = ["application/json"]
+        }
+    }
+    
     public init(acceptTypes: [String]) {
         self.acceptTypes = acceptTypes
     }

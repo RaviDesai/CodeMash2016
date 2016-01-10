@@ -23,7 +23,7 @@ private var game1 = Game(id: NSUUID(), title: "RuneQuest", owner: user1.id!, use
 private var game2 = Game(id: NSUUID(), title: "ElfQuest", owner: user4.id!, users: [user1.id!, user3.id!])
 
 class TestApiUsers: AsynchronousTestCase {
-    var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample/")
+    var loginSite = APISite(name: "Sample", uri: "http://com.desai.sample")
     var called = false
     var mockedRest: MockedRESTCalls?
     

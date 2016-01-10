@@ -43,7 +43,7 @@ public class Client {
         
         let parser = APIJSONSerializableResponseParser<LoginResponse>()
         let encoder = APIJSONBodyEncoder(model: LoginParameters(username: userName, password: password))
-        let endpointUrl = URLAndParameters(url: "api/authentication/authenticate")
+        let endpointUrl = URLAndParameters(url: "/api/authentication/authenticate")
         let endpoint = APIEndpoint.POST(endpointUrl)
         let request = APIRequest(baseURL: self.session.baseURL, endpoint: endpoint, bodyEncoder: encoder, responseParser: parser, additionalHeaders: nil)
         let call = APICall(session: self.session, request: request)
@@ -51,13 +51,13 @@ public class Client {
             if let params = loginResponse?.token, let message = loginResponse?.message, let userId = NSUUID(UUIDString: message) {
                 let parser = APIObjectResponseParser<String>()
                 let encoder = APIURLBodyEncoder(model: params)
-                let endpointUrl = URLAndParameters(url:"api/authentication/authenticationtoken")
+                let endpointUrl = URLAndParameters(url:"/api/authentication/authenticationtoken")
                 let endpoint = APIEndpoint.POST(endpointUrl)
                 let request = APIRequest(baseURL: self.session.baseURL, endpoint: endpoint, bodyEncoder: encoder, responseParser: parser, additionalHeaders: nil)
                 let call = APICall(session: self.session, request: request)
                 call.executeRespondWithObject({ (stringResult, error) -> () in
                     if (stringResult == .Some("success")) {
-                        let endpointUrl = URLAndParameters(url:"api/PostLogin/PostLoginChecks")
+                        let endpointUrl = URLAndParameters(url:"/api/PostLogin/PostLoginChecks")
                         let endpoint = APIEndpoint.GET(endpointUrl)
                         let request = APIRequest(baseURL: self.session.baseURL, endpoint: endpoint, bodyEncoder: nil, responseParser: APIDataResponseParser(), additionalHeaders: nil)
                         let call = APICall(session: self.session, request: request)
@@ -93,8 +93,8 @@ public class Client {
     }
     
     
-    public func call<U: APIResponseParserProtocol>(endpoint: APIEndpoint, encoder: APIBodyEncoderProtocol?, parser: U) -> APICall<U> {
-        let request = APIRequest(baseURL: self.session.baseURL, endpoint: endpoint, bodyEncoder: encoder, responseParser: parser, additionalHeaders: nil)
+    public func call<U: APIResponseParserProtocol>(endpoint: APIEndpoint, encoder: APIBodyEncoderProtocol?, parser: U, additionalHeaders: [String: String]?) -> APICall<U> {
+        let request = APIRequest(baseURL: self.session.baseURL, endpoint: endpoint, bodyEncoder: encoder, responseParser: parser, additionalHeaders: additionalHeaders)
         return APICall(session: self.session, request: request)
     }
     

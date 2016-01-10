@@ -16,14 +16,14 @@ import OHHTTPStubs
 
 
 class TestApiLogin: AsynchronousTestCase {
-    var loginSite = APISite(name: "Sample", uri: "http://sample.desai.com/")
+    var loginSite = APISite(name: "Sample", uri: "http://sample.desai.com")
     var called = false
     let initialUsers = [User(id: NSUUID(), name: "Admin", password: "Admin", emailAddress: EmailAddress(user: "admin", host: "desai.com"), image: nil)]
     var mockedRest: MockedRESTLogin?
     
     override func setUp() {
         super.setUp()
-        self.mockedRest = MockedRESTLogin(site: loginSite, usersStore: MockedUsersStore(host: loginSite.uri?.host, endpoint: "/api/users", initialValues: initialUsers), userLoginChange: {(user)->() in })
+        self.mockedRest = MockedRESTLogin(site: loginSite, usersStore: MockedUsersStore(scheme: loginSite.uri?.scheme ?? "https", host: loginSite.uri?.host, initialValues: initialUsers), userLoginChange: {(user)->() in })
         self.called = false
     }
     

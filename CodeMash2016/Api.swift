@@ -37,25 +37,25 @@ class Api: ApiProtocol {
     }
     
     func getAllUsers(completionHandler: (([User]?, NSError?) -> ())) {
-        let parser = APIJSONSerializableResponseParser<User>()
-        let endpoint = APIEndpoint.GET(URLAndParameters(url: "api/users"))
-        let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser)
+        let parser = APIModelResourceResponseParser<User>()
+        let endpoint = APIEndpoint.GET(URLAndParameters(url: User.versionedResourceEndpoint))
+        let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser, additionalHeaders: User.additionalHeadersForRequest)
         call.executeRespondWithArray(completionHandler)
     }
     
     func getUser(id: NSUUID, completionHandler: (User?, NSError?) -> ()) {
-        let parser = APIJSONSerializableResponseParser<User>()
-        let endpoint = APIEndpoint.GET(URLAndParameters(url: "api/users/\(id.UUIDString)"))
-        let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser)
+        let parser = APIModelResourceResponseParser<User>()
+        let endpoint = APIEndpoint.GET(URLAndParameters(url: "\(User.versionedResourceEndpoint)/\(id.UUIDString)"))
+        let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser, additionalHeaders: User.additionalHeadersForRequest)
         call.executeRespondWithObject(completionHandler)
     }
     
     func saveUser(user: User, completionHandler: (User?, NSError?)->()) {
         if let id = user.id {
-            let parser = APIJSONSerializableResponseParser<User>()
+            let parser = APIModelResourceResponseParser<User>()
             let encoder = APIJSONBodyEncoder(model: user)
-            let endpoint = APIEndpoint.PUT(URLAndParameters(url: "api/users/\(id.UUIDString)"))
-            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
+            let endpoint = APIEndpoint.PUT(URLAndParameters(url: "\(User.versionedResourceEndpoint)/\(id.UUIDString)"))
+            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser, additionalHeaders: User.additionalHeadersForRequest)
             call.executeRespondWithObject(completionHandler)
         } else {
             completionHandler(nil, invalidId)
@@ -64,10 +64,10 @@ class Api: ApiProtocol {
     
     func createUser(user: User, completionHandler: (User?, NSError?) -> ()) {
         if (user.id == nil) {
-            let parser = APIJSONSerializableResponseParser<User>()
+            let parser = APIModelResourceResponseParser<User>()
             let encoder = APIJSONBodyEncoder(model: user)
-            let endpoint = APIEndpoint.POST(URLAndParameters(url: "api/users"))
-            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
+            let endpoint = APIEndpoint.POST(URLAndParameters(url: "\(User.versionedResourceEndpoint)"))
+            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser, additionalHeaders: User.additionalHeadersForRequest)
             call.executeRespondWithObject(completionHandler)
         } else {
             completionHandler(nil, invalidId)
@@ -76,9 +76,9 @@ class Api: ApiProtocol {
     
     func deleteUser(user: User, completionHandler: (User?, NSError?)->()) {
         if let id = user.id {
-            let parser = APIJSONSerializableResponseParser<User>()
-            let endpoint = APIEndpoint.DELETE(URLAndParameters(url: "api/users/\(id.UUIDString)"))
-            let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser)
+            let parser = APIModelResourceResponseParser<User>()
+            let endpoint = APIEndpoint.DELETE(URLAndParameters(url: "\(User.versionedResourceEndpoint)/\(id.UUIDString)"))
+            let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser, additionalHeaders: User.additionalHeadersForRequest)
             call.executeRespondWithObject(completionHandler)
         } else {
             completionHandler(nil, invalidId)
@@ -87,10 +87,10 @@ class Api: ApiProtocol {
 
     func createGame(game: Game, completionHandler: (Game?, NSError?) -> ()) {
         if game.id == nil {
-            let parser = APIJSONSerializableResponseParser<Game>()
+            let parser = APIModelResourceResponseParser<Game>()
             let encoder = APIJSONBodyEncoder(model: game)
-            let endpoint = APIEndpoint.POST(URLAndParameters(url: "api/games"))
-            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
+            let endpoint = APIEndpoint.POST(URLAndParameters(url: "\(Game.versionedResourceEndpoint)"))
+            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser, additionalHeaders: Game.additionalHeadersForRequest)
             call.executeRespondWithObject(completionHandler)
         } else {
             completionHandler(nil, invalidId)
@@ -98,11 +98,11 @@ class Api: ApiProtocol {
     }
     
     func deleteGame(game: Game, completionHandler: (NSError?)->()) {
-        if let gameId = game.id {
+        if let gameId = game.id?.UUIDString {
             let parser = APIDataResponseParser()
             let encoder = APIJSONBodyEncoder(model: game)
-            let endpoint = APIEndpoint.DELETE(URLAndParameters(url: "api/games/\(gameId.UUIDString)"))
-            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser)
+            let endpoint = APIEndpoint.DELETE(URLAndParameters(url: "\(Game.versionedResourceEndpoint)/\(gameId)"))
+            let call = Client.sharedClient.call(endpoint, encoder: encoder, parser: parser, additionalHeaders: Game.additionalHeadersForRequest)
             call.execute(completionHandler)
         } else {
             completionHandler(invalidId)
@@ -110,17 +110,17 @@ class Api: ApiProtocol {
     }
 
     func getAllGames(user: User?, completionHandler: ([Game]?, NSError?)->()) {
-        let parser = APIJSONSerializableResponseParser<Game>()
-        let endpoint = APIEndpoint.GET(URLAndParameters(url: "api/games"))
-        let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser)
+        let parser = APIModelResourceResponseParser<Game>()
+        let endpoint = APIEndpoint.GET(URLAndParameters(url: "\(Game.versionedResourceEndpoint)"))
+        let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser, additionalHeaders: Game.additionalHeadersForRequest)
         call.executeRespondWithArray(completionHandler)
     }
     
     func getMessagesForGame(game: Game, completionHandler: ([Message]?, NSError?)->()) {
         if let gameId = game.id?.UUIDString {
-            let parser = APIJSONSerializableResponseParser<Message>()
-            let endpoint = APIEndpoint.GET(URLAndParameters(url: "api/messages", parameters: ("game", gameId)))
-            let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser)
+            let parser = APIModelResourceResponseParser<Message>()
+            let endpoint = APIEndpoint.GET(URLAndParameters(url: "\(Message.versionedResourceEndpoint)", parameters: ("game", gameId)))
+            let call = Client.sharedClient.call(endpoint, encoder: nil, parser: parser, additionalHeaders: Message.additionalHeadersForRequest)
             call.executeRespondWithArray(completionHandler)
         } else {
             completionHandler(nil, invalidId)

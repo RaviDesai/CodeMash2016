@@ -27,7 +27,7 @@ private let dd1Message = Message(id: NSUUID(), from: walker.id!, to: nil, game: 
 
 class TestApiMessages: AsynchronousTestCase {
     
-    var loginSite = APISite(name: "Sample", uri: "https://com.desai.sample/")
+    var loginSite = APISite(name: "Sample", uri: "https://com.desai.sample")
     var called = false
     var mockedRest: MockedRESTCalls?
 

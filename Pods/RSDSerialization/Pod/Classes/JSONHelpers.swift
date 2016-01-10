@@ -24,6 +24,33 @@ public extension NSDate {
     }
 }
 
+public extension NSUUID {
+    public func convertToJSON() -> JSON {
+        return self.UUIDString
+    }
+    
+    public static func createFromJSON(json: JSON) -> NSUUID? {
+        if let uuidString = json as? String {
+            return NSUUID(UUIDString: uuidString)
+        }
+        return nil
+    }
+    
+    public static func createFromJSONArray(json: JSON) -> [NSUUID]? {
+        if let jsonArray = json as? JSONArray {
+            return jsonArray.map { NSUUID.createFromJSON($0) }.filter { $0 != nil }.map { $0! }
+        }
+        return nil
+    }
+}
+
+public extension SequenceType where Generator.Element == NSUUID {
+    public func convertToJSONArray() -> [JSON] {
+        return self.map { $0.convertToJSON() }
+    }
+}
+
+
 private func toStringFromDate(format: String, dateOptional: NSDate?) -> String? {
     if let date = dateOptional {
         let formatter = NSDateFormatter()

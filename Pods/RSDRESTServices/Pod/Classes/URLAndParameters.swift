@@ -25,7 +25,7 @@ public struct URLAndParameters : CustomStringConvertible {
               value: $0.value.stringByAddingPercentEncodingWithAllowedCharacters(URLQueryValueAllowedCharacterSet)!)
         };
     }
-    
+        
     public var description: String {
         get {
             return self.Parameters

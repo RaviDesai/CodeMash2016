@@ -10,7 +10,7 @@ import Foundation
 import RSDRESTServices
 import RSDSerialization
 
-struct Message: ModelItem {
+struct Message: ModelResource {
     var id: NSUUID?
     var from: NSUUID
     var to: [NSUUID]?
@@ -18,6 +18,13 @@ struct Message: ModelItem {
     var subject: String
     var message: String
     var date: NSDate
+    
+    static var resourceApiEndpoint: String { get { return "/api" } }
+    static var resourceName: String { get { return "messages" } }
+    static var resourceVersion: String { get { return "1" } }
+    static var resourceVersionRepresentedBy: ModelResourceVersionRepresentation { get  { return ModelResourceVersionRepresentation.CustomRequestHeader } }
+    static var resourceVendor: String { get { return "sample.vendor" } }
+
     
     init(id: NSUUID?, from: NSUUID, to: [NSUUID]?, game: NSUUID?, subject: String, message: String, date: NSDate) {
         self.id = id

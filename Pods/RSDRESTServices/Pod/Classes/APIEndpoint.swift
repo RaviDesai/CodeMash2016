@@ -15,7 +15,7 @@ public class APIEndpoint {
         self._URLAndParams = url;
         self._method = method;
     }
-    
+
     public func URL(baseURL: NSURL?) -> NSURL? {
         return self._URLAndParams.URL(baseURL)
     }

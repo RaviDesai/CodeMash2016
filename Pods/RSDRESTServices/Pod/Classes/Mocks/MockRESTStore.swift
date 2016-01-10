@@ -17,9 +17,10 @@ public enum StoreError: ErrorType {
     case UndefinedError
 }
 
-public class MockedRESTStore<T: ModelItem> {
+public class MockedRESTStore<T: ModelResource> {
+    public var scheme: String?
     public var host: String?
-    public var endpoint: String?
+    public var endpoint: String
     private var endpointRegEx: NSRegularExpression?
     public var authFilterForReading: (T)->(Bool)
     public var authFilterForUpdating: (T)->(Bool)
@@ -33,9 +34,10 @@ public class MockedRESTStore<T: ModelItem> {
     public var getOneStub: OHHTTPStubsDescriptor?
     
     
-    public init(host: String?, endpoint: String, initialValues: [T]?) {
+    public init(scheme: String, host: String?, initialValues: [T]?) {
+        self.scheme = scheme
         self.host = host
-        self.endpoint = endpoint
+        self.endpoint = T.versionedResourceEndpoint
         self.authFilterForReading = {(t: T)->(Bool) in return true }
         self.authFilterForUpdating = {(t: T)->(Bool) in return true }
         
@@ -138,6 +140,48 @@ public class MockedRESTStore<T: ModelItem> {
         return self.store[index]
     }
     
+    private func validatePathAndVersion(request: NSURLRequest, pathWillSpecifyUUID: Bool) -> Bool {
+        var versionInRequest: String?
+        var pathInRequest: String?
+        switch(T.resourceVersionRepresentedBy) {
+        case .URLVersioning:
+            pathInRequest = request.URL?.path
+            let pathSubtractionIndex = pathWillSpecifyUUID ? 3 : 2
+            let splitPath = request.URL?.pathComponents
+            if let pathCount = splitPath?.count where pathCount > pathSubtractionIndex {
+                let versionAtEndOfPath = splitPath?[pathCount - pathSubtractionIndex]
+                if let versionAtEnd = versionAtEndOfPath where versionAtEnd.hasPrefix("v") {
+                    versionInRequest = String(versionAtEnd.characters.dropFirst())
+                }
+            }
+            break
+        case .CustomRequestHeader:
+            pathInRequest = request.URL?.path
+            versionInRequest = request.allHTTPHeaderFields?["api-version"]
+            break
+        case .CustomContentType:
+            pathInRequest = request.URL?.path
+            if let acceptHeaders = request.allHTTPHeaderFields?["Accept"] {
+                for acceptHeader in acceptHeaders.componentsSeparatedByString(",") {
+                    let testAcceptHeader = "application/\(T.resourceVendor).v"
+                    if acceptHeader.hasPrefix(testAcceptHeader) {
+                        let strippedAcceptHeader = acceptHeader.stringByReplacingOccurrencesOfString(testAcceptHeader, withString: "")
+                        let splitVersionAndType = strippedAcceptHeader.componentsSeparatedByString("+")
+                        if splitVersionAndType.count > 1 {
+                            versionInRequest = splitVersionAndType[0]
+                        }
+                    }
+                }
+            }
+            break
+        }
+        var pathMatch = pathInRequest == .Some(T.versionedResourceEndpoint)
+        if (pathWillSpecifyUUID) {
+            pathMatch = pathInRequest?.hasPrefix("\(T.versionedResourceEndpoint)/") == .Some(true)
+        }
+        return versionInRequest == .Some(T.resourceVersion) && pathMatch
+    }
+    
     public func getAll() -> [T] {
         return self.store.filter(self.authFilterForReading).sort(<)
     }
@@ -147,10 +191,13 @@ public class MockedRESTStore<T: ModelItem> {
         
         self.getAllStub =
             OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.scheme != self.scheme) {
+                    return false
+                }
                 if (request.URL?.host != self.host) {
                     return false
                 }
-                if (request.URL?.path != self.endpoint) {
+                if (!self.validatePathAndVersion(request, pathWillSpecifyUUID: false)) {
                     return false
                 }
                 if (request.HTTPMethod != "GET") {
@@ -171,10 +218,18 @@ public class MockedRESTStore<T: ModelItem> {
         
         self.getOneStub =
             OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.scheme != self.scheme) {
+                    return false
+                }
+                
                 if (request.URL?.host != self.host) {
                     return false
                 }
                 
+                if (!self.validatePathAndVersion(request, pathWillSpecifyUUID: true)) {
+                    return false
+                }
+
                 if pullIdFromPath(request.URL?.path, regEx: self.endpointRegEx) == nil {
                     return false
                 }
@@ -212,11 +267,19 @@ public class MockedRESTStore<T: ModelItem> {
         
         self.createStub =
             OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.scheme != self.scheme) {
+                    return false
+                }
+
                 if (request.URL?.host != self.host) {
                     return false
                 }
                 
-                if request.URL?.path != self.endpoint {
+                if (!self.validatePathAndVersion(request, pathWillSpecifyUUID: false)) {
+                    return false
+                }
+                
+                if let queryString = request.URL?.query where queryString != "" {
                     return false
                 }
                 
@@ -251,11 +314,23 @@ public class MockedRESTStore<T: ModelItem> {
         
         self.updateStub =
             OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.scheme != self.scheme) {
+                    return false
+                }
+
                 if (request.URL?.host != self.host) {
                     return false
                 }
                 
+                if (!self.validatePathAndVersion(request, pathWillSpecifyUUID: true)) {
+                    return false
+                }
+                
                 if pullIdFromPath(request.URL?.path, regEx: self.endpointRegEx) == nil {
+                    return false
+                }
+                
+                if let queryString = request.URL?.query where queryString != "" {
                     return false
                 }
                 
@@ -291,10 +366,18 @@ public class MockedRESTStore<T: ModelItem> {
         
         self.deleteStub =
             OHHTTPStubs.stubRequestsPassingTest({ (request) -> Bool in
+                if (request.URL?.scheme != self.scheme) {
+                    return false
+                }
+
                 if (request.URL?.host != self.host) {
                     return false
                 }
                 
+                if (!self.validatePathAndVersion(request, pathWillSpecifyUUID: true)) {
+                    return false
+                }
+
                 if pullIdFromPath(request.URL?.path, regEx: self.endpointRegEx) == nil {
                     return false
                 }
@@ -303,6 +386,10 @@ public class MockedRESTStore<T: ModelItem> {
                     return false
                 }
                 
+                if let queryString = request.URL?.query where queryString != "" {
+                    return false
+                }
+
                 return true
             }, withStubResponse: { (request) -> OHHTTPStubsResponse in
                     return MockHTTPResponder<T>.withIdInPath(request, regEx: self.endpointRegEx, logic: { (requestId) -> OHHTTPStubsResponse in
